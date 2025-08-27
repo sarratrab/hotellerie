@@ -1,0 +1,88 @@
+<div class="survey-dashboard">
+  <app-survey-navbar></app-survey-navbar>
+  <app-template-navbar></app-template-navbar>
+  <p-toast></p-toast>
+
+  <!-- Header / actions -->
+  <div class="sub-navbar">
+    <div class="sub-nav-card">
+      <div class="sub-nav-items">
+        <div class="surveys-count">
+          <h1>Edit Survey Type</h1>
+        </div>
+
+        <div class="filter-dropdowns">
+          <div class="dropdown-wrapper">
+            <button class="cancel" routerLink="/preferences">Cancel</button>
+          </div>
+          <div class="dropdown-wrapper">
+            <button
+              class="actions-btn"
+              (click)="submit()"
+              [disabled]="saving || !surveyTypeName.trim() || !isHexValid()"
+              >
+              {{ saving ? 'Saving…' : 'Save changes' }}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Form -->
+  <div class="sub-navbar">
+    <div class="sub-nav-card">
+      <div class="card-content">
+        <!-- Alerte si utilisé -->
+
+
+        <div class="form-group">
+          <label for="typeName">Type Name</label>
+          <input
+            id="typeName"
+            type="text"
+            class="form-input"
+            placeholder="Enter survey type name"
+            [(ngModel)]="surveyTypeName"
+            [disabled]="saving || usedCount>0"
+          />
+        </div>
+
+        <div class="form-group">
+          <label>Choose Color</label>
+          <div class="color-section">
+            <!-- Preset Colors -->
+            <div class="preset-colors">
+              <div class="preset-label">Quick Colors:</div>
+              <div class="color-palette">
+                <div
+                  *ngFor="let color of presetColors"
+                  class="color-option"
+                  [class.selected]="selectedColor === color"
+                  [style.background-color]="color"
+                  (click)="selectColor(color)"
+                  [title]="color"
+                ></div>
+              </div>
+            </div>
+
+            <!-- Color Picker -->
+            <div class="color-picker-container">
+              <input
+                type="color"
+                class="color-picker"
+                [(ngModel)]="selectedColor"
+                (change)="onColorChange($event)"
+                [disabled]="saving || usedCount>0"
+              />
+              <div class="color-preview" [style.background-color]="selectedColor"></div>
+              <span class="color-value">{{ selectedColor }}</span>
+              <span *ngIf="!isHexValid()" class="error-text">Invalid HEX</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>

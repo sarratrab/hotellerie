@@ -1,0 +1,29 @@
+<button
+      class="w-full p-3 border border-gray-200 hover:border-primary hover:shadow-md transition-shadow duration-200 rounded-lg flex items-center gap-3 cursor-pointer"
+      cdkDrag
+      [cdkDragData]="field()"
+      (cdkDragStarted)="whileDragging.set(true)"
+      (cdkDragEnded)="whileDragging.set(false)"
+    >
+      <div
+        class="rounded-md bg-primary-container flex items-center justify-center p-1"
+      >
+        <i class="pi" [ngClass]="'pi-' + field().icon + ' scale-75 text-primary'"></i>  <!-- PrimeNG icon -->
+      </div>
+      <span>{{ field().label }}</span>
+      <!-- Placeholder of the element -->
+      <div *cdkDragPlaceholder></div>
+    </button>
+    @if (whileDragging()) {
+      <div
+        class="w-full p-3 border border-gray-200 rounded-lg flex items-center gap-3"
+      >
+        <div
+          class="rounded-md bg-blue-100 flex items-center justify-center p-1"
+        >
+          <i class="pi" [ngClass]="'pi-' + field().icon + ' scale-75'"></i>  <!-- PrimeNG icon -->
+        </div>
+
+        <span>{{ field().label }}</span>
+      </div>
+    }

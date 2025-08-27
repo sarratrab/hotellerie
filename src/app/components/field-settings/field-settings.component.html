@@ -1,0 +1,57 @@
+<div class="p-8 bg-white overflow-y-auto border-l border-gray-200 shadow-sm h-[calc(100vh-150px)] rounded-xl">
+      @if (formService.selectedField(); as selectedField) {
+        <h2 class="text-xl font-medium mb-6">Field Properties</h2>
+        <div class="flex flex-col gap-6">
+          @for (setting of fieldSettings(); track setting.key) {
+            @switch (setting.type) {
+              @case ('text') {
+                <div class="p-inputgroup w-full">
+                  <span class="p-inputgroup-addon">{{ setting.label }}</span>
+                  <input
+                    pInputText
+                    [ngModel]="fieldValues()[setting.key]"
+                    (ngModelChange)="updateField(selectedField.id, setting.key, $event)"
+                    class="w-full"
+                  />
+                </div>
+              }
+              @case ('checkbox') {
+                <div class="flex items-center">
+                  <p-checkbox
+                    [binary]="true"
+                    [ngModel]="fieldValues()[setting.key]"
+                    (ngModelChange)="updateField(selectedField.id, setting.key, $event)"
+                    inputId="{{setting.key}}"
+                  ></p-checkbox>
+                  <label [for]="setting.key" class="ml-2">{{ setting.label }}</label>
+                </div>
+              }
+              @case ('select') {
+                <div class="p-inputgroup w-full">
+                  <span class="p-inputgroup-addon">{{ setting.label }}</span>
+                  <p-dropdown
+                    [options]="setting.options || []"
+                    optionLabel="label"
+                    optionValue="value"
+                    [ngModel]="fieldValues()[setting.key]"
+                    (ngModelChange)="updateField(selectedField.id, setting.key, $event)"
+                    class="w-full"
+                  ></p-dropdown>
+                </div>
+              }
+              @case ('options') {
+                <app-field-options
+                  [title]="setting.label"
+                  [options]="selectedField.options || []"
+                  (optionsChange)="updateFieldOptions(selectedField, $event)"
+                />
+              }
+            }
+          }
+        </div>
+      } @else {
+        <div class="flex items-center justify-center h-full text-gray-400">
+          Select a field to customize
+        </div>
+      }
+    </div>

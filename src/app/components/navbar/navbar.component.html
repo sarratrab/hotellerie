@@ -1,0 +1,35 @@
+
+    <!-- Navbar Component -->
+    <nav class="navbar">
+        <div class="navbar-left">
+             <div class="navbar-left">
+               <img src="assets/logo-avidia.png" alt="Avidia Logo" class="logo" />
+             </div>
+            <ul class="nav-menu">
+                <li class="nav-item"><a href="#" class="active">Home</a></li>
+                <li class="nav-item"><a href="#">My HR</a></li>
+                <li class="nav-item"><a href="#">My Leave</a></li>
+                <li class="nav-item"><a href="#">My Expenses</a></li>
+                <li class="nav-item"><a href="#">My Time</a></li>
+                <li class="nav-item"><a href="#">My Payroll</a></li>
+                <li class="nav-item"><a href="#">My Talent</a></li>
+                <li class="nav-item"><a href="#">Employees</a></li>
+                <li class="nav-item"><a href="#">Reports</a></li>
+            </ul>
+        </div>
+        <div class="navbar-right">
+            <div class="nav-icon">⚡</div>
+            <div class="nav-icon">+</div>
+            <!-- Button that opens the dropdown -->
+<button pButton type="button" icon="pi pi-th-large"
+        class="p-button-rounded p-button-text"
+        (click)="toggleMenu($event)">
+</button>
+
+<!-- PrimeNG Dropdown Menu -->
+<p-tieredMenu #menu [model]="items" popup="true"></p-tieredMenu>
+
+            <div class="user-avatar">ST</div>
+        </div>
+    </nav>
+

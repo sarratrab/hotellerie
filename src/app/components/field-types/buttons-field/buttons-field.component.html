@@ -1,0 +1,19 @@
+<div
+      [class]="
+        'flex gap-2 mt-4 ' +
+        (field().alignment === 'right' ? 'justify-end' : 'justify-start')
+      "
+    >
+       <p-button
+            [label]="field().label"
+            styleClass="p-button-raised"
+        >
+        </p-button>
+
+  @if (field().showCancelButton) {
+    <p-button
+      label="Cancel"
+      styleClass="p-button-text"
+    ></p-button>
+  }
+</div>

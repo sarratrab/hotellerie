@@ -1,0 +1,138 @@
+<!-- survey-dashboard.component.html -->
+<div class="survey-dashboard">
+  <app-survey-navbar></app-survey-navbar>
+  <app-template-navbar></app-template-navbar>
+
+  <!-- Filters and Search -->
+  <div class="sub-navbar">
+    <div class="sub-nav-card">
+      <div class="sub-nav-items">
+        <div class="surveys-count">
+          Surveys ({{ totalSurveys() }})
+        </div>
+
+        <div class="search-container">
+          <div class="search-wrapper">
+            <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <circle cx="11" cy="11" r="8"></circle>
+              <path d="m21 21-4.35-4.35"></path>
+            </svg>
+            <input
+              type="text"
+              placeholder="search by type, name..."
+              [ngModel]="searchTerm()"
+              (ngModelChange)="searchTerm.set($event)"
+              (input)="onSearch()"
+              class="search-input"
+            />
+          </div>
+        </div>
+
+        <div class="filter-dropdowns">
+          <div class="dropdown-wrapper">
+            <select
+              [ngModel]="selectedYear()"
+              (ngModelChange)="selectedYear.set($event); onYearChange()"
+              class="filter-dropdown"
+            >
+              <option value="2025">2025</option>
+              <option value="2024">2024</option>
+              <option value="2023">2023</option>
+            </select>
+          </div>
+
+          <div class="dropdown-wrapper">
+            <select
+              [ngModel]="selectedType()"
+              (ngModelChange)="selectedType.set($event); onTypeChange()"
+              class="filter-dropdown"
+            >
+              <option value="">Type</option>
+              <option *ngFor="let t of typeOptions" [value]="t.label">
+                {{ t.label }}
+              </option>
+            </select>
+          </div>
+
+          <div class="filter-dropdowns">
+            <div class="dropdown-wrapper">
+              <button class="actions-btn" (click)="toggleMenu($event)">Actions</button>
+            </div>
+          </div>
+
+          <p-tieredMenu #menu [model]="items" popup="true"></p-tieredMenu>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Survey Cards Grid -->
+  <div class="sub-navbar">
+    <div class="sub-nav-card">
+      <div class="surveys-grid">
+        <div class="grid-container">
+          <div *ngIf="filteredSurveys().length === 0" class="empty-message">
+            <i class="fa fa-info-circle info-icon"></i>
+            There are no active templates to display
+          </div>
+
+          <div
+            class="survey-card"
+            *ngFor="let survey of filteredSurveys(); trackBy: trackBySurvey"
+          >
+            <div class="card-header">
+              <div class="card-title-section">
+                <div class="card-title">{{ survey.name }}</div>
+                <br />
+                <div class="card-body">
+                  <div class="card-description">{{ survey.description }}</div>
+                </div>
+              </div>
+
+              <button class="menu-btn" (click)="toggleCardMenu($event, survey.id)">
+                <span class="menu-dots">⋯</span>
+              </button>
+            </div>
+
+            <div class="card-content">
+              <div class="card-meta">
+                <div class="meta-row">
+                  <span class="meta-label">Created on</span>
+                  <span class="meta-value">{{ survey.createdOn | date:'MMM dd, yyyy' }}</span>
+                </div>
+                <div class="meta-row">
+                  <span class="meta-label">Created by</span>
+                  <span class="meta-value">{{ survey.createdBy }}</span>
+                </div>
+              </div>
+
+              <div class="card-badges">
+                <div class="type-badge">{{ survey.type }}</div>
+                <div
+                  class="status-badge"
+                  [class]="'status-' + ((survey.usage_status==1)? 'in-use' : 'idle').replace(' ', '-')"
+                >
+                  {{ (survey.usage_status==1)? 'In Use' : 'Idle' }}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Card Menu Dropdown -->
+<div
+  class="card-menu-dropdown"
+  *ngIf="activeCardMenu()"
+  [style.left.px]="menuPosition().x"
+  [style.top.px]="menuPosition().y"
+>
+  <div class="menu-item" (click)="editTemplate()">Edit</div>
+  <div class="menu-item" (click)="duplicateTemplate()">Duplicate</div>
+  <div class="menu-item" (click)="previewTemplate()">Preview</div>
+  <div class="menu-item" (click)="deleteTemplate()">Delete</div>
+  <div class="menu-item" (click)="assignTemplate()">Assign</div>
+</div>

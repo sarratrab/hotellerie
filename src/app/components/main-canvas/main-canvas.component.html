@@ -1,0 +1,36 @@
+    <div class="relative h-[calc(100vh-150px)] overflow-y-auto p-6 pt-0">
+      <!-- Main canvas container -->
+      <div class="bg-white rounded-lg border border-gray-200 shadow-sm">
+        <div class="flex gap-2 items-center p-4 border-b border-gray-200">
+          <span class="text-xl font-medium text-primary">Form Canvas</span>
+         <p-selectButton
+            [options]="tabs"
+            [ngModel]="activeTab()"
+            (ngModelChange)="setActiveTab($event)"
+            optionLabel="label"
+            optionValue="value"
+          ></p-selectButton>
+
+          <div class="flex-1"></div>
+
+          @if (activeTab() === 'editor') {
+            <button
+              class="compact-button"
+              mat-flat-button
+              (click)="formService.addRow()"
+            >
+              Add Row
+             <i class="pi pi-plus-circle"></i>
+
+            </button>
+          }
+        </div>
+
+        <!-- Form Editor -->
+        @if (activeTab() === 'editor') {
+          <app-form-editor />
+        } @else {
+          <app-form-preview />
+        }
+      </div>
+    </div>

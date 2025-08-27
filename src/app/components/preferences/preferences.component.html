@@ -1,0 +1,153 @@
+<div class="survey-dashboard">
+  <app-survey-navbar></app-survey-navbar>
+  <app-template-navbar></app-template-navbar>
+  <p-confirmDialog></p-confirmDialog>
+  <p-toast></p-toast>
+
+  <div class="sub-navbar">
+    <div class="sub-nav-card">
+      <div class="main-content">
+
+        <!-- Survey Types Card -->
+        <div class="survey-types-card">
+          <div class="card-header">
+            <div class="header-content">
+              <div class="title">
+                <span class="title-icon">📊</span>
+                <h2 class="title-text">Survey Types</h2>
+              </div>
+              <p class="description">
+                Define and manage the types of surveys that can be created. Each type has a 
+                unique color for easy identification.
+              </p>
+            </div>
+            <button class="actions-btn" routerLink="/addtype">Add Type</button>
+          </div>
+
+          <div class="survey-types-list">
+            <div class="types-scroll">
+              <div class="survey-type-item" *ngFor="let t of types(); trackBy: trackById" [attr.data-type]="t.id">
+                <div class="type-icon" [style.background-color]="t.color"></div>
+                <div class="type-content">
+                  <div class="type-name">{{ t.name }}</div>
+                  <div class="type-usage">{{ t.templatesCount }} surveys using this type</div>
+                </div>
+                <div class="type-actions">
+                  <button class="action-btn edit-btn" title="Edit" (click)="onEditType(t)">✏️</button>
+                  <button class="action-btn delete-btn" title="Delete" (click)="onDelete(t)">🗑️</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Default Settings Card -->
+        <div class="survey-types-card">
+          <div class="card-header">
+            <div class="header-content">
+              <div class="title">
+                <span class="title-icon">⚙️</span>
+                <h2 class="title-text">Default Settings</h2>
+              </div>
+              <p class="description">
+                Configure default settings that will be applied to new surveys automatically.
+              </p>
+            </div>
+            <button class="actions-btn">Edit Settings</button>
+          </div>
+
+          <div class="card-content">
+            <div class="main-content">
+              <div class="card-item">
+                <div class="survey-type-ite">
+                  <span class="item-icon">⏳</span>
+                  <div>
+                    <h4>Survey Duration</h4>
+                    <p>Default time surveys remain active</p>
+                    <button class="toggle-btn">30 days</button>
+                  </div>
+                </div>
+              </div>
+              <div class="card-item">
+                <div class="survey-type-ite">
+                  <span class="item-icon">🔒</span>
+                  <div>
+                    <h4>Anonymous Responses</h4>
+                    <p>Allow participants to respond anonymously</p>
+                    <button class="toggle-btn enabled">Enabled</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="main-content">
+              <div class="card-item">
+                <div class="survey-type-ite">
+                  <span class="item-icon">📧</span>
+                  <div>
+                    <h4>Email Notifications</h4>
+                    <p>Automated email invitations and updates</p>
+                    <button class="toggle-btn enabled">Enabled</button>
+                  </div>
+                </div>
+              </div>
+              <div class="card-item">
+                <div class="survey-type-ite">
+                  <span class="item-icon">⏰</span>
+                  <div>
+                    <h4>Auto-Reminders</h4>
+                    <p>Automated reminder schedule</p>
+                    <button class="toggle-btn">Fixed 7d, 3d before deadline</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Notification Templates Card -->
+        <div class="notification-card" *ngIf="isBrowser">
+          <div class="card-header">
+            <div class="header-content">
+              <div class="title">
+                <span class="title-icon">📧</span>
+                <h2 class="title-text">Notification Templates</h2>
+              </div>
+              <p class="description">
+                Customize email templates for survey notifications and reminders sent to employees.
+              </p>
+            </div>
+            <div class="buttons">
+              <button *ngIf="!isEditing" (click)="edit()">Edit</button>
+              <button *ngIf="isEditing" (click)="save()">Save</button>
+              <button *ngIf="isEditing" (click)="cancel()">Cancel</button>
+            </div>
+          </div>
+
+          <div class="notification-templates-container">
+            <!-- Survey Invitation -->
+            <div class="template-section">
+              <h3>Survey Invitation Email</h3>
+              <div *ngIf="!isEditing" class="template-readonly" [innerHTML]="surveyInvitation"></div>
+              <div *ngIf="isEditing">
+                <div #editor1 style="height: 200px;"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="notification-templates-container">
+            <!-- Reminder -->
+            <div class="template-section">
+              <h3>Reminder Email Template</h3>
+              <div *ngIf="!isEditing" class="template-readonly" [innerHTML]="reminderEmail"></div>
+              <div *ngIf="isEditing">
+                <div #editor2 style="height: 200px;"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>

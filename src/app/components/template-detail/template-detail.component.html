@@ -1,0 +1,58 @@
+<div class="survey-dashboard">
+  <app-survey-navbar></app-survey-navbar>
+  <app-template-navbar></app-template-navbar>
+
+  <!-- Content -->
+  <div class="sub-navbar" *ngIf="tpl as t">
+    <div class="sub-nav-card">
+
+      <!-- Header block -->
+      
+      <!-- Header -->
+      <div class="sub-nav-items">
+        <div class="surveys-count">
+          Template Preview
+        </div>
+        <div class="flex justify-between items-start gap-4">
+          <div>
+            <h2 class="text-gray-700 font-semibold">{{ t.name }}</h2>
+          </div>
+
+          <!-- Status badge -->
+          <span
+            class="px-2 py-1 rounded-full text-[11px]"
+            [class.bg-green-100]="t.activeStatusId === 1"
+            [class.text-green-700]="t.activeStatusId === 1"
+            [class.bg-gray-100]="!(t.activeStatusId === 1)"
+            [class.text-gray-700]="!(t.activeStatusId === 1)"
+          >
+            {{ (t.activeStatusId === 1) ? 'ACTIVE' : 'INACTIVE' }}
+          </span>
+        </div>
+
+        <div class="filter-dropdowns">
+          <div class="dropdown-wrapper">
+            <a (click)="cancel()" class="actions-btn">Back to list</a>
+          </div>
+        </div>
+      
+      </div>
+
+      <!-- Form Preview (même rendu que le designer) -->
+      <div class="p-6">
+        <div class="p-6 flex flex-col gap-4 shadow-md rounded-lg border border-gray-200">
+          @for (row of rows; track row.id) {
+            <div class="flex gap-4 flex-wrap">
+              @for (field of row.fields; track field.id) {
+                <div class="flex-1">
+                  <app-form-field-preview [field]="field" />
+                </div>
+              }
+            </div>
+          }
+        </div>
+      </div>
+    
+    </div>
+  </div>
+</div>
