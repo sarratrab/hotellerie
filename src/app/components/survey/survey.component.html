@@ -1,0 +1,190 @@
+<!-- survey-dashboard.component.html -->
+<div class="survey-dashboard">
+  <app-survey-navbar></app-survey-navbar>
+    <!-- Filters and Search -->
+  <div class="sub-navbar">
+    <div class="sub-nav-card">
+      <div class="sub-nav-items">
+        <div class="surveys-count">
+           Surveys 
+        </div>
+        <div class="filter-dropdowns">
+
+          <div class="filter-dropdowns">
+            <div class="dropdown-wrapper">
+              <button class="actions-btn" (click)="toggleMenu($event)">Actions</button>
+            </div>
+          </div>
+
+          <p-tieredMenu #menu [model]="items" popup="true"></p-tieredMenu>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filters and Search -->
+  <div class="sub-navbar">
+    <div class="sub-nav-card">
+      <div class="sub-nav-items">
+        <div class="surveys-count">
+          Active Surveys ({{ totalSurveys() }})
+        </div>
+
+        <div class="search-container">
+          <div class="search-wrapper">
+            <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <circle cx="11" cy="11" r="8"></circle>
+              <path d="m21 21-4.35-4.35"></path>
+            </svg>
+            <input
+              type="text"
+              placeholder="search by type, name..."
+              [ngModel]="searchTerm()"
+              (ngModelChange)="searchTerm.set($event)"
+              (input)="onSearch()"
+              class="search-input"
+            />
+          </div>
+        </div>
+
+        <div class="filter-dropdowns">
+          <div class="dropdown-wrapper">
+            <select
+              [ngModel]="selectedYear()"
+              (ngModelChange)="selectedYear.set($event); onYearChange()"
+              class="filter-dropdown"
+            >
+              <option value="2025">2025</option>
+              <option value="2024">2024</option>
+              <option value="2023">2023</option>
+            </select>
+          </div>
+
+          <div class="dropdown-wrapper">
+            <select
+              [ngModel]="selectedType()"
+              (ngModelChange)="selectedType.set($event); onTypeChange()"
+              class="filter-dropdown"
+            >
+              <option value="">Type</option>
+              <option *ngFor="let t of typeOptions" [value]="t.label">
+                {{ t.label }}
+              </option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Survey Cards Grid -->
+  <div class="sub-navbar">
+    <div class="sub-nav-card">
+      <div class="surveys-grid">
+        <div class="grid-container">
+          <div *ngIf="filteredSurveys().length === 0" class="empty-message">
+            <i class="fa fa-info-circle info-icon"></i>
+            There are no active surveys to display
+          </div>
+
+<div class="survey-card survey-card--row" *ngFor="let survey of filteredSurveys()">
+     <div class="card-header"><div class="survey-card__title">{{ survey.name }}</div>
+  <!-- right side -->
+    <button class="menu-btn" (click)="toggleCardMenu($event, survey.id)">
+      <span class="menu-dots">⋯</span>
+    </button>
+    
+</div>
+        <div class="survey-card__aside">
+<div class="mini-metrics">
+  <!-- Deadline: color changes if overdue / due soon -->
+  <div
+    class="metric-chip chip-deadline"
+    [class.chip-danger]="isOverdue(survey)"
+    [class.chip-warning]="isDueSoon(survey)"
+  >
+    <span class="metric-label">Deadline</span>
+    <span class="metric-value">{{survey.deadline | date:'MMM d, yyyy' }}</span>
+  </div>
+
+  <!-- Sent to -->
+  <div class="metric-chip chip-sent">
+    <span class="metric-label">Sent to</span>
+    <span class="metric-value">
+      {{ survey.sentTo ?? survey.totalEmployees ?? 0 }}
+    </span>
+  </div>
+
+  <!-- Est. time -->
+  <div class="metric-chip chip-time">
+    <span class="metric-label">Estimated time</span>
+    <span class="metric-value">{{survey.estimatedMins ?? 0 }} min</span>
+  </div>
+</div>
+
+</div>
+<div class="card-body"><div class="survey-card__desc">{{ survey.description }}</div></div>
+  <!-- main -->
+  <div class="survey-card__main">
+
+    <div class="survey-card__metrics">
+      <div class="metric-label">Total Employees</div>
+      <div class="chips">
+        <span class="chip chip-done">
+          Completed
+          <strong>{{ survey.stats?.completed || 0 }}</strong>
+        </span>
+        <span class="chip chip-idle">
+          Not Touched
+          <strong>{{ survey.stats?.notTouched || 0 }}</strong>
+        </span>
+        <span class="chip chip-progress">
+          In Progress
+          <strong>{{ survey.stats?.inProgress || 0}}</strong>
+        </span>
+      </div>
+    </div>
+         <div class="survey-card__aside">
+
+<div class="pill-group">
+  <div class="pill pill-type">{{ survey.typeLabel || survey.type || 'HR SURVEY' }}</div>
+  <div class="pill pill-anon" *ngIf="survey.isAnonymous !== false">ANONYMOUS</div>
+</div>
+
+  </div>
+
+
+  
+  </div>
+      <div class="survey-card__footer">
+      <div class="meta">
+        <span class="meta-label">Created on</span>
+        <span class="meta-value">{{ survey.createdOn | date:'MMM dd, yyyy' }}</span>
+      </div>
+      <div class="meta">
+        <span class="meta-label">Created by</span>
+        <span class="meta-value">{{ survey.createdBy }}</span>
+      </div>
+    </div>
+</div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Card Menu Dropdown -->
+<div
+  class="card-menu-dropdown"
+  *ngIf="activeCardMenu()"
+  [style.left.px]="menuPosition().x"
+  [style.top.px]="menuPosition().y"
+>
+  <div class="menu-item" >Edit</div>
+  <div class="menu-item" >Duplicate</div>
+  <div class="menu-item" >Preview</div>
+  <div class="menu-item" >Delete</div>
+  <div class="menu-item" >Assign</div>
+</div>
+

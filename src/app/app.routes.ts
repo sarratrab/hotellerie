@@ -14,6 +14,7 @@ import { HomeComponent } from './components/home/home.component';
 import { PreferencesComponent } from './components/preferences/preferences.component';
 import { TemplateDetailComponent } from './components/template-detail/template-detail.component';
 import { AddTypeComponent } from './components/add-type/add-type.component';
+import { SurveyComponent } from './components/survey/survey.component';
 
 
 
@@ -29,6 +30,7 @@ export const routes: Routes = [
      {path : 'edit-template/:id' , component : EditTemplateComponent},
      {path : 'addtype' , component : AddTypeComponent},
      { path: 'edittype/:id', component: EditTypeComponent },
+     { path: 'survey', component: SurveyComponent },
      
      
      
