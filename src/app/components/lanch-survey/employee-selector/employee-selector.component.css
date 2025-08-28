@@ -1,0 +1,29 @@
+.card p-3 sub-navbar {
+     background: #fff;
+     padding: 24px;
+     margin: 20px; /* horizontal margins */
+
+}
+
+:host ::ng-deep .p-paginator {
+  justify-content: center;
+}
+ .sub-navbar {
+            padding: 24px;
+            background-color: #f0f2f5;
+        }
+
+        .sub-nav-card {
+            background-color: white;
+            border-radius: 8px;
+            border: 1px solid #e9ecef;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+            padding: 20px 24px;
+        }
+
+        .sub-nav-items {
+            display: flex;
+            justify-content: space-between;
+            gap: 16px;
+            max-width: 100%;
+        }
