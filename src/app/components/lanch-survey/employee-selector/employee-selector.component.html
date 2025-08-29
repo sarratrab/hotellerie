@@ -1,0 +1,51 @@
+<div class="sub-navbar">
+  <div class="sub-nav-card">
+    <div class="sub-nav-items">
+      <div class="form-grid">
+        <div class="form-column">
+    <input
+      pInputText
+      type="text"
+      (input)="onGlobalFilter(dt, $event)"
+      placeholder="Rechercher..."
+      class="form-column"
+    />
+  </div>
+  <br>
+<div class="form-column">
+  <!-- Employee table -->
+  <p-table #dt
+           [value]="employees"
+           [(selection)]="selectedEmployees"
+           dataKey="id"
+           [paginator]="true"
+           [rows]="rowsPerPage"
+           [rowsPerPageOptions]="[5,10,20,50,100]"
+           [globalFilterFields]="['name']">
+
+    <!-- Table header -->
+    <ng-template pTemplate="header">
+      <tr>
+        <th style="width: 3rem">
+          <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
+        </th>
+        <th>Name</th>
+      </tr>
+    </ng-template>
+
+    <!-- Table body -->
+    <ng-template pTemplate="body" let-employee>
+      <tr>
+        <td>
+          <p-tableCheckbox [value]="employee"></p-tableCheckbox>
+        </td>
+        <td>{{ employee.name }}</td>
+      </tr>
+    </ng-template>
+
+  </p-table>
+</div>
+</div>
+</div>
+</div>
+</div>

@@ -1,0 +1,53 @@
+<div class="sub-navbar">
+  <div class="sub-nav-card">
+    <div class="sub-nav-items">
+
+  <!-- Two-column layout -->
+  <div class="form-grid">
+    <!-- LEFT: Target Audience -->
+    <div class="form-column">
+      <label class="form-label">Target Audience</label>
+      <p-multiSelect
+        [options]="audienceOptions"
+        optionLabel="label"
+        optionValue="value"
+        display="chip"
+        [filter]="true"
+        [showClear]="true"
+        placeholder="Select audience"
+        [(ngModel)]="selectedAudience"
+        [maxSelectedLabels]="6"
+        class="w-full">
+      </p-multiSelect>
+    </div>
+
+    <!-- RIGHT: Expiration Date + checkboxes -->
+    <div class="form-column">
+      <label for="expDate" class="form-label">Expiration Date</label>
+      <p-calendar
+        id="expDate"
+        [(ngModel)]="expirationDate"
+        [minDate]="minDate"
+        [showIcon]="true"
+        [showButtonBar]="true"
+        dateFormat="mm/dd/yy"
+        placeholder="mm/dd/yyyy"
+        class="w-full">
+      </p-calendar>
+
+      <div class="checkbox-group">
+        <div class="checkbox-item">
+          <p-checkbox inputId="anon" [(ngModel)]="allowAnonymous" [binary]="true"></p-checkbox>
+          <label for="anon" class="checkbox-label">Allow anonymous Response</label>
+        </div>
+
+        <div class="checkbox-item">
+          <p-checkbox inputId="notify" [(ngModel)]="sendNotification" [binary]="true"></p-checkbox>
+          <label for="notify" class="checkbox-label">Send Notification mail</label>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+</div>

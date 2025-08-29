@@ -15,6 +15,9 @@ import { PreferencesComponent } from './components/preferences/preferences.compo
 import { TemplateDetailComponent } from './components/template-detail/template-detail.component';
 import { AddTypeComponent } from './components/add-type/add-type.component';
 import { SurveyComponent } from './components/survey/survey.component';
+import { TargetAudiencePanelComponent } from './components/lanch-survey/target-audience-panel/target-audience-panel.component';
+import { EmployeeSelectorComponent } from './components/lanch-survey/employee-selector/employee-selector.component';
+import { LanchSurveyComponent } from './components/lanch-survey/lanch-survey/lanch-survey.component';
 
 
 
@@ -31,6 +34,7 @@ export const routes: Routes = [
      {path : 'addtype' , component : AddTypeComponent},
      { path: 'edittype/:id', component: EditTypeComponent },
      { path: 'survey', component: SurveyComponent },
+     {path : 'tst' , component : LanchSurveyComponent},
      
      
      

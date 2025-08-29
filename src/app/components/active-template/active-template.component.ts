@@ -312,4 +312,53 @@ export class ActiveTemplateComponent implements OnInit, OnDestroy {
     }
     return v === 1 ? UsageStatus.Inuse : UsageStatus.Idle;
   }
+
+  // Couleur prioritaire : card.typeColor -> card.type?.color -> card.color -> défaut
+getTypeColor(survey: any): string {
+  const raw = survey?.typeColor
+          ?? survey?.type?.color
+          ?? survey?.color
+          ?? '#3b82f6';
+  return this.normalizeHex(raw);
+}
+
+typeChipStyle(survey: any) {
+  const hex = this.getTypeColor(survey);
+  // Pastel pour le fond, texte = couleur principale, bordure = pastel un peu plus soutenu
+  return {
+    'background-color': this.tint(hex, 0.85),
+    'color': hex,
+    'border-color': this.tint(hex, 0.7)
+  };
+}
+
+/* -------- helpers couleur -------- */
+private normalizeHex(c: string): string {
+  if (!c) return '#3B82F6';
+  c = ('' + c).trim();
+  if (!c.startsWith('#')) c = '#' + c;
+  if (c.length === 4) {
+    // #abc -> #aabbcc
+    c = '#' + c[1] + c[1] + c[2] + c[2] + c[3] + c[3];
+  }
+  return c.toUpperCase();
+}
+
+private hexToRgb(hex: string) {
+  const h = this.normalizeHex(hex).slice(1);
+  const r = parseInt(h.slice(0, 2), 16);
+  const g = parseInt(h.slice(2, 4), 16);
+  const b = parseInt(h.slice(4, 6), 16);
+  return { r, g, b };
+}
+
+// mélange vers blanc (ratio 0..1)
+private tint(hex: string, ratio = 0.85): string {
+  const { r, g, b } = this.hexToRgb(hex);
+  const nr = Math.round(r + (255 - r) * ratio);
+  const ng = Math.round(g + (255 - g) * ratio);
+  const nb = Math.round(b + (255 - b) * ratio);
+  return `rgb(${nr}, ${ng}, ${nb})`;
+}
+
 }
