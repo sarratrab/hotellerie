@@ -7,8 +7,15 @@ import { CalendarModule } from 'primeng/calendar';
 import { CheckboxModule } from 'primeng/checkbox';
 import { ButtonModule } from 'primeng/button';
 
-type AudienceOption = { label: string; value: string };
 
+import {  OnInit } from '@angular/core';
+import { LanchSurveyComponent } from '../lanch-survey/lanch-survey.component';
+import { LanchSurveyFooterComponent } from '../lanch-survey-footer/lanch-survey-footer.component';
+
+interface EmployeeOption {
+  id: number;
+  name: string;
+}
 @Component({
   selector: 'app-target-audience-panel',
   standalone: true,
@@ -17,68 +24,96 @@ type AudienceOption = { label: string; value: string };
   styleUrls: ['./target-audience-panel.component.css']
 })
 export class TargetAudiencePanelComponent {
-  audienceOptions: AudienceOption[] = [
-    { label: 'All Employees', value: 'all' },
-    { label: 'HR Department', value: 'hr' },
-    { label: 'Finance Department', value: 'finance' },
-    { label: 'Engineering', value: 'eng' },
-    { label: 'Sales', value: 'sales' },
-    { label: 'Marketing', value: 'mkt' },
-  ];
-
-  selectedAudience: string[] = ['all', 'hr', 'finance']; // preselected like the mock
-  expirationDate: Date | null = null;
-
-  allowAnonymous = false;
-  sendNotification = false;
-
- minDate: Date = new Date(); // Today's date
-  maxDate: Date = new Date(new Date().setFullYear(new Date().getFullYear() + 5)); // 5 years from now
-//Add these methods (optional - you can remove the event handlers if not needed)
-  getValidationClass(fieldName: string): string {
-    // Simple implementation - customize as needed
-    return '';
-  }
-
-  getFieldError(fieldName: string): string {
-    // Simple implementation - customize as needed
-    return '';
-  }
-
-  onAudienceChange(event: any): void {
-    // Handle audience selection changes if needed
-  }
-
-  onDateChange(event: any): void {
-    // Handle date changes if needed
-  }
-
-  onAnonymousChange(event: any): void {
-    // Handle anonymous toggle if needed
-  }
-
-  onNotificationChange(event: any): void {
-    // Handle notification toggle if needed
-  }
-
-  getYearRange(): string {
-    const currentYear = new Date().getFullYear();
-    return `${currentYear}:${currentYear + 10}`;
-  }
-
-  resetForm(): void {
-    this.selectedAudience = [];
-    this.expirationDate = null;
-    this.allowAnonymous = false;
-    this.sendNotification = false;
-  }
-
-  saveConfiguration(): void {
-    // Implement your save logic here
-    console.log('Saving configuration...');
-  }
+Next() {
+throw new Error('Method not implemented.');
 }
+// Checkboxes
+  allEmployees: boolean = false;
+  byLocation: boolean = false;
+  byDepartment: boolean = false;
+  byPosition: boolean = false;
 
+  // MultiSelect options
+  employeeOptions: EmployeeOption[] = [];
+
+  // Selected values
+  selectedLocations: EmployeeOption[] = [];
+  selectedDepartments: EmployeeOption[] = [];
+  selectedPositions: EmployeeOption[] = [];
+
+  constructor() {}
+
+  ngOnInit(): void {
+    // Mock data (you can replace with API call)
+    this.employeeOptions = [
+      { id: 1, name: 'All Employees' },
+      { id: 2, name: 'HR Department' },
+      { id: 3, name: 'Finance Department' },
+      { id: 4, name: 'IT Department' },
+      { id: 5, name: 'Marketing Department' }
+    ];
+  }
+
+  // Add these properties to your component
+locationOptions = [
+  { name: 'New York Office', value: 'ny' },
+  { name: 'London Office', value: 'london' },
+  { name: 'Tokyo Office', value: 'tokyo' }
+];
+
+departmentOptions = [
+  { name: 'Engineering', value: 'eng' },
+  { name: 'Sales', value: 'sales' },
+  { name: 'Marketing', value: 'marketing' },
+  { name: 'HR', value: 'hr' }
+];
+
+positionOptions = [
+  { name: 'Senior Manager', value: 'senior_manager' },
+  { name: 'Developer', value: 'developer' },
+  { name: 'Designer', value: 'designer' },
+  { name: 'Analyst', value: 'analyst' }
+];
+
+  onCancel() {
+    console.log('Survey creation cancelled');
+    // 👉 you can navigate back or reset form
+  }
+
+  onNext() {
+    console.log('Next step clicked');
+    console.log('All Employees:', this.allEmployees);
+    console.log('By Location:', this.selectedLocations);
+    console.log('By Department:', this.selectedDepartments);
+    console.log('By Position:', this.selectedPositions);
+
+    // 👉 you can navigate to next child route (step2) here
+    // this.router.navigate(['/lanch-survey/step2']);
+  }
+// Add this method for the summary
+getSelectionSummary(): string {
+  const selections = [];
+  
+  if (this.allEmployees) {
+    return 'This survey will be sent to all employees in your organization.';
+  }
+  
+  if (this.byLocation && this.selectedLocations?.length) {
+    selections.push(`${this.selectedLocations.length} location(s)`);
+  }
+  
+  if (this.byDepartment && this.selectedDepartments?.length) {
+    selections.push(`${this.selectedDepartments.length} department(s)`);
+  }
+  
+  if (this.byPosition && this.selectedPositions?.length) {
+    selections.push(`${this.selectedPositions.length} position(s)`);
+  }
+  
+  if (selections.length === 0) return '';
+  
+  return `This survey will be sent to employees in: ${selections.join(', ')}.`;
+}}
 
   
 

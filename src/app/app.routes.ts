@@ -15,10 +15,13 @@ import { PreferencesComponent } from './components/preferences/preferences.compo
 import { TemplateDetailComponent } from './components/template-detail/template-detail.component';
 import { AddTypeComponent } from './components/add-type/add-type.component';
 import { SurveyComponent } from './components/survey/survey.component';
-import { TargetAudiencePanelComponent } from './components/lanch-survey/target-audience-panel/target-audience-panel.component';
-import { EmployeeSelectorComponent } from './components/lanch-survey/employee-selector/employee-selector.component';
 import { LanchSurveyComponent } from './components/lanch-survey/lanch-survey/lanch-survey.component';
 import { HistoryComponent } from './components/history/history.component';
+import { EditSurveyComponent } from './components/edit-survey/edit-survey.component';
+import { EmployeeSelectorComponent } from './components/lanch-survey/employee-selector/employee-selector.component';
+import { TargetAudiencePanelComponent } from './components/lanch-survey/target-audience-panel/target-audience-panel.component';
+import { LanchSurveyFooterComponent } from './components/lanch-survey/lanch-survey-footer/lanch-survey-footer.component';
+import { LaunchStep3Component } from './components/lanch-survey/launch-step3/launch-step3.component';
 
 
 
@@ -35,10 +38,24 @@ export const routes: Routes = [
      {path : 'addtype' , component : AddTypeComponent},
      { path: 'edittype/:id', component: EditTypeComponent },
      { path: 'surveys', component: SurveyComponent },
-     {path : 'tst' , component : LanchSurveyComponent},
      {path : 'history' , component : HistoryComponent},
      
+     {path : 'lanch-footer' , component : LanchSurveyFooterComponent},
+    
+     {path : 'edit-survey' , component : EditSurveyComponent},
      
+{
+  path: 'lanch-survey',
+  component: LanchSurveyComponent,
+  children: [
+    { path: '', redirectTo: 'step1', pathMatch: 'full' }, // ✅ default child
+    { path: 'step1', component: TargetAudiencePanelComponent },
+    { path: 'step2', component: EmployeeSelectorComponent },
+    { path: 'step3', component: LaunchStep3Component },
+  ]
+}
+
+
      
 
 

@@ -208,8 +208,8 @@ private typeLabelById = new Map<string, string>();
     if (id) this.router.navigate(['/templates', id]);
   }
 
-  assignTemplate() {
-    throw new Error('Method not implemented.');
+  lanchSurvey() {
+    this.router.navigate(['/lanch-survey']);
   }
 
   trackBySurvey(index: number, template: TemplateBase): string {

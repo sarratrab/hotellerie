@@ -1,22 +1,41 @@
 import { Component } from '@angular/core';
-import { TargetAudiencePanelComponent } from "../target-audience-panel/target-audience-panel.component";
-import { EmployeeSelectorComponent } from "../employee-selector/employee-selector.component";
+import { Router, ActivatedRoute, RouterOutlet } from '@angular/router';
 import { SurveyNavbarComponent } from "../../survey-navbar/survey-navbar.component";
-import { Button } from "primeng/button";
-import { TemplateNavbarComponent } from "../../template-header/template-navbar.component";
+import { LanchSurveyStepsNavComponent } from "../lanch-survey-steps-nav/lanch-survey-steps-nav.component";
+import { LanchSurveyFooterComponent } from "../lanch-survey-footer/lanch-survey-footer.component";
 
 @Component({
   selector: 'app-lanch-survey',
-  imports: [TargetAudiencePanelComponent, EmployeeSelectorComponent, SurveyNavbarComponent, TemplateNavbarComponent],
+  standalone: true,
+  imports: [SurveyNavbarComponent, LanchSurveyStepsNavComponent, LanchSurveyFooterComponent, RouterOutlet],
   templateUrl: './lanch-survey.component.html',
-  styleUrl: './lanch-survey.component.css'
+  styleUrls: ['./lanch-survey.component.css']
 })
 export class LanchSurveyComponent {
-onCancel() {
-throw new Error('Method not implemented.');
-}
-onSubmit() {
-throw new Error('Method not implemented.');
-}
+  constructor(private router: Router) {}
 
+  next() {
+    if (this.router.url.includes('step1')) {
+      this.router.navigate(['/lanch-survey/step2']);   // ✅ absolute
+    } else if (this.router.url.includes('step2')) {
+      this.router.navigate(['/lanch-survey/step3']);   // ✅ absolute
+    } else if (this.router.url.includes('step3')) {
+      this.saveSurvey();
+    }
+  }
+
+  cancel() {
+    if (this.router.url.includes('step1')) {
+      this.router.navigate(['/active-templates']);
+    } else if (this.router.url.includes('step2')) {
+      this.router.navigate(['/lanch-survey/step1']);   // ✅ absolute
+    } else if (this.router.url.includes('step3')) {
+      this.router.navigate(['/lanch-survey/step2']);   // ✅ absolute
+    }
+  }
+
+  private saveSurvey() {
+    console.log('Survey saved!');
+    this.router.navigate(['/surveys']);
+  }
 }

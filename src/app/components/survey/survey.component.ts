@@ -28,6 +28,12 @@ import { ButtonModule } from 'primeng/button';
   styleUrl: './survey.component.css'
 })
 export class SurveyComponent implements OnInit{
+CompleteSurvey() {
+throw new Error('Method not implemented.');
+}
+EditSurvey() {
+ this.router.navigate(['/edit-survey']);
+}
 
   @ViewChild('menu') menu!: TieredMenu;
 

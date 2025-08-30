@@ -92,3 +92,22 @@
   position: relative; /* or absolute with proper top/left values */
   z-index: 999; /* ensure it's above other elements */
 }
+
+.animate-fadeIn {
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.group:hover .group-hover\:visible {
+  visibility: visible;
+}

@@ -151,10 +151,9 @@
   [style.left.px]="menuPosition().x"
   [style.top.px]="menuPosition().y"
 >
-  <div class="menu-item" >Edit</div>
-  <div class="menu-item" >Duplicate</div>
+  <div class="menu-item" (click)="EditSurvey()" >Edit</div>
   <div class="menu-item" >Preview</div>
-  <div class="menu-item" >Delete</div>
-  <div class="menu-item" >Assign</div>
+  <div class="menu-item" >View responses </div>
+  <div class="menu-item" (click)="CompleteSurvey()" >complete</div>
 </div>
 

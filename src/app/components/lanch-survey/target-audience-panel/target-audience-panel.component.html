@@ -1,53 +1,184 @@
 <div class="sub-navbar">
   <div class="sub-nav-card">
     <div class="sub-nav-items">
+      <div class="p-6">
+        <h2 class="text-xl font-semibold mb-2 text-gray-800">
+          Launch Survey – Employee Satisfaction Survey
+        </h2>
+        <p class="text-sm text-gray-600 mb-6">
+          Choose your target audience to send this survey to the right employees
+        </p>
 
-  <!-- Two-column layout -->
-  <div class="form-grid">
-    <!-- LEFT: Target Audience -->
-    <div class="form-column">
-      <label class="form-label">Target Audience</label>
-      <p-multiSelect
-        [options]="audienceOptions"
-        optionLabel="label"
-        optionValue="value"
-        display="chip"
-        [filter]="true"
-        [showClear]="true"
-        placeholder="Select audience"
-        [(ngModel)]="selectedAudience"
-        [maxSelectedLabels]="6"
-        class="w-full">
-      </p-multiSelect>
-    </div>
+        <!-- Two Column Layout -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
+          <!-- Left Column -->
+          <div class="space-y-6">
+            <!-- All Employees -->
+            <div class="border rounded-lg p-4 hover:bg-gray-50 transition-colors">
+              <div class="flex items-start">
+                <p-checkbox
+                  name="allEmployees"
+                  [(ngModel)]="allEmployees"
+                  binary="true"
+                  inputId="allEmployees"
+                  class="mt-1"
+                ></p-checkbox>
+                <div class="ml-3 flex-1">
+                  <label for="allEmployees" class="font-medium text-gray-900 cursor-pointer">
+                    All employees
+                  </label>
+                  <p class="text-sm text-gray-600 mt-1">
+                    Send the survey to every employee across all departments and locations
+                  </p>
+                </div>
+              </div>
+            </div>
 
-    <!-- RIGHT: Expiration Date + checkboxes -->
-    <div class="form-column">
-      <label for="expDate" class="form-label">Expiration Date</label>
-      <p-calendar
-        id="expDate"
-        [(ngModel)]="expirationDate"
-        [minDate]="minDate"
-        [showIcon]="true"
-        [showButtonBar]="true"
-        dateFormat="mm/dd/yy"
-        placeholder="mm/dd/yyyy"
-        class="w-full calendar-container">
-      </p-calendar>
+            <!-- By Department -->
+            <div class="border rounded-lg p-4 hover:bg-gray-50 transition-colors">
+              <div class="flex items-start">
+                <p-checkbox
+                  name="byDepartment"
+                  [(ngModel)]="byDepartment"
+                  binary="true"
+                  inputId="byDepartment"
+                  class="mt-1"
+                ></p-checkbox>
+                <div class="ml-3 flex-1">
+                  <div class="flex items-center">
+                    <label for="byDepartment" class="font-medium text-gray-900 cursor-pointer">
+                      By Department
+                    </label>
+                    <div class="group relative ml-2">
+                      <i class="pi pi-info-circle text-blue-500 cursor-help"></i>
+                      <div class="invisible group-hover:visible absolute z-10 w-64 p-2 mt-1 text-xs text-white bg-gray-800 rounded-lg shadow-lg -translate-x-1/2 left-1/2">
+                        Focus on specific departments like HR, Engineering, Sales, etc.
+                      </div>
+                    </div>
+                  </div>
+                  <p class="text-sm text-gray-600 mt-1 mb-3">
+                    Target specific departments like HR, Engineering, Sales, and Marketing teams
+                  </p>
+                  <div *ngIf="byDepartment" class="animate-fadeIn">
+                    <p-multiSelect
+                      class="w-full"
+                      [options]="departmentOptions"
+                      optionLabel="name"
+                      [(ngModel)]="selectedDepartments"
+                      placeholder="Select departments"
+                      display="chip"
+                      [showToggleAll]="true"
+                    ></p-multiSelect>
+                    <p class="text-xs text-green-600 mt-1">
+                      📊 Perfect for department-specific performance analysis
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
 
-      <div class="checkbox-group">
-        <div class="checkbox-item">
-          <p-checkbox inputId="anon" [(ngModel)]="allowAnonymous" [binary]="true"></p-checkbox>
-          <label for="anon" class="checkbox-label">Allow anonymous Response</label>
+          <!-- Right Column -->
+          <div class="space-y-6">
+            <!-- By Location -->
+            <div class="border rounded-lg p-4 hover:bg-gray-50 transition-colors">
+              <div class="flex items-start">
+                <p-checkbox
+                  name="byLocation"
+                  [(ngModel)]="byLocation"
+                  binary="true"
+                  inputId="byLocation"
+                  class="mt-1"
+                ></p-checkbox>
+                <div class="ml-3 flex-1">
+                  <div class="flex items-center">
+                    <label for="byLocation" class="font-medium text-gray-900 cursor-pointer">
+                      By Location
+                    </label>
+                    <div class="group relative ml-2">
+                      <i class="pi pi-info-circle text-blue-500 cursor-help"></i>
+                      <div class="invisible group-hover:visible absolute z-10 w-64 p-2 mt-1 text-xs text-white bg-gray-800 rounded-lg shadow-lg -translate-x-1/2 left-1/2">
+                        Target employees based on their office locations or geographic regions
+                      </div>
+                    </div>
+                  </div>
+                  <p class="text-sm text-gray-600 mt-1 mb-3">
+                    Send surveys to employees in specific office locations and regional branches
+                  </p>
+                  <div *ngIf="byLocation" class="animate-fadeIn">
+                    <p-multiSelect
+                      class="w-full"
+                      [options]="locationOptions"
+                      optionLabel="name"
+                      [(ngModel)]="selectedLocations"
+                      placeholder="Select locations"
+                      display="chip"
+                      [showToggleAll]="true"
+                    ></p-multiSelect>
+                    <p class="text-xs text-blue-600 mt-1">
+                      💡 Great for location-specific feedback and regional insights
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- By Position -->
+            <div class="border rounded-lg p-4 hover:bg-gray-50 transition-colors">
+              <div class="flex items-start">
+                <p-checkbox
+                  name="byPosition"
+                  [(ngModel)]="byPosition"
+                  binary="true"
+                  inputId="byPosition"
+                  class="mt-1"
+                ></p-checkbox>
+                <div class="ml-3 flex-1">
+                  <div class="flex items-center">
+                    <label for="byPosition" class="font-medium text-gray-900 cursor-pointer">
+                      By Position
+                    </label>
+                    <div class="group relative ml-2">
+                      <i class="pi pi-info-circle text-blue-500 cursor-help"></i>
+                      <div class="invisible group-hover:visible absolute z-10 w-64 p-2 mt-1 text-xs text-white bg-gray-800 rounded-lg shadow-lg -translate-x-1/2 left-1/2">
+                        Target by job roles like Manager, Developer, Designer, etc.
+                      </div>
+                    </div>
+                  </div>
+                  <p class="text-sm text-gray-600 mt-1 mb-3">
+                    Send surveys to employees based on their job roles and seniority levels
+                  </p>
+                  <div *ngIf="byPosition" class="animate-fadeIn">
+                    <p-multiSelect
+                      class="w-full"
+                      [options]="positionOptions"
+                      optionLabel="name"
+                      [(ngModel)]="selectedPositions"
+                      placeholder="Select positions"
+                      display="chip"
+                      [showToggleAll]="true"
+                    ></p-multiSelect>
+                    <p class="text-xs text-purple-600 mt-1">
+                      🎯 Ideal for role-specific feedback and career development insights
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
 
-        <div class="checkbox-item">
-          <p-checkbox inputId="notify" [(ngModel)]="sendNotification" [binary]="true"></p-checkbox>
-          <label for="notify" class="checkbox-label">Send Notification mail</label>
+        <!-- Selection Summary -->
+        <div *ngIf="getSelectionSummary()" class="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+          <div class="flex items-start">
+            <i class="pi pi-info-circle text-blue-500 mt-0.5"></i>
+            <div class="ml-2">
+              <h4 class="font-medium text-blue-900">Survey Target Summary</h4>
+              <p class="text-sm text-blue-800 mt-1">{{ getSelectionSummary() }}</p>
+            </div>
+          </div>
         </div>
       </div>
     </div>
   </div>
-</div>
-</div>
 </div>
