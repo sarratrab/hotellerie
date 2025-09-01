@@ -104,8 +104,8 @@
             </div>
           </div>
         </div>
-
-        <!-- Notification Templates Card -->
+       </div>
+              <!-- Notification Templates Card -->
         <div class="notification-card" *ngIf="isBrowser">
           <div class="card-header">
             <div class="header-content">
@@ -118,9 +118,10 @@
               </p>
             </div>
             <div class="buttons">
-              <button *ngIf="!isEditing" (click)="edit()">Edit</button>
-              <button *ngIf="isEditing" (click)="save()">Save</button>
-              <button *ngIf="isEditing" (click)="cancel()">Cancel</button>
+              <button class="actions-btn" *ngIf="!isEditing"  (click)="edit()">Edit</button>
+              <button class="cancel" *ngIf="isEditing" (click)="cancel()">Cancel</button>
+              <button class="actions-btn" *ngIf="isEditing" (click)="save()">Save</button>
+              
             </div>
           </div>
 
@@ -146,8 +147,6 @@
             </div>
           </div>
         </div>
-
-      </div>
     </div>
   </div>
 </div>

@@ -18,6 +18,7 @@ import { SurveyComponent } from './components/survey/survey.component';
 import { TargetAudiencePanelComponent } from './components/lanch-survey/target-audience-panel/target-audience-panel.component';
 import { EmployeeSelectorComponent } from './components/lanch-survey/employee-selector/employee-selector.component';
 import { LanchSurveyComponent } from './components/lanch-survey/lanch-survey/lanch-survey.component';
+import { HistoryComponent } from './components/history/history.component';
 
 
 
@@ -33,8 +34,9 @@ export const routes: Routes = [
      {path : 'edit-template/:id' , component : EditTemplateComponent},
      {path : 'addtype' , component : AddTypeComponent},
      { path: 'edittype/:id', component: EditTypeComponent },
-     { path: 'survey', component: SurveyComponent },
+     { path: 'surveys', component: SurveyComponent },
      {path : 'tst' , component : LanchSurveyComponent},
+     {path : 'history' , component : HistoryComponent},
      
      
      

@@ -5,7 +5,9 @@ export interface TemplateBase {
   id: string;
   name: string;
   description: string;
-  type: string;
+  type : string;
+  typeId?: string,       
+  typeColor?: string,   
   createdOn: Date;
   createdBy: string;
   usage_status: UsageStatus

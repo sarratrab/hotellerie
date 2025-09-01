@@ -27,6 +27,9 @@ import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { DialogService, DynamicDialogRef } from 'primeng/dynamicdialog';
 import { DuplicateTemplateDialogComponent } from '../duplicate-template-dialog/duplicate-template-dialog.component';
 import { TemplateActionsService } from '../../services/TemplateActionsService';
+// at the top
+import { MultiSelectModule } from 'primeng/multiselect';
+
 
 @Component({
   selector: 'app-active-template',
@@ -38,7 +41,8 @@ import { TemplateActionsService } from '../../services/TemplateActionsService';
     TemplateNavbarComponent,
     TieredMenuModule,
     ToastModule,
-    ConfirmDialogModule
+    ConfirmDialogModule,
+    MultiSelectModule,
   ],
   templateUrl: './active-template.component.html',
   styleUrl: './active-template.component.css'
@@ -50,6 +54,8 @@ export class ActiveTemplateComponent implements OnInit, OnDestroy {
   items: MenuItem[] = [];
   typeOptions: { value: string; label: string }[] = [];
   ref: DynamicDialogRef | undefined;
+  private typeColorById = new Map<string, string>();
+private typeLabelById = new Map<string, string>();
 
   searchTerm = signal<string>('');
   selectedYear = signal<string>('2025');
@@ -78,21 +84,23 @@ export class ActiveTemplateComponent implements OnInit, OnDestroy {
       { label: 'Export to Excel', command: () => console.log('') },
       { label: 'Export to PDF', command: () => console.log('') }
     ];
+      this.templateTypeService.list().subscribe({
+    next: (types: any[]) => {
+      this.typeOptions = types.map(t => ({
+        value: t.id,
+        label: t.name,
+        color: t.color
+      }));
 
-    this.loadSurveysFromAPI();
+      this.typeColorById = new Map(types.map(t => [t.id, this.normalizeHex(t.color)]));
+      this.typeLabelById = new Map(types.map(t => [t.id, t.name]));
 
-    this.templateTypeService.list().subscribe({
-      next: types => {
-        console.log('Types:', types);
-        this.typeOptions = types.map(t => ({
-          value: t.id,
-          label: t.name
-        }));
       },
       error: err => {
         console.error('Error fetching types:', err);
       }
     });
+    this.loadSurveysFromAPI();
   }
 
   ngOnDestroy(): void {
@@ -281,18 +289,24 @@ export class ActiveTemplateComponent implements OnInit, OnDestroy {
     });
   }
 
-  private mapDtoToTemplateBase(dto: TemplateCard): TemplateBase {
-    return {
-      id: dto.templateId,
-      name: dto.name,
-      description: dto.description ?? '',
-      type: dto.typeName || dto.typeId,
-      createdOn: new Date(dto.createdOn),
-      createdBy: dto.createdByName || '—',
-      usage_status: this.mapUsageStatus(dto.usageStatusId) as any,
-      active_status: this.mapActiveStatus(dto.activeStatusId) as any
-    };
-  }
+private mapDtoToTemplateBase(dto: TemplateCard): TemplateBase {
+  const color = this.typeColorById.get(dto.typeId) ?? '#3B82F6';
+  const typeName = dto.typeName ?? this.typeLabelById.get(dto.typeId) ?? dto.typeId;
+
+  return {
+    id: dto.templateId,
+    name: dto.name,
+    description: dto.description ?? '',
+    type: typeName,
+    typeId: dto.typeId,        // <— utile si besoin plus tard
+    typeColor: color,          // <— injecté ici
+    createdOn: new Date(dto.createdOn),
+    createdBy: dto.createdByName || '—',
+    usage_status: this.mapUsageStatus(dto.usageStatusId) as any,
+    active_status: this.mapActiveStatus(dto.activeStatusId) as any
+  };
+}
+
 
   private mapActiveStatus(v: number | string | null | undefined) {
     if (typeof v === 'string') {
@@ -315,22 +329,18 @@ export class ActiveTemplateComponent implements OnInit, OnDestroy {
 
   // Couleur prioritaire : card.typeColor -> card.type?.color -> card.color -> défaut
 getTypeColor(survey: any): string {
-  const raw = survey?.typeColor
-          ?? survey?.type?.color
-          ?? survey?.color
-          ?? '#3b82f6';
-  return this.normalizeHex(raw);
+  return this.normalizeHex(survey?.typeColor ?? '#3B82F6');
 }
 
 typeChipStyle(survey: any) {
   const hex = this.getTypeColor(survey);
-  // Pastel pour le fond, texte = couleur principale, bordure = pastel un peu plus soutenu
   return {
     'background-color': this.tint(hex, 0.85),
     'color': hex,
     'border-color': this.tint(hex, 0.7)
   };
 }
+
 
 /* -------- helpers couleur -------- */
 private normalizeHex(c: string): string {

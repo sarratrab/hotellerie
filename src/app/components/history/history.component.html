@@ -27,7 +27,7 @@
     <div class="sub-nav-card">
       <div class="sub-nav-items">
         <div class="surveys-count">
-          Active Surveys ({{ totalSurveys() }})
+          Completed Surveys ({{ totalSurveys() }})
         </div>
 
         <div class="search-container">
@@ -102,16 +102,12 @@
     <div class="survey-card__metrics">
       <div class="chips">
         <span class="chip chip-done">
-          Completed
+          Submited
           <strong>{{ survey.stats?.completed || 0 }}</strong>
         </span>
         <span class="chip chip-idle">
-          Not Touched
-          <strong>{{ survey.stats?.notTouched || 0 }}</strong>
-        </span>
-        <span class="chip chip-progress">
-          In Progress
-          <strong>{{ survey.stats?.inProgress || 0}}</strong>
+          Not Submited
+          <strong>{{ survey.stats?.notTouched + survey.stats?.inProgress|| 0 }}</strong>
         </span>
       </div>
     </div>
@@ -127,12 +123,6 @@
           
   <div class="pill pill-type">{{ survey.typeLabel || survey.type || 'HR SURVEY' }}</div>
   <div class="pill pill-anon" *ngIf="survey.isAnonymous !== false">ANONYMOUS</div>
-    
-      <div class="meta">
-        <span class="meta-label">Due Date : </span>
-        <span class="meta-value">{{survey.deadline | date:'MMM d, yyyy' }}</span>
-      </div>
-
 
   </div>
   </div>
@@ -151,10 +141,9 @@
   [style.left.px]="menuPosition().x"
   [style.top.px]="menuPosition().y"
 >
-  <div class="menu-item" >Edit</div>
-  <div class="menu-item" >Duplicate</div>
-  <div class="menu-item" >Preview</div>
-  <div class="menu-item" >Delete</div>
-  <div class="menu-item" >Assign</div>
+
+  <div class="menu-item" >View Responses</div>
+
 </div>
+
 

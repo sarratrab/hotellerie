@@ -107,7 +107,11 @@
               </div>
 
               <div class="card-badges">
-                <div class="type-badge">{{ survey.type }}</div>
+                                 <span class="type-badge"
+                     [ngStyle]="typeChipStyle(survey)">
+                     <span class="dot" [style.background-color]="getTypeColor(survey)"></span>
+                         {{ survey.type }}
+                      </span>
               </div>
             </div>
           </div>

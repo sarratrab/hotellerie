@@ -14,8 +14,8 @@ import { FormsModule } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
 
 @Component({
-  selector: 'app-survey',
-    imports: [
+  selector: 'app-history',
+  imports: [
     CommonModule,
     FormsModule,
     ButtonModule,
@@ -24,10 +24,10 @@ import { ButtonModule } from 'primeng/button';
     ToastModule,
     ConfirmDialogModule
   ],
-  templateUrl: './survey.component.html',
-  styleUrl: './survey.component.css'
+  templateUrl: './history.component.html',
+  styleUrl: './history.component.css'
 })
-export class SurveyComponent implements OnInit{
+export class HistoryComponent implements OnInit{
 
   @ViewChild('menu') menu!: TieredMenu;
 
@@ -64,7 +64,7 @@ isDueSoon(s: any, days = 7): boolean {
      {
     id: '1',
     name: 'Employee Engagement Q1',
-    description: 'Comprehensive quarterly assessment measuring employee engagement, workplace satisfaction, and overall job fulfillment across all departments.oui et oui et oui et oui et oi et cfhfhv  vkkgkg vjjgjg  jjggj  gjgjgj  jbbjgjg jbjbj jtjtjtjtj jtjtjttj jtjtjtj nnn nnn nnn nnnnn nnnnnn nnnnn nnnnnn nnnnn nnn',
+    description: 'Comprehensive quarterly assessment measuring employee engagement, workplace satisfaction, and overall job fulfillment across all departments.',
     type: 'HR Survey',
     createdOn: new Date('2025-01-15'),
     createdBy: 'Jane Doe',
@@ -98,7 +98,6 @@ isDueSoon(s: any, days = 7): boolean {
   ngOnInit(): void {
     this.loadSurveys();
     this.items = [
-      { label: 'Create a template', command: () => this.router.navigate(['/addtemp']) },
       { label: 'Export to Excel', command: () => console.log('') },
       { label: 'Export to PDF', command: () => console.log('') }
     ];
@@ -173,3 +172,4 @@ isDueSoon(s: any, days = 7): boolean {
     }
   }
 }
+

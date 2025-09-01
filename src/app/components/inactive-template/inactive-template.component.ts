@@ -45,6 +45,9 @@ export class InactiveTemplateComponent implements OnInit, OnDestroy {
   surveys = signal<TemplateBase[]>([]);
   activeCardMenu = signal<string | null>(null);
   menuPosition = signal<{ x: number, y: number }>({ x: 0, y: 0 });
+  
+  private typeColorById = new Map<string, string>();
+private typeLabelById = new Map<string, string>();
 
   private documentClickListener?: (event: Event) => void;
 
@@ -63,12 +66,18 @@ export class InactiveTemplateComponent implements OnInit, OnDestroy {
       { label: 'Export to Excel', command: () => console.log('') },
       { label: 'Export to PDF', command: () => console.log('') }
     ];
+          this.templateTypeService.list().subscribe({
+    next: (types: any[]) => {
+      this.typeOptions = types.map(t => ({
+        value: t.id,
+        label: t.name,
+        color: t.color
+      }));
+
+      this.typeColorById = new Map(types.map(t => [t.id, this.normalizeHex(t.color)]));
+      this.typeLabelById = new Map(types.map(t => [t.id, t.name]));
 
     this.loadSurveysFromAPI();
-
-    this.templateTypeService.list().subscribe({
-      next: (types) => {
-        this.typeOptions = types.map(t => ({ value: t.id, label: t.name }));
       },
       error: (err) => console.error('Error fetching types:', err)
     });
@@ -163,18 +172,25 @@ export class InactiveTemplateComponent implements OnInit, OnDestroy {
     }
   }
 
-  private mapDtoToTemplateBase(dto: TemplateCard): TemplateBase {
-    return {
-      id: dto.templateId,
-      name: dto.name,
-      description: dto.description ?? '',
-      type: dto.typeName || dto.typeId,
-      createdOn: new Date(dto.createdOn),
-      createdBy: dto.createdByName || '—',
-      usage_status: this.mapUsageStatus(dto.usageStatusId) as any,
-      active_status: this.mapActiveStatus(dto.activeStatusId) as any,
-    };
-  }
+
+private mapDtoToTemplateBase(dto: TemplateCard): TemplateBase {
+  const color = this.typeColorById.get(dto.typeId) ?? '#3B82F6';
+  const typeName = dto.typeName ?? this.typeLabelById.get(dto.typeId) ?? dto.typeId;
+
+  return {
+    id: dto.templateId,
+    name: dto.name,
+    description: dto.description ?? '',
+    type: typeName,
+    typeId: dto.typeId,       
+    typeColor: color,          
+    createdOn: new Date(dto.createdOn),
+    createdBy: dto.createdByName || '—',
+    usage_status: this.mapUsageStatus(dto.usageStatusId) as any,
+    active_status: this.mapActiveStatus(dto.activeStatusId) as any
+  };
+}
+
 
   private mapActiveStatus(v: number | string | null | undefined) {
     if (typeof v === 'string') {
@@ -227,4 +243,51 @@ export class InactiveTemplateComponent implements OnInit, OnDestroy {
       }
     });
   }
+
+   // Couleur prioritaire : card.typeColor -> card.type?.color -> card.color -> défaut
+getTypeColor(survey: any): string {
+  return this.normalizeHex(survey?.typeColor ?? '#3B82F6');
 }
+
+typeChipStyle(survey: any) {
+  const hex = this.getTypeColor(survey);
+  return {
+    'background-color': this.tint(hex, 0.85),
+    'color': hex,
+    'border-color': this.tint(hex, 0.7)
+  };
+}
+
+
+/* -------- helpers couleur -------- */
+private normalizeHex(c: string): string {
+  if (!c) return '#3B82F6';
+  c = ('' + c).trim();
+  if (!c.startsWith('#')) c = '#' + c;
+  if (c.length === 4) {
+    // #abc -> #aabbcc
+    c = '#' + c[1] + c[1] + c[2] + c[2] + c[3] + c[3];
+  }
+  return c.toUpperCase();
+}
+
+private hexToRgb(hex: string) {
+  const h = this.normalizeHex(hex).slice(1);
+  const r = parseInt(h.slice(0, 2), 16);
+  const g = parseInt(h.slice(2, 4), 16);
+  const b = parseInt(h.slice(4, 6), 16);
+  return { r, g, b };
+}
+
+// mélange vers blanc (ratio 0..1)
+private tint(hex: string, ratio = 0.85): string {
+  const { r, g, b } = this.hexToRgb(hex);
+  const nr = Math.round(r + (255 - r) * ratio);
+  const ng = Math.round(g + (255 - g) * ratio);
+  const nb = Math.round(b + (255 - b) * ratio);
+  return `rgb(${nr}, ${ng}, ${nb})`;
+}
+
+}
+
+

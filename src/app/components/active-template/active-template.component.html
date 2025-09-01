@@ -1,7 +1,7 @@
 <!-- survey-dashboard.component.html -->
-<div class="survey-dashboard">
-  <app-survey-navbar></app-survey-navbar>
-  <app-template-navbar></app-template-navbar>
+<div class="survey-dashboard"> 
+   <app-survey-navbar></app-survey-navbar>
+   <app-template-navbar></app-template-navbar>
 
   <!-- Filters and Search -->
   <div class="sub-navbar">
@@ -108,11 +108,11 @@
 
               <div class="card-badges">
                 <!-- type + couleur -->
-<span class="type-badge"
-      [ngStyle]="typeChipStyle(survey)">
-  <span class="dot" [style.background-color]="getTypeColor(survey)"></span>
-  {{ survey.type }}
-</span>
+                 <span class="type-badge"
+                     [ngStyle]="typeChipStyle(survey)">
+                     <span class="dot" [style.background-color]="getTypeColor(survey)"></span>
+                         {{ survey.type }}
+                      </span>
 
                 <div
                   class="status-badge"
