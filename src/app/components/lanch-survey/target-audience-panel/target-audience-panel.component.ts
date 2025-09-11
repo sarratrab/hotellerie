@@ -24,56 +24,94 @@ interface EmployeeOption {
   styleUrls: ['./target-audience-panel.component.css']
 })
 export class TargetAudiencePanelComponent {
-Next() {
-throw new Error('Method not implemented.');
-}
-// Checkboxes
-  allEmployees: boolean = false;
-  byLocation: boolean = false;
-  byDepartment: boolean = false;
-  byPosition: boolean = false;
 
-  // MultiSelect options
-  employeeOptions: EmployeeOption[] = [];
+  // Checkboxes
+  allEmployees = false;
+  byLocation = false;
+  byDepartment = false;
+  byPosition = false;
 
   // Selected values
-  selectedLocations: EmployeeOption[] = [];
-  selectedDepartments: EmployeeOption[] = [];
-  selectedPositions: EmployeeOption[] = [];
+  selectedLocations: any[] = [];
+  selectedDepartments: any[] = [];
+  selectedPositions: any[] = [];
 
-  constructor() {}
+  // Options
+  locationOptions = [
+    { name: 'New York Office', value: 'ny' },
+    { name: 'London Office', value: 'london' },
+    { name: 'Tokyo Office', value: 'tokyo' }
+  ];
+  departmentOptions = [
+    { name: 'Engineering', value: 'eng' },
+    { name: 'Sales', value: 'sales' },
+    { name: 'Marketing', value: 'marketing' },
+    { name: 'HR', value: 'hr' }
+  ];
+  positionOptions = [
+    { name: 'Senior Manager', value: 'senior_manager' },
+    { name: 'Developer', value: 'developer' },
+    { name: 'Designer', value: 'designer' },
+    { name: 'Analyst', value: 'analyst' }
+  ];
 
-  ngOnInit(): void {
-    // Mock data (you can replace with API call)
-    this.employeeOptions = [
-      { id: 1, name: 'All Employees' },
-      { id: 2, name: 'HR Department' },
-      { id: 3, name: 'Finance Department' },
-      { id: 4, name: 'IT Department' },
-      { id: 5, name: 'Marketing Department' }
-    ];
+  // ----- computed helpers -----
+  get segmentingDisabled(): boolean {
+    return this.allEmployees; // disable dept/location/position blocks
+  }
+  get allDisabled(): boolean {
+    return this.byDepartment || this.byLocation || this.byPosition; // disable AllEmployees
   }
 
-  // Add these properties to your component
-locationOptions = [
-  { name: 'New York Office', value: 'ny' },
-  { name: 'London Office', value: 'london' },
-  { name: 'Tokyo Office', value: 'tokyo' }
-];
+  // ----- handlers -----
+  onToggleAll(checked: boolean) {
+    this.allEmployees = checked;
+    if (checked) {
+      // lock and clear the three segments
+      this.byDepartment = this.byLocation = this.byPosition = false;
+      this.selectedDepartments = [];
+      this.selectedLocations = [];
+      this.selectedPositions = [];
+    }
+  }
 
-departmentOptions = [
-  { name: 'Engineering', value: 'eng' },
-  { name: 'Sales', value: 'sales' },
-  { name: 'Marketing', value: 'marketing' },
-  { name: 'HR', value: 'hr' }
-];
+  onToggleSegment(kind: 'dept' | 'loc' | 'pos', checked: boolean) {
+    if (kind === 'dept') {
+      this.byDepartment = checked;
+      if (!checked) this.selectedDepartments = [];
+    }
+    if (kind === 'loc') {
+      this.byLocation = checked;
+      if (!checked) this.selectedLocations = [];
+    }
+    if (kind === 'pos') {
+      this.byPosition = checked;
+      if (!checked) this.selectedPositions = [];
+    }
 
-positionOptions = [
-  { name: 'Senior Manager', value: 'senior_manager' },
-  { name: 'Developer', value: 'developer' },
-  { name: 'Designer', value: 'designer' },
-  { name: 'Analyst', value: 'analyst' }
-];
+    if (checked) {
+      // any segment active -> cannot be All Employees
+      this.allEmployees = false;
+    }
+  }
+
+  // Summary (inchangé sauf logique mutualisée)
+  getSelectionSummary(): string {
+    if (this.allEmployees) {
+      return 'This survey will be sent to all employees in your organization.';
+    }
+    const parts: string[] = [];
+    if (this.byLocation && this.selectedLocations?.length) {
+      parts.push(`${this.selectedLocations.length} location(s)`);
+    }
+    if (this.byDepartment && this.selectedDepartments?.length) {
+      parts.push(`${this.selectedDepartments.length} department(s)`);
+    }
+    if (this.byPosition && this.selectedPositions?.length) {
+      parts.push(`${this.selectedPositions.length} position(s)`);
+    }
+    return parts.length ? `This survey will be sent to employees in: ${parts.join(', ')}.` : '';
+  }
 
   onCancel() {
     console.log('Survey creation cancelled');
@@ -90,30 +128,6 @@ positionOptions = [
     // 👉 you can navigate to next child route (step2) here
     // this.router.navigate(['/lanch-survey/step2']);
   }
-// Add this method for the summary
-getSelectionSummary(): string {
-  const selections = [];
-  
-  if (this.allEmployees) {
-    return 'This survey will be sent to all employees in your organization.';
-  }
-  
-  if (this.byLocation && this.selectedLocations?.length) {
-    selections.push(`${this.selectedLocations.length} location(s)`);
-  }
-  
-  if (this.byDepartment && this.selectedDepartments?.length) {
-    selections.push(`${this.selectedDepartments.length} department(s)`);
-  }
-  
-  if (this.byPosition && this.selectedPositions?.length) {
-    selections.push(`${this.selectedPositions.length} position(s)`);
-  }
-  
-  if (selections.length === 0) return '';
-  
-  return `This survey will be sent to employees in: ${selections.join(', ')}.`;
-}}
-
+}
   
 

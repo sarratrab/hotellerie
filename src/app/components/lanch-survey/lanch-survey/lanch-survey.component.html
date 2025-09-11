@@ -1,10 +1,17 @@
 <app-survey-navbar></app-survey-navbar>
-<br />
+<br>
 <app-lanch-survey-steps-nav></app-lanch-survey-steps-nav>
 
+<div class="sub-navbar">
+  <div class="sub-nav-card">
+    <div class="sub-nav-items">
 <router-outlet></router-outlet>
-
-<app-lanch-survey-footer
+    <app-lanch-survey-footer
   (cancel)="cancel()"
   (next)="next()"
 ></app-lanch-survey-footer>
+  </div>
+
+  </div>
+
+</div>

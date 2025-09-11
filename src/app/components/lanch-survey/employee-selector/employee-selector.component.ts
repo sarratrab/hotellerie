@@ -43,6 +43,7 @@ export class EmployeeSelectorComponent {
   ngOnInit() {
     this.loadEmployees();
     this.filteredEmployees = [...this.employees];
+    this.selectedCount = this.selectedEmployees.length;
   }
 
   loadEmployees() {
@@ -81,27 +82,29 @@ export class EmployeeSelectorComponent {
   }
 
   applyFilters() {
-    let filtered = [...this.employees];
+ let filtered = [...this.employees];
 
-    // Apply search filter
-    if (this.searchTerm) {
-      filtered = filtered.filter(employee => 
-        employee.name.toLowerCase().includes(this.searchTerm) ||
-        (employee.title && employee.title.toLowerCase().includes(this.searchTerm)) ||
-        (employee.department && employee.department.toLowerCase().includes(this.searchTerm)) ||
-        (employee.manager && employee.manager.toLowerCase().includes(this.searchTerm))
+    // search
+    const q = this.searchTerm.trim().toLowerCase();
+    if (q) {
+      filtered = filtered.filter(e =>
+        e.name.toLowerCase().includes(q) ||
+        (e.title ?? '').toLowerCase().includes(q) ||
+        (e.department ?? '').toLowerCase().includes(q) ||
+        (e.manager ?? '').toLowerCase().includes(q)
       );
     }
 
-    // Apply selection filter
+    // dropdown filter
     if (this.selectedFilter === 'selected') {
-      filtered = filtered.filter(employee => this.isSelected(employee));
+      filtered = filtered.filter(e => this.isSelected(e));
     } else if (this.selectedFilter === 'available') {
-      filtered = filtered.filter(employee => !this.isSelected(employee));
+      filtered = filtered.filter(e => !this.isSelected(e));
     }
 
     this.filteredEmployees = filtered;
   }
+  trackById(_: number, e: Employee) { return e.id; }
 
   onEmployeeSelect(employee: Employee, event: Event) {
     const target = event.target as HTMLInputElement;

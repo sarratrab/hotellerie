@@ -1,7 +1,8 @@
 <!-- LaunchStep3Component Template -->
 <div class="launch-step3-container">
   <div class="settings-section">
-    
+    <div class="grid grid-cols-1 grid-cols-1">
+      <div class="space-y-6">
     <!-- Anonymous Response Setting -->
     <div class="setting-item">
       <div class="checkbox-container">
@@ -16,8 +17,7 @@
         </label>
       </div>
     </div>
-
-    <!-- Send Notification Mail Setting -->
+        <!-- Send Notification Mail Setting -->
     <div class="setting-item">
       <div class="checkbox-container">
         <input 
@@ -31,6 +31,7 @@
         </label>
       </div>
     </div>
+   
 
     <!-- Expiration Date Setting -->
     <div class="setting-item expiration-setting">
@@ -48,8 +49,11 @@
       </div>
     </div>
 
+ </div>
+  </div>
   </div>
 </div>
+<br>
 
 <style>
 .launch-step3-container {
@@ -62,25 +66,26 @@
 .settings-section {
   display: flex;
   flex-direction: column;
-  gap: 20px;
-  max-width: 500px;
+  gap: 10px;
+  max-width: 1500px;
 }
 
 .setting-item {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 1px;
 }
 
 .checkbox-container {
+  
   display: flex;
   align-items: center;
   gap: 12px;
 }
 
 .custom-checkbox {
-  width: 18px;
-  height: 18px;
+  width: 20px;
+  height: 20px;
   border: 2px solid #dee2e6;
   border-radius: 4px;
   background: white;
@@ -138,7 +143,7 @@
 
 .date-input-container {
   position: relative;
-  max-width: 200px;
+  max-width: 500px;
 }
 
 .date-input {
@@ -146,7 +151,7 @@
   padding: 10px 12px;
   border: 2px solid #dee2e6;
   border-radius: 4px;
-  font-size: 14px;
+  font-size: 17px;
   color: #495057;
   background: white;
   transition: border-color 0.2s ease;
@@ -160,11 +165,11 @@
 }
 
 .date-input:hover {
-  border-color: #adb5bd;
+  border-color: #007bff;
 }
 
 .date-input::placeholder {
-  color: #6c757d;
+  color: #007bff;
   font-style: italic;
 }
 
@@ -174,6 +179,7 @@
   padding: 4px;
   border-radius: 4px;
   transition: background-color 0.2s ease;
+  color: #007bff;
 }
 
 .date-input::-webkit-calendar-picker-indicator:hover {

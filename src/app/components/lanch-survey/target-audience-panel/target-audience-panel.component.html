@@ -1,6 +1,4 @@
-<div class="sub-navbar">
-  <div class="sub-nav-card">
-    <div class="sub-nav-items">
+
       <div class="p-6">
         <h2 class="text-xl font-semibold mb-2 text-gray-800">
           Launch Survey – Employee Satisfaction Survey
@@ -8,21 +6,24 @@
         <p class="text-sm text-gray-600 mb-6">
           Choose your target audience to send this survey to the right employees
         </p>
+        <div class="sub-nav-card " >
 
         <!-- Two Column Layout -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
+        <div class="">
           <!-- Left Column -->
-          <div class="space-y-6">
+          <div class="space-y-10">
             <!-- All Employees -->
-            <div class="border rounded-lg p-4 hover:bg-gray-50 transition-colors">
+            <div class=" p-12  transition-colors"[class.opacity-50]="allDisabled" [class.pointer-events-none]="allDisabled">
               <div class="flex items-start">
-                <p-checkbox
+                <div class="header-checkbox">
+                <input
+                type="checkbox"
                   name="allEmployees"
                   [(ngModel)]="allEmployees"
                   binary="true"
                   inputId="allEmployees"
-                  class="mt-1"
-                ></p-checkbox>
+                  class="checkbox"
+                ></div>
                 <div class="ml-3 flex-1">
                   <label for="allEmployees" class="font-medium text-gray-900 cursor-pointer">
                     All employees
@@ -34,16 +35,23 @@
               </div>
             </div>
 
-            <!-- By Department -->
-            <div class="border rounded-lg p-4 hover:bg-gray-50 transition-colors">
-              <div class="flex items-start">
-                <p-checkbox
+
+          </div>
+
+          <!-- Right Column -->
+          <div class="grid grid-cols-1 md:grid-cols-2 md:grid-cols-3 gap-12">
+                        <!-- By Department -->
+            <div class="border rounded-lg border-blue-500  p-10 hover:bg-blue-50 transition-colors"[class.opacity-50]="segmentingDisabled" [class.pointer-events-none]="segmentingDisabled">
+              <div class="sub-nav-items">
+              <div class="header-checkbox">
+                <input
+                type="checkbox"
                   name="byDepartment"
                   [(ngModel)]="byDepartment"
                   binary="true"
                   inputId="byDepartment"
-                  class="mt-1"
-                ></p-checkbox>
+                  class="checkbox"
+                ></div>
                 <div class="ml-3 flex-1">
                   <div class="flex items-center">
                     <label for="byDepartment" class="font-medium text-gray-900 cursor-pointer">
@@ -69,27 +77,25 @@
                       display="chip"
                       [showToggleAll]="true"
                     ></p-multiSelect>
-                    <p class="text-xs text-green-600 mt-1">
-                      📊 Perfect for department-specific performance analysis
+                    <p class="text-xs text-blue-600 mt-1">
+                       Perfect for department-specific performance analysis
                     </p>
                   </div>
                 </div>
               </div>
             </div>
-          </div>
-
-          <!-- Right Column -->
-          <div class="space-y-6">
             <!-- By Location -->
-            <div class="border rounded-lg p-4 hover:bg-gray-50 transition-colors">
+            <div class="border rounded-lg border-blue-500  p-10 hover:bg-blue-50 transition-colors"[class.opacity-50]="segmentingDisabled" [class.pointer-events-none]="segmentingDisabled">
               <div class="flex items-start">
-                <p-checkbox
+                <div class="header-checkbox">
+                <input
+                  type="checkbox"
                   name="byLocation"
                   [(ngModel)]="byLocation"
                   binary="true"
                   inputId="byLocation"
-                  class="mt-1"
-                ></p-checkbox>
+                  class="checkbox"
+                ></div>
                 <div class="ml-3 flex-1">
                   <div class="flex items-center">
                     <label for="byLocation" class="font-medium text-gray-900 cursor-pointer">
@@ -116,23 +122,26 @@
                       [showToggleAll]="true"
                     ></p-multiSelect>
                     <p class="text-xs text-blue-600 mt-1">
-                      💡 Great for location-specific feedback and regional insights
+                       Great for location-specific feedback and regional insights
                     </p>
                   </div>
                 </div>
               </div>
             </div>
+            
 
             <!-- By Position -->
-            <div class="border rounded-lg p-4 hover:bg-gray-50 transition-colors">
+            <div class="border rounded-lg border-blue-500  p-10 hover:bg-blue-50 transition-colors"[class.opacity-50]="segmentingDisabled" [class.pointer-events-none]="segmentingDisabled">
               <div class="flex items-start">
-                <p-checkbox
+                <div class="header-checkbox">
+                <input
+                type="checkbox"
                   name="byPosition"
                   [(ngModel)]="byPosition"
                   binary="true"
                   inputId="byPosition"
-                  class="mt-1"
-                ></p-checkbox>
+                  class="checkbox"
+                ></div>
                 <div class="ml-3 flex-1">
                   <div class="flex items-center">
                     <label for="byPosition" class="font-medium text-gray-900 cursor-pointer">
@@ -158,14 +167,15 @@
                       display="chip"
                       [showToggleAll]="true"
                     ></p-multiSelect>
-                    <p class="text-xs text-purple-600 mt-1">
-                      🎯 Ideal for role-specific feedback and career development insights
+                    <p class="text-xs text-blue-600 mt-1">
+                       Ideal for role-specific feedback and career development insights
                     </p>
                   </div>
                 </div>
               </div>
             </div>
           </div>
+        </div>
         </div>
 
         <!-- Selection Summary -->
@@ -179,6 +189,3 @@
           </div>
         </div>
       </div>
-    </div>
-  </div>
-</div>
