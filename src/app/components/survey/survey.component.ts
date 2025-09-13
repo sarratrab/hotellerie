@@ -32,7 +32,7 @@ CompleteSurvey() {
 throw new Error('Method not implemented.');
 }
 EditSurvey() {
- this.router.navigate(['/edit-survey']);
+ this.router.navigate(['/edit-survey/step1']);
 }
 
   @ViewChild('menu') menu!: TieredMenu;

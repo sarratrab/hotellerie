@@ -54,7 +54,16 @@ export const routes: Routes = [
     { path: 'step3', component: LaunchStep3Component },
   ]
 }
-
+,{
+  path: 'edit-survey',
+  component: EditSurveyComponent,
+  children: [
+    { path: '', redirectTo: 'step1', pathMatch: 'full' }, // ✅ default child
+    { path: 'step1', component: TargetAudiencePanelComponent },
+    { path: 'step2', component: EmployeeSelectorComponent },
+    { path: 'step3', component: LaunchStep3Component },
+  ]
+}
 
      
 
