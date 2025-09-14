@@ -27,11 +27,8 @@ import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { DialogService, DynamicDialogRef } from 'primeng/dynamicdialog';
 import { DuplicateTemplateDialogComponent } from '../duplicate-template-dialog/duplicate-template-dialog.component';
 import { TemplateActionsService } from '../../services/TemplateActionsService';
-// at the top
 import { MultiSelectModule } from 'primeng/multiselect';
-import { LaunchSurveyStateService } from '../../services/launch-survey-state.service';
 import { AudienceStateService } from '../../services/audience-state.service';
-
 
 @Component({
   selector: 'app-active-template',
@@ -56,15 +53,21 @@ export class ActiveTemplateComponent implements OnInit, OnDestroy {
   items: MenuItem[] = [];
   typeOptions: { value: string; label: string }[] = [];
   ref: DynamicDialogRef | undefined;
-  private typeColorById = new Map<string, string>();
-private typeLabelById = new Map<string, string>();
 
+  private typeColorById = new Map<string, string>();
+  private typeLabelById = new Map<string, string>();
+
+  // ---------- state ----------
   searchTerm = signal<string>('');
   selectedYear = signal<string>('2025');
   selectedType = signal<string>('');
+
   surveys = signal<TemplateBase[]>([]);
   activeCardMenu = signal<string | null>(null);
   menuPosition = signal<{ x: number; y: number }>({ x: 0, y: 0 });
+
+  // NEW: carte actuellement “ouverte” par le menu
+  selectedCard = signal<TemplateBase | null>(null);
 
   totalSurveys = computed(() => this.filteredSurveys().length);
 
@@ -87,22 +90,23 @@ private typeLabelById = new Map<string, string>();
       { label: 'Export to Excel', command: () => console.log('') },
       { label: 'Export to PDF', command: () => console.log('') }
     ];
-      this.templateTypeService.list().subscribe({
-    next: (types: any[]) => {
-      this.typeOptions = types.map(t => ({
-        value: t.id,
-        label: t.name,
-        color: t.color
-      }));
 
-      this.typeColorById = new Map(types.map(t => [t.id, this.normalizeHex(t.color)]));
-      this.typeLabelById = new Map(types.map(t => [t.id, t.name]));
+    this.templateTypeService.list().subscribe({
+      next: (types: any[]) => {
+        this.typeOptions = types.map(t => ({
+          value: t.id,
+          label: t.name,
+          color: t.color
+        }));
 
+        this.typeColorById = new Map(types.map(t => [t.id, this.normalizeHex(t.color)]));
+        this.typeLabelById = new Map(types.map(t => [t.id, t.name]));
       },
       error: err => {
         console.error('Error fetching types:', err);
       }
     });
+
     this.loadSurveysFromAPI();
   }
 
@@ -110,6 +114,7 @@ private typeLabelById = new Map<string, string>();
     this.removeDocumentClickListener();
   }
 
+  // ---------- filters ----------
   filteredSurveys = computed(() => {
     const surveys = this.surveys();
     const search = this.searchTerm().toLowerCase();
@@ -126,6 +131,7 @@ private typeLabelById = new Map<string, string>();
 
       const matchesYear =
         !year || survey.createdOn.getFullYear().toString() === year;
+
       const matchesType =
         !type || survey.type.toLowerCase() === type.toLowerCase();
 
@@ -136,55 +142,54 @@ private typeLabelById = new Map<string, string>();
   toggleMenu(event: Event) {
     this.menu.toggle(event);
   }
+  onSearch(): void {}
+  onYearChange(): void {}
+  onTypeChange(): void {}
 
-  onSearch(): void {
-    console.log('Searching for:', this.searchTerm());
-  }
-
-  onYearChange(): void {
-    console.log('Year filter changed to:', this.selectedYear());
-  }
-
-  onTypeChange(): void {
-    console.log('Type filter changed to:', this.selectedType());
-  }
-
-  toggleCardMenu(event: Event, surveyId: string): void {
+  // ---------- card menu ----------
+  // On passe ici l’objet survey complet (depuis *ngFor)
+  toggleCardMenu(event: Event, survey: TemplateBase): void {
     event.stopPropagation();
 
-    if (this.activeCardMenu() === surveyId) {
+    if (this.activeCardMenu() === survey.id) {
+      // fermer si déjà ouvert
       this.activeCardMenu.set(null);
-    } else {
-      const rect = (event.target as HTMLElement).getBoundingClientRect();
-      this.menuPosition.set({
-        x: rect.left - 100,
-        y: rect.bottom + 5
-      });
-      this.activeCardMenu.set(surveyId);
+      this.selectedCard.set(null);
+      return;
     }
+
+    const rect = (event.target as HTMLElement).getBoundingClientRect();
+    this.menuPosition.set({
+      x: rect.left - 100,
+      y: rect.bottom + 5
+    });
+
+    this.activeCardMenu.set(survey.id);
+    this.selectedCard.set(survey);
   }
 
   editTemplate() {
-    const id = this.activeCardMenu();
-    this.router.navigate(['/edit-template', id]);
+    const id = this.activeCardMenu() ?? this.selectedCard()?.id;
+    if (id) this.router.navigate(['/edit-template', id]);
+    this.activeCardMenu.set(null);
   }
 
   duplicateTemplate(): void {
-    const templateId = this.activeCardMenu();
+    const survey = this.selectedCard();
+    const templateId = survey?.id;
     if (!templateId) {
       console.error('No template selected for duplication');
       return;
     }
 
-    const currentTemplate = this.surveys().find(s => s.id === templateId);
-    const defaultName = currentTemplate ? `${currentTemplate.name} (Copy)` : '';
+    const defaultName = survey ? `${survey.name} (Copy)` : '';
 
     this.ref = this.dialogService.open(DuplicateTemplateDialogComponent, {
       header: 'Duplicate Template',
       width: '400px',
       modal: true,
       data: {
-        originalName: currentTemplate?.name || '',
+        originalName: survey?.name || '',
         defaultName: defaultName
       }
     });
@@ -198,33 +203,45 @@ private typeLabelById = new Map<string, string>();
   }
 
   deleteTemplate(): void {
+    const id = this.activeCardMenu() ?? this.selectedCard()?.id ?? null;
     this.templateActionsSvc.confirmAndDelete(
-      this.activeCardMenu(),
+      id,
       () => this.loadSurveysFromAPI(),
       () => this.activeCardMenu.set(null)
     );
   }
 
   previewTemplate(): void {
-    const id = this.activeCardMenu();
+    const id = this.activeCardMenu() ?? this.selectedCard()?.id;
     this.activeCardMenu.set(null);
     if (id) this.router.navigate(['/templates', id]);
   }
 
-  onAssign(t: any) {
-    const templateId = t?.templateId ?? t?.id ?? t?.template_id;
-    const name       = t?.name ?? t?.title ?? '';
-    const description = t?.description ?? t?.summary ?? '';
+  // ✅ Paramètre optionnel pour supporter (click)="onAssign()" dans le menu
+  onAssign(t?: any) {
+    const src = t ?? this.selectedCard();
+    if (!src) {
+      console.error('No template context for Assign');
+      return;
+    }
+
+    const templateId = src?.templateId ?? src?.id ?? src?.template_id;
+    const name       = src?.name ?? src?.title ?? '';
+    const description = src?.description ?? src?.summary ?? '';
 
     if (!templateId) {
-      console.error('TemplateId manquant sur la carte:', t);
+      console.error('TemplateId manquant');
       return;
     }
 
     this.launchState.setTemplateInfo(templateId, name, description);
+
+    // fermer le menu et vider la sélection
+    this.activeCardMenu.set(null);
+    this.selectedCard.set(null);
+
     this.router.navigate(['/lanch-survey/step1']);
   }
-
 
   trackBySurvey(index: number, template: TemplateBase): string {
     return template.id;
@@ -236,6 +253,7 @@ private typeLabelById = new Map<string, string>();
     }
   }
 
+  // ---------- data ----------
   async loadSurveysFromAPI(): Promise<void> {
     try {
       this.templateSvc.getAll({ status: 1 /* Active */ }).subscribe({
@@ -303,24 +321,23 @@ private typeLabelById = new Map<string, string>();
     });
   }
 
-private mapDtoToTemplateBase(dto: TemplateCard): TemplateBase {
-  const color = this.typeColorById.get(dto.typeId) ?? '#3B82F6';
-  const typeName = dto.typeName ?? this.typeLabelById.get(dto.typeId) ?? dto.typeId;
+  private mapDtoToTemplateBase(dto: TemplateCard): TemplateBase {
+    const color = this.typeColorById.get(dto.typeId) ?? '#3B82F6';
+    const typeName = dto.typeName ?? this.typeLabelById.get(dto.typeId) ?? dto.typeId;
 
-  return {
-    id: dto.templateId,
-    name: dto.name,
-    description: dto.description ?? '',
-    type: typeName,
-    typeId: dto.typeId,        // <— utile si besoin plus tard
-    typeColor: color,          // <— injecté ici
-    createdOn: new Date(dto.createdOn),
-    createdBy: dto.createdByName || '—',
-    usage_status: this.mapUsageStatus(dto.usageStatusId) as any,
-    active_status: this.mapActiveStatus(dto.activeStatusId) as any
-  };
-}
-
+    return {
+      id: dto.templateId,
+      name: dto.name,
+      description: dto.description ?? '',
+      type: typeName,
+      typeId: dto.typeId,
+      typeColor: color,
+      createdOn: new Date(dto.createdOn),
+      createdBy: dto.createdByName || '—',
+      usage_status: this.mapUsageStatus(dto.usageStatusId) as any,
+      active_status: this.mapActiveStatus(dto.activeStatusId) as any
+    };
+  }
 
   private mapActiveStatus(v: number | string | null | undefined) {
     if (typeof v === 'string') {
@@ -341,48 +358,43 @@ private mapDtoToTemplateBase(dto: TemplateCard): TemplateBase {
     return v === 1 ? UsageStatus.Inuse : UsageStatus.Idle;
   }
 
-  // Couleur prioritaire : card.typeColor -> card.type?.color -> card.color -> défaut
-getTypeColor(survey: any): string {
-  return this.normalizeHex(survey?.typeColor ?? '#3B82F6');
-}
-
-typeChipStyle(survey: any) {
-  const hex = this.getTypeColor(survey);
-  return {
-    'background-color': this.tint(hex, 0.85),
-    'color': hex,
-    'border-color': this.tint(hex, 0.7)
-  };
-}
-
-
-/* -------- helpers couleur -------- */
-private normalizeHex(c: string): string {
-  if (!c) return '#3B82F6';
-  c = ('' + c).trim();
-  if (!c.startsWith('#')) c = '#' + c;
-  if (c.length === 4) {
-    // #abc -> #aabbcc
-    c = '#' + c[1] + c[1] + c[2] + c[2] + c[3] + c[3];
+  // ---------- couleurs ----------
+  getTypeColor(survey: any): string {
+    return this.normalizeHex(survey?.typeColor ?? '#3B82F6');
   }
-  return c.toUpperCase();
-}
 
-private hexToRgb(hex: string) {
-  const h = this.normalizeHex(hex).slice(1);
-  const r = parseInt(h.slice(0, 2), 16);
-  const g = parseInt(h.slice(2, 4), 16);
-  const b = parseInt(h.slice(4, 6), 16);
-  return { r, g, b };
-}
+  typeChipStyle(survey: any) {
+    const hex = this.getTypeColor(survey);
+    return {
+      'background-color': this.tint(hex, 0.85),
+      color: hex,
+      'border-color': this.tint(hex, 0.7)
+    };
+  }
 
-// mélange vers blanc (ratio 0..1)
-private tint(hex: string, ratio = 0.85): string {
-  const { r, g, b } = this.hexToRgb(hex);
-  const nr = Math.round(r + (255 - r) * ratio);
-  const ng = Math.round(g + (255 - g) * ratio);
-  const nb = Math.round(b + (255 - b) * ratio);
-  return `rgb(${nr}, ${ng}, ${nb})`;
-}
+  private normalizeHex(c: string): string {
+    if (!c) return '#3B82F6';
+    c = ('' + c).trim();
+    if (!c.startsWith('#')) c = '#' + c;
+    if (c.length === 4) {
+      c = '#' + c[1] + c[1] + c[2] + c[2] + c[3] + c[3];
+    }
+    return c.toUpperCase();
+  }
 
+  private hexToRgb(hex: string) {
+    const h = this.normalizeHex(hex).slice(1);
+    const r = parseInt(h.slice(0, 2), 16);
+    const g = parseInt(h.slice(2, 4), 16);
+    const b = parseInt(h.slice(4, 6), 16);
+    return { r, g, b };
+  }
+
+  private tint(hex: string, ratio = 0.85): string {
+    const { r, g, b } = this.hexToRgb(hex);
+    const nr = Math.round(r + (255 - r) * ratio);
+    const ng = Math.round(g + (255 - g) * ratio);
+    const nb = Math.round(b + (255 - b) * ratio);
+    return `rgb(${nr}, ${ng}, ${nb})`;
+  }
 }
