@@ -12,6 +12,7 @@ import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
+import { SurveyOutDto, SurveyService } from '../../services/SurveyService';
 
 @Component({
   selector: 'app-survey',
@@ -32,7 +33,7 @@ CompleteSurvey() {
 throw new Error('Method not implemented.');
 }
 EditSurvey() {
- this.router.navigate(['/edit-survey']);
+ this.router.navigate(['/edit-survey/step1']);
 }
 
   @ViewChild('menu') menu!: TieredMenu;
@@ -64,32 +65,27 @@ isDueSoon(s: any, days = 7): boolean {
 
 
   totalSurveys = computed(() => this.filteredSurveys().length);
-    private loadSurveys(): void {
-    // Mock data - replace with actual API call
-    const mockSurveys: any[] = [
-     {
-    id: '1',
-    name: 'Employee Engagement Q1',
-    description: 'Comprehensive quarterly assessment measuring employee engagement, workplace satisfaction, and overall job fulfillment across all departments.oui et oui et oui et oui et oi et cfhfhv  vkkgkg vjjgjg  jjggj  gjgjgj  jbbjgjg jbjbj jtjtjtjtj jtjtjttj jtjtjtj nnn nnn nnn nnnnn nnnnnn nnnnn nnnnnn nnnnn nnn',
-    type: 'HR Survey',
-    createdOn: new Date('2025-01-15'),
-    createdBy: 'Jane Doe',
-    usage_status: 1,
-    active_status: 1,
-    deadline: new Date(2025, 0, 30),
-    sentTo: 235,
-    estimatedMins: 7,
-    // extra purely front:
-    ...( {
-      typeLabel: 'HR Survey',
-      isAnonymous: true,
-      stats: { completed: 120, notTouched: 80, inProgress: 35 }
-    } as any )
-  },
-    ];
-
-    this.surveys.set(mockSurveys);
+     private loadSurveys(): void {
+    this.surveyService.getAll().subscribe({
+      next: (surveys: SurveyOutDto[]) => {
+        this.surveys.set(surveys.map(s => ({
+          id: s.surveyId,
+          name: s.name,
+          description: s.description,
+          createdOn: new Date(s.createdOn),
+          deadline: new Date(s.deadline),
+          isAnonymous: s.isAnonymous,
+          typeLabel: 'Survey',
+          sentTo: s.employeeIds.length,
+          stats: { completed: 0, notTouched: s.employeeIds.length, inProgress: 0 }
+        })));
+      },
+      error: err => {
+        console.error('Error fetching surveys:', err);
+      }
+    });
   }
+
 
   private documentClickListener?: (event: Event) => void;
 
@@ -99,6 +95,7 @@ isDueSoon(s: any, days = 7): boolean {
     private templateTypeService: TypeServiceService,
     private messageService: MessageService,
     private dialogService: DialogService,
+     private surveyService: SurveyService,
   ) {}
 
   ngOnInit(): void {
