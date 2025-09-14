@@ -1,191 +1,205 @@
+<div class="p-6">
+  <h2 class="text-xl font-semibold mb-2 text-gray-800">
+    Launch Survey – Employee Satisfaction Survey
+  </h2>
+  <p class="text-sm text-gray-600 mb-6">
+    Choose your target audience to send this survey to the right employees
+  </p>
 
-      <div class="p-6">
-        <h2 class="text-xl font-semibold mb-2 text-gray-800">
-          Launch Survey – Employee Satisfaction Survey
-        </h2>
-        <p class="text-sm text-gray-600 mb-6">
-          Choose your target audience to send this survey to the right employees
-        </p>
-        <div class="sub-nav-card " >
-
-        <!-- Two Column Layout -->
-        <div class="">
-          <!-- Left Column -->
-          <div class="space-y-10">
-            <!-- All Employees -->
-            <div class=" p-12  transition-colors"[class.opacity-50]="allDisabled" [class.pointer-events-none]="allDisabled">
-              <div class="flex items-start">
-                <div class="header-checkbox">
-                <input
-                type="checkbox"
-                  name="allEmployees"
-                  [(ngModel)]="allEmployees"
-                  binary="true"
-                  inputId="allEmployees"
-                  class="checkbox"
-                ></div>
-                <div class="ml-3 flex-1">
-                  <label for="allEmployees" class="font-medium text-gray-900 cursor-pointer">
-                    All employees
-                  </label>
-                  <p class="text-sm text-gray-600 mt-1">
-                    Send the survey to every employee across all departments and locations
-                  </p>
-                </div>
-              </div>
-            </div>
-
-
-          </div>
-
-          <!-- Right Column -->
-          <div class="grid grid-cols-1 md:grid-cols-2 md:grid-cols-3 gap-12">
-                        <!-- By Department -->
-            <div class="border rounded-lg border-blue-500  p-10 hover:bg-blue-50 transition-colors"[class.opacity-50]="segmentingDisabled" [class.pointer-events-none]="segmentingDisabled">
-              <div class="sub-nav-items">
-              <div class="header-checkbox">
-                <input
-                type="checkbox"
-                  name="byDepartment"
-                  [(ngModel)]="byDepartment"
-                  binary="true"
-                  inputId="byDepartment"
-                  class="checkbox"
-                ></div>
-                <div class="ml-3 flex-1">
-                  <div class="flex items-center">
-                    <label for="byDepartment" class="font-medium text-gray-900 cursor-pointer">
-                      By Department
-                    </label>
-                    <div class="group relative ml-2">
-                      <i class="pi pi-info-circle text-blue-500 cursor-help"></i>
-                      <div class="invisible group-hover:visible absolute z-10 w-64 p-2 mt-1 text-xs text-white bg-gray-800 rounded-lg shadow-lg -translate-x-1/2 left-1/2">
-                        Focus on specific departments like HR, Engineering, Sales, etc.
-                      </div>
-                    </div>
-                  </div>
-                  <p class="text-sm text-gray-600 mt-1 mb-3">
-                    Target specific departments like HR, Engineering, Sales, and Marketing teams
-                  </p>
-                  <div *ngIf="byDepartment" class="animate-fadeIn">
-                    <p-multiSelect
-                      class="w-full"
-                      [options]="departmentOptions"
-                      optionLabel="name"
-                      [(ngModel)]="selectedDepartments"
-                      placeholder="Select departments"
-                      display="chip"
-                      [showToggleAll]="true"
-                    ></p-multiSelect>
-                    <p class="text-xs text-blue-600 mt-1">
-                       Perfect for department-specific performance analysis
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <!-- By Location -->
-            <div class="border rounded-lg border-blue-500  p-10 hover:bg-blue-50 transition-colors"[class.opacity-50]="segmentingDisabled" [class.pointer-events-none]="segmentingDisabled">
-              <div class="flex items-start">
-                <div class="header-checkbox">
-                <input
-                  type="checkbox"
-                  name="byLocation"
-                  [(ngModel)]="byLocation"
-                  binary="true"
-                  inputId="byLocation"
-                  class="checkbox"
-                ></div>
-                <div class="ml-3 flex-1">
-                  <div class="flex items-center">
-                    <label for="byLocation" class="font-medium text-gray-900 cursor-pointer">
-                      By Location
-                    </label>
-                    <div class="group relative ml-2">
-                      <i class="pi pi-info-circle text-blue-500 cursor-help"></i>
-                      <div class="invisible group-hover:visible absolute z-10 w-64 p-2 mt-1 text-xs text-white bg-gray-800 rounded-lg shadow-lg -translate-x-1/2 left-1/2">
-                        Target employees based on their office locations or geographic regions
-                      </div>
-                    </div>
-                  </div>
-                  <p class="text-sm text-gray-600 mt-1 mb-3">
-                    Send surveys to employees in specific office locations and regional branches
-                  </p>
-                  <div *ngIf="byLocation" class="animate-fadeIn">
-                    <p-multiSelect
-                      class="w-full"
-                      [options]="locationOptions"
-                      optionLabel="name"
-                      [(ngModel)]="selectedLocations"
-                      placeholder="Select locations"
-                      display="chip"
-                      [showToggleAll]="true"
-                    ></p-multiSelect>
-                    <p class="text-xs text-blue-600 mt-1">
-                       Great for location-specific feedback and regional insights
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-
-            <!-- By Position -->
-            <div class="border rounded-lg border-blue-500  p-10 hover:bg-blue-50 transition-colors"[class.opacity-50]="segmentingDisabled" [class.pointer-events-none]="segmentingDisabled">
-              <div class="flex items-start">
-                <div class="header-checkbox">
-                <input
-                type="checkbox"
-                  name="byPosition"
-                  [(ngModel)]="byPosition"
-                  binary="true"
-                  inputId="byPosition"
-                  class="checkbox"
-                ></div>
-                <div class="ml-3 flex-1">
-                  <div class="flex items-center">
-                    <label for="byPosition" class="font-medium text-gray-900 cursor-pointer">
-                      By Position
-                    </label>
-                    <div class="group relative ml-2">
-                      <i class="pi pi-info-circle text-blue-500 cursor-help"></i>
-                      <div class="invisible group-hover:visible absolute z-10 w-64 p-2 mt-1 text-xs text-white bg-gray-800 rounded-lg shadow-lg -translate-x-1/2 left-1/2">
-                        Target by job roles like Manager, Developer, Designer, etc.
-                      </div>
-                    </div>
-                  </div>
-                  <p class="text-sm text-gray-600 mt-1 mb-3">
-                    Send surveys to employees based on their job roles and seniority levels
-                  </p>
-                  <div *ngIf="byPosition" class="animate-fadeIn">
-                    <p-multiSelect
-                      class="w-full"
-                      [options]="positionOptions"
-                      optionLabel="name"
-                      [(ngModel)]="selectedPositions"
-                      placeholder="Select positions"
-                      display="chip"
-                      [showToggleAll]="true"
-                    ></p-multiSelect>
-                    <p class="text-xs text-blue-600 mt-1">
-                       Ideal for role-specific feedback and career development insights
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-        </div>
-
-        <!-- Selection Summary -->
-        <div *ngIf="getSelectionSummary()" class="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+  <div class="sub-nav-card">
+    <div class="">
+      <div class="space-y-10">
+        <!-- All Employees -->
+        <div class="p-12 transition-colors"
+             [class.opacity-50]="allDisabled"
+             [class.pointer-events-none]="allDisabled">
           <div class="flex items-start">
-            <i class="pi pi-info-circle text-blue-500 mt-0.5"></i>
-            <div class="ml-2">
-              <h4 class="font-medium text-blue-900">Survey Target Summary</h4>
-              <p class="text-sm text-blue-800 mt-1">{{ getSelectionSummary() }}</p>
+            <div class="header-checkbox">
+              <input
+                type="checkbox"
+                name="allEmployees"
+                [(ngModel)]="allEmployees"
+                (ngModelChange)="onToggleAll($event)"
+                class="checkbox"
+              />
+            </div>
+            <div class="ml-3 flex-1">
+              <label for="allEmployees" class="font-medium text-gray-900 cursor-pointer">
+                All employees
+              </label>
+              <p class="text-sm text-gray-600 mt-1">
+                Send the survey to every employee across all departments and locations
+              </p>
             </div>
           </div>
         </div>
       </div>
+
+      <!-- Right Column -->
+      <div class="grid grid-cols-1 md:grid-cols-2 md:grid-cols-3 gap-12">
+
+        <!-- By Department -->
+        <div class="border rounded-lg border-blue-500 p-10 hover:bg-blue-50 transition-colors"
+             [class.opacity-50]="segmentingDisabled"
+             [class.pointer-events-none]="segmentingDisabled">
+          <div class="sub-nav-items">
+            <div class="header-checkbox">
+              <input
+                type="checkbox"
+                name="byDepartment"
+                [(ngModel)]="byDepartment"
+                (ngModelChange)="onToggleSegment('dept', $event)"
+                class="checkbox"
+              />
+            </div>
+            <div class="ml-3 flex-1">
+              <div class="flex items-center">
+                <label for="byDepartment" class="font-medium text-gray-900 cursor-pointer">
+                  By Department
+                </label>
+                <div class="group relative ml-2">
+                  <i class="pi pi-info-circle text-blue-500 cursor-help"></i>
+                  <div class="invisible group-hover:visible absolute z-10 w-64 p-2 mt-1 text-xs text-white bg-gray-800 rounded-lg shadow-lg -translate-x-1/2 left-1/2">
+                    Focus on specific departments like HR, Engineering, Sales, etc.
+                  </div>
+                </div>
+              </div>
+              <p class="text-sm text-gray-600 mt-1 mb-3">
+                Target specific departments like HR, Engineering, Sales, and Marketing teams
+              </p>
+              <div *ngIf="byDepartment" class="animate-fadeIn">
+<p-multiSelect
+  class="w-full"
+  [options]="departmentOptions"
+  optionLabel="name"
+  optionValue="value"
+  [(ngModel)]="selectedDepartments"
+  placeholder="Select departments"
+  display="chip"
+  [showToggleAll]="true"
+  [disabled]="segmentingDisabled"
+  (onChange)="persistSelection()"
+></p-multiSelect>
+                <p class="text-xs text-blue-600 mt-1">
+                  Perfect for department-specific performance analysis
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- By Location -->
+        <div class="border rounded-lg border-blue-500 p-10 hover:bg-blue-50 transition-colors"
+             [class.opacity-50]="segmentingDisabled"
+             [class.pointer-events-none]="segmentingDisabled">
+          <div class="flex items-start">
+            <div class="header-checkbox">
+              <input
+                type="checkbox"
+                name="byLocation"
+                [(ngModel)]="byLocation"
+                (ngModelChange)="onToggleSegment('loc', $event)"
+                class="checkbox"
+              />
+            </div>
+            <div class="ml-3 flex-1">
+              <div class="flex items-center">
+                <label for="byLocation" class="font-medium text-gray-900 cursor-pointer">
+                  By Location
+                </label>
+                <div class="group relative ml-2">
+                  <i class="pi pi-info-circle text-blue-500 cursor-help"></i>
+                  <div class="invisible group-hover:visible absolute z-10 w-64 p-2 mt-1 text-xs text-white bg-gray-800 rounded-lg shadow-lg -translate-x-1/2 left-1/2">
+                    Target employees based on their office locations or geographic regions
+                  </div>
+                </div>
+              </div>
+              <p class="text-sm text-gray-600 mt-1 mb-3">
+                Send surveys to employees in specific office locations and regional branches
+              </p>
+              <div *ngIf="byLocation" class="animate-fadeIn">
+<p-multiSelect
+  class="w-full"
+  [options]="locationOptions"
+  optionLabel="name"
+  optionValue="value"
+  [(ngModel)]="selectedLocations"
+  placeholder="Select locations"
+  display="chip"
+  [showToggleAll]="true"
+  [disabled]="segmentingDisabled"
+  (onChange)="persistSelection()"
+></p-multiSelect>
+                <p class="text-xs text-blue-600 mt-1">
+                  Great for location-specific feedback and regional insights
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- By Position -->
+        <div class="border rounded-lg border-blue-500 p-10 hover:bg-blue-50 transition-colors"
+             [class.opacity-50]="segmentingDisabled"
+             [class.pointer-events-none]="segmentingDisabled">
+          <div class="flex items-start">
+            <div class="header-checkbox">
+              <input
+                type="checkbox"
+                name="byPosition"
+                [(ngModel)]="byPosition"
+                (ngModelChange)="onToggleSegment('pos', $event)"
+                class="checkbox"
+              />
+            </div>
+            <div class="ml-3 flex-1">
+              <div class="flex items-center">
+                <label for="byPosition" class="font-medium text-gray-900 cursor-pointer">
+                  By Position
+                </label>
+                <div class="group relative ml-2">
+                  <i class="pi pi-info-circle text-blue-500 cursor-help"></i>
+                  <div class="invisible group-hover:visible absolute z-10 w-64 p-2 mt-1 text-xs text-white bg-gray-800 rounded-lg shadow-lg -translate-x-1/2 left-1/2">
+                    Target by job roles like Manager, Developer, Designer, etc.
+                  </div>
+                </div>
+              </div>
+              <p class="text-sm text-gray-600 mt-1 mb-3">
+                Send surveys to employees based on their job roles and seniority levels
+              </p>
+              <div *ngIf="byPosition" class="animate-fadeIn">
+<p-multiSelect
+  class="w-full"
+  [options]="positionOptions"
+  optionLabel="name"
+  optionValue="value"
+  [(ngModel)]="selectedPositions"
+  placeholder="Select positions"
+  display="chip"
+  [showToggleAll]="true"
+  [disabled]="segmentingDisabled"
+  (onChange)="persistSelection()"
+></p-multiSelect>
+                <p class="text-xs text-blue-600 mt-1">
+                  Ideal for role-specific feedback and career development insights
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Selection Summary -->
+  <div *ngIf="getSelectionSummary()" class="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+    <div class="flex items-start">
+      <i class="pi pi-info-circle text-blue-500 mt-0.5"></i>
+      <div class="ml-2">
+        <h4 class="font-medium text-blue-900">Survey Target Summary</h4>
+        <p class="text-sm text-blue-800 mt-1">{{ getSelectionSummary() }}</p>
+      </div>
+    </div>
+  </div>
+</div>

@@ -6,6 +6,9 @@ import { TableModule } from 'primeng/table';
 import { CheckboxModule } from 'primeng/checkbox';
 import { InputTextModule } from 'primeng/inputtext';
 import { DropdownModule } from "primeng/dropdown";
+import { EmployeeRow } from '../../../models/interfaces/EmployeeRow';
+import { EmployeeApiService } from '../../../services/employee-api.service';
+import { AudienceStateService } from '../../../services/audience-state.service';
 
 export interface Employee {
   id: number;
@@ -23,204 +26,127 @@ export interface Employee {
   styleUrls: ['./employee-selector.component.css']
 })
 export class EmployeeSelectorComponent {
-   employees: Employee[] = [];
-  filteredEmployees: Employee[] = [];
-  selectedEmployees: Employee[] = [];
-  allEmployees: Employee[] = [];
-  
-  totalEmployees = 264;
-  selectedCount = 212;
-  
+ employees: EmployeeRow[] = [];
+  filteredEmployees: EmployeeRow[] = [];
+  selectedEmployees: EmployeeRow[] = [];
+
+  totalEmployees = 0;
+  selectedCount   = 0;
+
   searchTerm = '';
-  selectedFilter = '';
-  
-  filterOptions = [
-    { label: 'All employee', value: 'All employee' },
-    { label: 'Selected', value: 'selected' },
-    { label: 'Available', value: 'available' }
-  ];
+  selectedFilter = ''; // '', 'selected', 'available'
 
-  ngOnInit() {
-    this.loadEmployees();
-    this.filteredEmployees = [...this.employees];
-    this.selectedCount = this.selectedEmployees.length;
+  constructor(
+    private employeeApi: EmployeeApiService,
+    private audienceState: AudienceStateService
+  ) {}
+
+ngOnInit() {
+  const filters = this.audienceState.getSelection();
+
+  this.employeeApi.getForSelection(filters).subscribe({
+    next: (rows) => {
+      this.employees = rows;
+      this.totalEmployees = rows.length;
+
+      // ✅ pre-select: only if the API rows have isSelected = true
+      this.selectedEmployees = rows.filter(r => r.isSelected === true);
+      this.selectedCount = this.selectedEmployees.length;
+
+      this.filteredEmployees = [...this.employees];
+    },
+    error: (err) => console.error('Load employees failed', err)
+  });
+}
+
+onEmployeeSelect(employee: EmployeeRow, ev: Event) {
+  const checked = ($any(ev.target) as HTMLInputElement).checked;
+  if (checked) {
+    if (!this.isSelected(employee)) this.selectedEmployees.push(employee);
+  } else {
+    this.selectedEmployees = this.selectedEmployees.filter(x => x.id !== employee.id);
   }
+  this.updateSelectedCount();
+}
 
-  loadEmployees() {
-    // Sample data - replace with your actual data source
-    this.allEmployees = [
-      { id: 1, name: 'Yasmine', title: 'Software Engineer', department: 'IT', manager: 'John Smith' },
-      { id: 2, name: 'Ahmed', title: 'Product Manager', department: 'Product', manager: 'Sarah Johnson' },
-      { id: 3, name: 'Yousine', title: 'Designer', department: 'Design', manager: 'Mike Wilson' },
-      { id: 4, name: 'Yasmine', title: 'Data Analyst', department: 'Analytics', manager: 'Lisa Brown' },
-      { id: 5, name: 'Ameni', title: 'Marketing Specialist', department: 'Marketing', manager: 'David Lee' },
-      { id: 6, name: 'Mohamed', title: 'DevOps Engineer', department: 'IT', manager: 'John Smith' },
-      { id: 7, name: 'Employee 1', title: '', department: '', manager: '' },
-      { id: 8, name: 'Employee 2', title: '', department: '', manager: '' },
-      { id: 9, name: 'Employee 3', title: '', department: '', manager: '' },
-      { id: 10, name: 'Employee 4', title: '', department: '', manager: '' },
-      { id: 11, name: 'Employee 5', title: '', department: '', manager: '' },
-      { id: 12, name: 'Employee 6', title: '', department: '', manager: '' },
-      { id: 13, name: 'Employee 7', title: '', department: '', manager: '' }
-    ];
-
-    // Pre-select some employees to match the "212 of 264" count
-    this.employees = [...this.allEmployees];
-    this.selectedEmployees = this.employees.slice(0, 7); // Pre-select first 7 for demo
+onSelectAll(ev: Event) {
+  const checked = ($any(ev.target) as HTMLInputElement).checked;
+  if (checked) {
+    this.filteredEmployees.forEach(e => {
+      if (!this.isSelected(e)) this.selectedEmployees.push(e);
+    });
+  } else {
+    const ids = new Set(this.filteredEmployees.map(e => e.id));
+    this.selectedEmployees = this.selectedEmployees.filter(sel => !ids.has(sel.id));
   }
+  this.updateSelectedCount();
+}
 
-  onGlobalFilter(table: any, event: Event) {
-    const target = event.target as HTMLInputElement;
-    this.searchTerm = target.value.toLowerCase();
-    this.applyFilters();
-  }
 
-  onFilterChange(event: Event) {
-    const target = event.target as HTMLSelectElement;
-    this.selectedFilter = target.value;
-    this.applyFilters();
-  }
-
-  applyFilters() {
- let filtered = [...this.employees];
-
-    // search
-    const q = this.searchTerm.trim().toLowerCase();
-    if (q) {
-      filtered = filtered.filter(e =>
-        e.name.toLowerCase().includes(q) ||
-        (e.title ?? '').toLowerCase().includes(q) ||
-        (e.department ?? '').toLowerCase().includes(q) ||
-        (e.manager ?? '').toLowerCase().includes(q)
-      );
-    }
-
-    // dropdown filter
-    if (this.selectedFilter === 'selected') {
-      filtered = filtered.filter(e => this.isSelected(e));
-    } else if (this.selectedFilter === 'available') {
-      filtered = filtered.filter(e => !this.isSelected(e));
-    }
-
-    this.filteredEmployees = filtered;
-  }
-  trackById(_: number, e: Employee) { return e.id; }
-
-  onEmployeeSelect(employee: Employee, event: Event) {
-    const target = event.target as HTMLInputElement;
-    
-    if (target.checked) {
-      // Add to selection if not already selected
-      if (!this.isSelected(employee)) {
-        this.selectedEmployees.push(employee);
-      }
-    } else {
-      // Remove from selection
-      this.selectedEmployees = this.selectedEmployees.filter(e => e.id !== employee.id);
-    }
-
-    this.updateSelectedCount();
-  }
-
-  onSelectAll(event: Event) {
-    const target = event.target as HTMLInputElement;
-    
-    if (target.checked) {
-      // Select all filtered employees
-      this.filteredEmployees.forEach(employee => {
-        if (!this.isSelected(employee)) {
-          this.selectedEmployees.push(employee);
-        }
-      });
-    } else {
-      // Deselect all filtered employees
-      this.selectedEmployees = this.selectedEmployees.filter(selected => 
-        !this.filteredEmployees.find(filtered => filtered.id === selected.id)
-      );
-    }
-
-    this.updateSelectedCount();
-  }
-
-  isSelected(employee: Employee): boolean {
-    return this.selectedEmployees.some(selected => selected.id === employee.id);
-  }
-
-  isAllSelected(): boolean {
-    return this.filteredEmployees.length > 0 && 
-           this.filteredEmployees.every(employee => this.isSelected(employee));
-  }
-
-  isIndeterminate(): boolean {
-    const selectedCount = this.filteredEmployees.filter(employee => this.isSelected(employee)).length;
-    return selectedCount > 0 && selectedCount < this.filteredEmployees.length;
+  // ---------- UI helpers / actions ----------
+  isSelected(e: EmployeeRow): boolean {
+    return this.selectedEmployees.some(x => x.id === e.id);
   }
 
   updateSelectedCount() {
     this.selectedCount = this.selectedEmployees.length;
   }
 
+
+
+  isAllSelected(): boolean {
+    return this.filteredEmployees.length > 0 &&
+           this.filteredEmployees.every(e => this.isSelected(e));
+  }
+
+  isIndeterminate(): boolean {
+    const count = this.filteredEmployees.filter(e => this.isSelected(e)).length;
+    return count > 0 && count < this.filteredEmployees.length;
+  }
+
+  // Recherche + filtre "Selected/Available"
+  onGlobalFilter(_table: any, ev: Event) {
+    const v = (ev.target as HTMLInputElement).value.toLowerCase();
+    this.searchTerm = v;
+    this.applyFilters();
+  }
+
+  onFilterChange(ev: Event) {
+    this.selectedFilter = (ev.target as HTMLSelectElement).value;
+    this.applyFilters();
+  }
+
+  applyFilters() {
+    let rows = [...this.employees];
+
+    if (this.searchTerm) {
+      const s = this.searchTerm;
+      rows = rows.filter(e =>
+        (e.name?.toLowerCase().includes(s)) ||
+        (e.title?.toLowerCase().includes(s)) ||
+        (e.department?.toLowerCase().includes(s)) ||
+        (e.manager?.toLowerCase().includes(s)) ||
+        (e.city?.toLowerCase().includes(s))
+      );
+    }
+
+    if (this.selectedFilter === 'selected') {
+      rows = rows.filter(e => this.isSelected(e));
+    } else if (this.selectedFilter === 'available') {
+      rows = rows.filter(e => !this.isSelected(e));
+    }
+
+    this.filteredEmployees = rows;
+  }
+
   getSelectedEmployeesCount(): string {
     return `Selected Employees (${this.selectedCount} of ${this.totalEmployees})`;
   }
 
-  onCancel() {
-    // Handle cancel action - could emit event or navigate back
-    console.log('Cancel clicked');
-  }
+  onCancel() { console.log('Cancel'); }
+  onNext()   { console.log('Next with:', this.selectedEmployees); }
+}
 
-  onNext() {
-    // Handle next action - could emit selected employees or navigate forward
-    console.log('Next clicked with selected employees:', this.selectedEmployees);
-  }
-
-  // Utility methods for UI state
-  getCheckboxState(employee: Employee) {
-    return this.isSelected(employee);
-  }
-
-  getHeaderCheckboxState() {
-    if (this.isAllSelected()) return 'checked';
-    if (this.isIndeterminate()) return 'indeterminate';
-    return 'unchecked';
-  }
-
-  // Method to add/remove employees programmatically
-  addEmployee(employee: Employee) {
-    if (!this.employees.find(e => e.id === employee.id)) {
-      this.employees.push(employee);
-      this.applyFilters();
-    }
-  }
-
-  removeEmployee(employeeId: number) {
-    this.employees = this.employees.filter(e => e.id !== employeeId);
-    this.selectedEmployees = this.selectedEmployees.filter(e => e.id !== employeeId);
-    this.applyFilters();
-    this.updateSelectedCount();
-  }
-
-  // Method to load employees from API
-  async loadEmployeesFromApi() {
-    try {
-      // Replace with your actual API call
-      // const response = await this.employeeService.getEmployees();
-      // this.allEmployees = response.data;
-      // this.employees = [...this.allEmployees];
-      // this.applyFilters();
-    } catch (error) {
-      console.error('Error loading employees:', error);
-    }
-  }
-
-  // Method to save selection
-  async saveSelection() {
-    try {
-      // Replace with your actual API call
-      // await this.employeeService.saveSelectedEmployees(this.selectedEmployees);
-      console.log('Selection saved:', this.selectedEmployees);
-    } catch (error) {
-      console.error('Error saving selection:', error);
-    }
-  }
+function $any(target: EventTarget | null): HTMLInputElement {
+  throw new Error('Function not implemented.');
 }

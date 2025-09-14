@@ -105,7 +105,7 @@ export class AddTemplateComponent {
       Description: formValues.description,
       TemplateDefinition: this.formService.exportTemplateDefinition(),
       UsageStatus: Usage_Status,
-      CreatedBy: '644817fe-1333-4bb9-ab8d-757218f54ef7' // to do later
+      CreatedBy: '3' // to do later
     };
 
     this.templateService.add(template).subscribe({
