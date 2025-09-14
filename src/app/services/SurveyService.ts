@@ -1,6 +1,8 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, map } from 'rxjs';
+import { baseUrl } from '../../baseURL';
+import { AddSurveyDto } from '../models/interfaces/AddSurveyDto';
 
 export interface SurveyOutDto {
   surveyId: string;
@@ -22,8 +24,13 @@ export class SurveyService {
 
   constructor(private http: HttpClient) {}
 
+  addSurvey(dto: AddSurveyDto): Observable<string> {
+    // le back renvoie du text/plain => responseType:'text'
+    return this.http.post(`${baseUrl}api/Survey/AddSurvey`, dto, { responseType: 'text' });
+  }
+
   getAll(): Observable<SurveyOutDto[]> {
-    return this.http.get<any>(`${this.apiUrl}/GetAllSurveys`)
+    return this.http.get<any>(`${baseUrl}api/Survey/GetAllSurveys`)
       .pipe(map(res => res.data));
   }
 }

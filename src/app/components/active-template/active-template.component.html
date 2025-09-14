@@ -122,6 +122,7 @@
                 </div>
               </div>
             </div>
+
           </div>
         </div>
       </div>
@@ -130,7 +131,8 @@
 </div>
 
 <!-- Card Menu Dropdown -->
-<div
+
+            <div
   class="card-menu-dropdown"
   *ngIf="activeCardMenu()"
   [style.left.px]="menuPosition().x"
@@ -140,5 +142,9 @@
   <div class="menu-item" (click)="duplicateTemplate()">Duplicate</div>
   <div class="menu-item" (click)="previewTemplate()">Preview</div>
   <div class="menu-item" (click)="deleteTemplate()">Delete</div>
-  <div class="menu-item" (click)="lanchSurvey()">Assign</div>
+  <div class="menu-item" (click)="onAssign({ 
+  templateId: survey.id, 
+  name: survey.name, 
+  description: survey.description 
+})">Assign</div>
 </div>

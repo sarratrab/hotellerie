@@ -14,6 +14,7 @@ import { DepartmentListItem } from '../../../models/interfaces/DepartementListIt
 import { PositionListItem } from '../../../models/interfaces/PositionListItem';
 import { LocationListItem } from '../../../models/interfaces/LocationListItem';
 import { AudienceStateService } from '../../../services/audience-state.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-target-audience-panel',
@@ -23,7 +24,7 @@ import { AudienceStateService } from '../../../services/audience-state.service';
   styleUrls: ['./target-audience-panel.component.css']
 })
 export class TargetAudiencePanelComponent implements OnInit {
-
+constructor(private router : Router ,private lookups: SurveyServiceService,private audienceState: AudienceStateService){}
   // Checkboxes
   allEmployees = false;
   byLocation = false;
@@ -67,8 +68,20 @@ persistSelection() {
 }
 
 onNext() {
+  const deptIds = (this.selectedDepartments || []).map((d: any) => d.id ?? d.value);
+const posIds  = (this.selectedPositions  || []).map((p: any) => p.id ?? p.value);
+const cities  = (this.selectedLocations  || []).map((l: any) => l.name ?? l.value ?? l);
+
+this.audienceState.setSelection({
+  allEmployees: this.allEmployees,
+  departmentIds: deptIds,
+  positionIds: posIds,
+  cities
+});
+ this.persistSelection();
+this.router?.navigate(['/lanch-survey/step2']);
   // plus de mapping nécessaire : tu as déjà des primitives
-  this.persistSelection();
+ 
   console.log('Step1 selection saved:', this.audienceState.getSelection());
 }
 
@@ -80,7 +93,6 @@ onNext() {
   loading = false;
   error?: string;
 
-  constructor(private lookups: SurveyServiceService,private audienceState: AudienceStateService) {}
 
   ngOnInit(): void {
     this.loadLookups();

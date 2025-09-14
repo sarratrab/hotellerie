@@ -9,7 +9,7 @@
         <input 
           type="checkbox" 
           id="allowAnonymous"
-          [(ngModel)]="allowAnonymousResponse"
+          [(ngModel)]="isAnonymous"
           class="custom-checkbox"
         />
         <label for="allowAnonymous" class="checkbox-label">
@@ -23,7 +23,6 @@
         <input 
           type="checkbox" 
           id="sendNotification"
-          [(ngModel)]="sendNotificationMail"
           class="custom-checkbox"
         />
         <label for="sendNotification" class="checkbox-label">
@@ -42,7 +41,7 @@
         <input 
           type="date"
           id="expirationDate"
-          [(ngModel)]="expirationDate"
+          [(ngModel)]="deadline"
           class="date-input"
           placeholder="mm/dd/yyyy"
         />

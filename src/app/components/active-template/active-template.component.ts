@@ -29,6 +29,8 @@ import { DuplicateTemplateDialogComponent } from '../duplicate-template-dialog/d
 import { TemplateActionsService } from '../../services/TemplateActionsService';
 // at the top
 import { MultiSelectModule } from 'primeng/multiselect';
+import { LaunchSurveyStateService } from '../../services/launch-survey-state.service';
+import { AudienceStateService } from '../../services/audience-state.service';
 
 
 @Component({
@@ -75,7 +77,8 @@ private typeLabelById = new Map<string, string>();
     private templateTypeService: TypeServiceService,
     private messageService: MessageService,
     private dialogService: DialogService,
-    private templateActionsSvc: TemplateActionsService
+    private templateActionsSvc: TemplateActionsService,
+    private launchState: AudienceStateService,
   ) {}
 
   ngOnInit(): void {
@@ -208,9 +211,20 @@ private typeLabelById = new Map<string, string>();
     if (id) this.router.navigate(['/templates', id]);
   }
 
-  lanchSurvey() {
-    this.router.navigate(['/lanch-survey']);
+  onAssign(t: any) {
+    const templateId = t?.templateId ?? t?.id ?? t?.template_id;
+    const name       = t?.name ?? t?.title ?? '';
+    const description = t?.description ?? t?.summary ?? '';
+
+    if (!templateId) {
+      console.error('TemplateId manquant sur la carte:', t);
+      return;
+    }
+
+    this.launchState.setTemplateInfo(templateId, name, description);
+    this.router.navigate(['/lanch-survey/step1']);
   }
+
 
   trackBySurvey(index: number, template: TemplateBase): string {
     return template.id;

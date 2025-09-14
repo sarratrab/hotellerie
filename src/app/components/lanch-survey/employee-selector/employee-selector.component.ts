@@ -9,6 +9,7 @@ import { DropdownModule } from "primeng/dropdown";
 import { EmployeeRow } from '../../../models/interfaces/EmployeeRow';
 import { EmployeeApiService } from '../../../services/employee-api.service';
 import { AudienceStateService } from '../../../services/audience-state.service';
+import { Router } from '@angular/router';
 
 export interface Employee {
   id: number;
@@ -38,50 +39,52 @@ export class EmployeeSelectorComponent {
 
   constructor(
     private employeeApi: EmployeeApiService,
-    private audienceState: AudienceStateService
+    private audienceState: AudienceStateService  ,
+  private router: Router
   ) {}
 
-ngOnInit() {
-  const filters = this.audienceState.getSelection();
-
-  this.employeeApi.getForSelection(filters).subscribe({
-    next: (rows) => {
-      this.employees = rows;
-      this.totalEmployees = rows.length;
-
-      // ✅ pre-select: only if the API rows have isSelected = true
-      this.selectedEmployees = rows.filter(r => r.isSelected === true);
-      this.selectedCount = this.selectedEmployees.length;
-
-      this.filteredEmployees = [...this.employees];
-    },
-    error: (err) => console.error('Load employees failed', err)
-  });
-}
+  ngOnInit() {
+    const filters = this.audienceState.getSelection();
+    this.employeeApi.getForSelection(filters).subscribe({
+      next: (rows) => {
+        this.employees = rows;
+        this.totalEmployees = rows.length;
+        this.selectedEmployees = rows.filter(r => r.isSelected);   // pré-sélection
+        this.selectedCount = this.selectedEmployees.length;
+        this.filteredEmployees = [...this.employees];
+      },
+      error: (err) => console.error('Load employees failed', err)
+    });
+  }
 
 onEmployeeSelect(employee: EmployeeRow, ev: Event) {
-  const checked = ($any(ev.target) as HTMLInputElement).checked;
+  const checked = (ev.target as HTMLInputElement)?.checked ?? false;
+
   if (checked) {
     if (!this.isSelected(employee)) this.selectedEmployees.push(employee);
   } else {
     this.selectedEmployees = this.selectedEmployees.filter(x => x.id !== employee.id);
   }
+
   this.updateSelectedCount();
 }
 
 onSelectAll(ev: Event) {
-  const checked = ($any(ev.target) as HTMLInputElement).checked;
+  const checked = (ev.target as HTMLInputElement)?.checked ?? false;
+
   if (checked) {
+    // coche toutes les lignes visibles (filtrées)
     this.filteredEmployees.forEach(e => {
       if (!this.isSelected(e)) this.selectedEmployees.push(e);
     });
   } else {
+    // décoche toutes les lignes visibles (filtrées)
     const ids = new Set(this.filteredEmployees.map(e => e.id));
     this.selectedEmployees = this.selectedEmployees.filter(sel => !ids.has(sel.id));
   }
+
   this.updateSelectedCount();
 }
-
 
   // ---------- UI helpers / actions ----------
   isSelected(e: EmployeeRow): boolean {
@@ -143,10 +146,14 @@ onSelectAll(ev: Event) {
     return `Selected Employees (${this.selectedCount} of ${this.totalEmployees})`;
   }
 
-  onCancel() { console.log('Cancel'); }
-  onNext()   { console.log('Next with:', this.selectedEmployees); }
+  onNext() {
+    const ids = this.selectedEmployees.map(e => e.id);
+    this.audienceState.setSelectedEmployees(ids);
+    this.router.navigate(['/lanch-survey/step3']);
+  }
+
+  onCancel() {
+    this.router.navigate(['/lanch-survey/step1']);
+  }
 }
 
-function $any(target: EventTarget | null): HTMLInputElement {
-  throw new Error('Function not implemented.');
-}

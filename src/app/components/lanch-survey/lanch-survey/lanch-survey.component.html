@@ -5,7 +5,7 @@
 <div class="sub-navbar">
   <div class="sub-nav-card">
     <div class="sub-nav-items">
-<router-outlet></router-outlet>
+<router-outlet #stepOutlet="outlet"></router-outlet>
     <app-lanch-survey-footer
   (cancel)="cancel()"
   (next)="next()"
