@@ -30,6 +30,17 @@ export class LaunchStep3Component implements OnInit {
   ) {}
 
   ngOnInit(): void {
+     this.route.queryParams.subscribe((p) => {
+    const templateId = p['templateId'] || p['id'];
+    const templateName = p['name'];
+    if (templateId) this.wizard.setTemplateInfo(templateId, templateName);
+  });
+
+  // Restore previously saved values if they exist
+  if (this.wizard.deadline) {
+    this.deadline = this.wizard.deadline.substring(0, 10);
+  }
+  this.isAnonymous = this.wizard.allowAnonymous ?? false;
     // 1) Si tu arrives ici depuis "Assign", récupère le templateId (et éventuellement le name) en query params
     this.route.queryParams.subscribe((p) => {
       const templateId = p['templateId'] || p['id'];
@@ -46,6 +57,7 @@ export class LaunchStep3Component implements OnInit {
 
   public onCancel() {
     console.log('[Step3] onCancel called');
+    this.wizard.setSettings(this.deadline, this.isAnonymous);
     this.router.navigate(['/lanch-survey/step2']);
   }
 

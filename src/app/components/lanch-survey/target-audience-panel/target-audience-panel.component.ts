@@ -96,6 +96,18 @@ this.router?.navigate(['/lanch-survey/step2']);
 
   ngOnInit(): void {
     this.loadLookups();
+     // ✅ restore previous selection if any
+  const saved = this.audienceState.getSelection();
+  if (saved) {
+    this.allEmployees = saved.allEmployees;
+    this.byDepartment = saved.departmentIds?.length > 0;
+    this.byLocation   = saved.cities?.length > 0;
+    this.byPosition   = saved.positionIds?.length > 0;
+
+    this.selectedDepartments = saved.departmentIds || [];
+    this.selectedPositions   = saved.positionIds   || [];
+    this.selectedLocations   = saved.cities        || [];
+  }
   }
 
   private loadLookups() {
