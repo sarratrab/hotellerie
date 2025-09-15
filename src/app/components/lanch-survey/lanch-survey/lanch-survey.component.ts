@@ -1,9 +1,8 @@
 import { AfterViewInit, Component, ViewChild } from '@angular/core';
-import { Router, ActivatedRoute, RouterOutlet } from '@angular/router';
+import { Router, RouterOutlet } from '@angular/router';
 import { SurveyNavbarComponent } from "../../survey-navbar/survey-navbar.component";
 import { LanchSurveyStepsNavComponent } from "../lanch-survey-steps-nav/lanch-survey-steps-nav.component";
 import { LanchSurveyFooterComponent } from "../lanch-survey-footer/lanch-survey-footer.component";
-import { LaunchStep3Component } from '../launch-step3/launch-step3.component';
 
 @Component({
   selector: 'app-lanch-survey',
@@ -13,12 +12,17 @@ import { LaunchStep3Component } from '../launch-step3/launch-step3.component';
   styleUrls: ['./lanch-survey.component.css']
 })
 export class LanchSurveyComponent implements AfterViewInit {
+  private readonly routes = {
+  step1: '/lanch-survey/step1',
+  step2: '/lanch-survey/step2', 
+  step3: '/lanch-survey/step3',
+  templates: '/active-templates'
+};
   @ViewChild(RouterOutlet) outlet?: RouterOutlet;
 
   constructor(private router: Router) {}
 
   ngAfterViewInit() {
-    // petit log pour vérifier que l’outlet est bien résolu
     setTimeout(() => {
       console.log('[Parent] outlet.component =', this.outlet?.component);
     }, 0);
@@ -31,12 +35,12 @@ export class LanchSurveyComponent implements AfterViewInit {
   next() {
     const child = this.activeChild();
     if (child?.onNext) {
-      child.onNext();               // délégation au Step courant
+      child.onNext();              
       return;
     }
-    // fallback de sécurité si jamais
-    if (this.router.url.includes('step1')) this.router.navigate(['/lanch-survey/step2']);
-    else if (this.router.url.includes('step2')) this.router.navigate(['/lanch-survey/step3']);
+     const currentUrl = this.router.url;
+    if (currentUrl.includes('step1')) this.router.navigate([this.routes.step2]);
+    else if (currentUrl.includes('step2')) this.router.navigate([this.routes.step3]);
   }
 
   cancel() {
@@ -45,9 +49,9 @@ export class LanchSurveyComponent implements AfterViewInit {
       child.onCancel();
       return;
     }
-    // fallback
-    if (this.router.url.includes('step3')) this.router.navigate(['/lanch-survey/step2']);
-    else if (this.router.url.includes('step2')) this.router.navigate(['/lanch-survey/step1']);
-    else this.router.navigate(['/active-templates']);
+    const currentUrl = this.router.url;
+    if (currentUrl.includes('step3')) this.router.navigate([this.routes.step2]);
+    else if (currentUrl.includes('step2')) this.router.navigate([this.routes.step1]);
+    else this.router.navigate([this.routes.templates]);
   }
 }

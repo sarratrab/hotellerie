@@ -1,7 +1,6 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-
 import { TableModule } from 'primeng/table';
 import { CheckboxModule } from 'primeng/checkbox';
 import { InputTextModule } from 'primeng/inputtext';
@@ -11,14 +10,6 @@ import { EmployeeApiService } from '../../../services/employee-api.service';
 import { AudienceStateService } from '../../../services/audience-state.service';
 import { Router } from '@angular/router';
 
-export interface Employee {
-  id: number;
-  name: string;
-  title?: string;
-  department?: string;
-  manager?: string;
-}
-
 @Component({
   selector: 'app-employee-selector',
   standalone: true,
@@ -26,21 +17,20 @@ export interface Employee {
   templateUrl: './employee-selector.component.html',
   styleUrls: ['./employee-selector.component.css']
 })
-export class EmployeeSelectorComponent {
- employees: EmployeeRow[] = [];
+export class EmployeeSelectorComponent implements OnInit {
+
+  employees: EmployeeRow[] = [];
   filteredEmployees: EmployeeRow[] = [];
   selectedEmployees: EmployeeRow[] = [];
-
   totalEmployees = 0;
-  selectedCount   = 0;
-
+  selectedCount = 0;
   searchTerm = '';
-  selectedFilter = ''; // '', 'selected', 'available'
+  selectedFilter = '';
 
   constructor(
     private employeeApi: EmployeeApiService,
-    private audienceState: AudienceStateService  ,
-  private router: Router
+    private audienceState: AudienceStateService,
+    private router: Router
   ) {}
 
   ngOnInit() {
@@ -49,7 +39,7 @@ export class EmployeeSelectorComponent {
       next: (rows) => {
         this.employees = rows;
         this.totalEmployees = rows.length;
-        this.selectedEmployees = rows.filter(r => r.isSelected);   // pré-sélection
+        this.selectedEmployees = rows.filter(r => r.isSelected);   
         this.selectedCount = this.selectedEmployees.length;
         this.filteredEmployees = [...this.employees];
       },
@@ -57,57 +47,33 @@ export class EmployeeSelectorComponent {
     });
   }
 
-onEmployeeSelect(employee: EmployeeRow, ev: Event) {
-  const checked = (ev.target as HTMLInputElement)?.checked ?? false;
+  onEmployeeSelect(employee: EmployeeRow, ev: Event) {
+    const checked = (ev.target as HTMLInputElement)?.checked ?? false;
 
-  if (checked) {
-    if (!this.isSelected(employee)) this.selectedEmployees.push(employee);
-  } else {
-    this.selectedEmployees = this.selectedEmployees.filter(x => x.id !== employee.id);
+    if (checked) {
+      if (!this.isSelected(employee)) this.selectedEmployees.push(employee);
+    } else {
+      this.selectedEmployees = this.selectedEmployees.filter(x => x.id !== employee.id);
+    }
+
+    this.updateSelectedCount();
   }
 
-  this.updateSelectedCount();
-}
+  onSelectAll(ev: Event) {
+    const checked = (ev.target as HTMLInputElement)?.checked ?? false;
 
-onSelectAll(ev: Event) {
-  const checked = (ev.target as HTMLInputElement)?.checked ?? false;
+    if (checked) {
+      this.filteredEmployees.forEach(e => {
+        if (!this.isSelected(e)) this.selectedEmployees.push(e);
+      });
+    } else {
+      const ids = new Set(this.filteredEmployees.map(e => e.id));
+      this.selectedEmployees = this.selectedEmployees.filter(sel => !ids.has(sel.id));
+    }
 
-  if (checked) {
-    // coche toutes les lignes visibles (filtrées)
-    this.filteredEmployees.forEach(e => {
-      if (!this.isSelected(e)) this.selectedEmployees.push(e);
-    });
-  } else {
-    // décoche toutes les lignes visibles (filtrées)
-    const ids = new Set(this.filteredEmployees.map(e => e.id));
-    this.selectedEmployees = this.selectedEmployees.filter(sel => !ids.has(sel.id));
+    this.updateSelectedCount();
   }
 
-  this.updateSelectedCount();
-}
-
-  // ---------- UI helpers / actions ----------
-  isSelected(e: EmployeeRow): boolean {
-    return this.selectedEmployees.some(x => x.id === e.id);
-  }
-
-  updateSelectedCount() {
-    this.selectedCount = this.selectedEmployees.length;
-  }
-
-
-
-  isAllSelected(): boolean {
-    return this.filteredEmployees.length > 0 &&
-           this.filteredEmployees.every(e => this.isSelected(e));
-  }
-
-  isIndeterminate(): boolean {
-    const count = this.filteredEmployees.filter(e => this.isSelected(e)).length;
-    return count > 0 && count < this.filteredEmployees.length;
-  }
-
-  // Recherche + filtre "Selected/Available"
   onGlobalFilter(_table: any, ev: Event) {
     const v = (ev.target as HTMLInputElement).value.toLowerCase();
     this.searchTerm = v;
@@ -117,6 +83,20 @@ onSelectAll(ev: Event) {
   onFilterChange(ev: Event) {
     this.selectedFilter = (ev.target as HTMLSelectElement).value;
     this.applyFilters();
+  }
+
+  onNext() {
+    const ids = this.selectedEmployees.map(e => e.id);
+    this.audienceState.setSelectedEmployees(ids);
+    this.router.navigate(['/lanch-survey/step3']);
+  }
+
+  onCancel() {
+    this.router.navigate(['/lanch-survey/step1']);
+  }
+
+  updateSelectedCount() {
+    this.selectedCount = this.selectedEmployees.length;
   }
 
   applyFilters() {
@@ -142,18 +122,22 @@ onSelectAll(ev: Event) {
     this.filteredEmployees = rows;
   }
 
+  isSelected(e: EmployeeRow): boolean {
+    return this.selectedEmployees.some(x => x.id === e.id);
+  }
+
+  isAllSelected(): boolean {
+    return this.filteredEmployees.length > 0 &&
+           this.filteredEmployees.every(e => this.isSelected(e));
+  }
+
+  isIndeterminate(): boolean {
+    const count = this.filteredEmployees.filter(e => this.isSelected(e)).length;
+    return count > 0 && count < this.filteredEmployees.length;
+  }
+
   getSelectedEmployeesCount(): string {
     return `Selected Employees (${this.selectedCount} of ${this.totalEmployees})`;
   }
 
-  onNext() {
-    const ids = this.selectedEmployees.map(e => e.id);
-    this.audienceState.setSelectedEmployees(ids);
-    this.router.navigate(['/lanch-survey/step3']);
-  }
-
-  onCancel() {
-    this.router.navigate(['/lanch-survey/step1']);
-  }
 }
-

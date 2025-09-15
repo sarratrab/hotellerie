@@ -1,20 +1,22 @@
-// target-audience-panel.component.ts
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
-
 import { MultiSelectModule } from 'primeng/multiselect';
 import { CalendarModule } from 'primeng/calendar';
 import { CheckboxModule } from 'primeng/checkbox';
 import { ButtonModule } from 'primeng/button';
-
 import { SurveyServiceService } from '../../../services/survey-service.service';
 import { DepartmentListItem } from '../../../models/interfaces/DepartementListItem';
 import { PositionListItem } from '../../../models/interfaces/PositionListItem';
 import { LocationListItem } from '../../../models/interfaces/LocationListItem';
 import { AudienceStateService } from '../../../services/audience-state.service';
 import { Router } from '@angular/router';
+
+interface SelectOption {
+  name: string;
+  value: number | string;
+}
 
 @Component({
   selector: 'app-target-audience-panel',
@@ -24,90 +26,95 @@ import { Router } from '@angular/router';
   styleUrls: ['./target-audience-panel.component.css']
 })
 export class TargetAudiencePanelComponent implements OnInit {
-constructor(private router : Router ,private lookups: SurveyServiceService,private audienceState: AudienceStateService){}
-  // Checkboxes
+
   allEmployees = false;
   byLocation = false;
   byDepartment = false;
   byPosition = false;
 
-  // Selected values (PrimeNG MultiSelect stocke les objets d’option quand on ne met pas optionValue)
-selectedLocations: string[] = [];
-selectedDepartments: number[] = [];
-selectedPositions: number[] = [];
+  selectedLocations: string[] = [];
+  selectedDepartments: number[] = [];
+  selectedPositions: number[] = [];
 
-
-
-onToggleAll(checked: boolean) {
-  this.allEmployees = checked;
-  if (checked) {
-    this.byDepartment = this.byLocation = this.byPosition = false;
-    this.selectedDepartments = [];
-    this.selectedLocations = [];
-    this.selectedPositions = [];
-  }
-  this.persistSelection();
-}
-
-onToggleSegment(kind: 'dept' | 'loc' | 'pos', checked: boolean) {
-  if (kind === 'dept') { this.byDepartment = checked; if (!checked) this.selectedDepartments = []; }
-  if (kind === 'loc')  { this.byLocation  = checked; if (!checked) this.selectedLocations  = []; }
-  if (kind === 'pos')  { this.byPosition  = checked; if (!checked) this.selectedPositions  = []; }
-  if (checked) this.allEmployees = false;
-  this.persistSelection();
-}
-
-// Sauvegarde centrale vers le service partagé
-persistSelection() {
-  this.audienceState.setSelection({
-    allEmployees: this.allEmployees,
-    departmentIds: this.byDepartment ? this.selectedDepartments : [],
-    positionIds:   this.byPosition   ? this.selectedPositions   : [],
-    cities:        this.byLocation   ? this.selectedLocations   : []
-  });
-}
-
-onNext() {
-  const deptIds = (this.selectedDepartments || []).map((d: any) => d.id ?? d.value);
-const posIds  = (this.selectedPositions  || []).map((p: any) => p.id ?? p.value);
-const cities  = (this.selectedLocations  || []).map((l: any) => l.name ?? l.value ?? l);
-
-this.audienceState.setSelection({
-  allEmployees: this.allEmployees,
-  departmentIds: deptIds,
-  positionIds: posIds,
-  cities
-});
- this.persistSelection();
-this.router?.navigate(['/lanch-survey/step2']);
-  // plus de mapping nécessaire : tu as déjà des primitives
- 
-  console.log('Step1 selection saved:', this.audienceState.getSelection());
-}
-
-  // Options (remplies par l’API)
-  locationOptions:  { name: string; value: string }[] = [];
-  departmentOptions:{ name: string; value: number }[] = [];
-  positionOptions:  { name: string; value: number }[] = [];
+  locationOptions: { name: string; value: string }[] = [];
+  departmentOptions: { name: string; value: number }[] = [];
+  positionOptions: { name: string; value: number }[] = [];
 
   loading = false;
   error?: string;
 
+  constructor(
+    private router: Router,
+    private lookups: SurveyServiceService,
+    private audienceState: AudienceStateService
+  ) {}
 
   ngOnInit(): void {
     this.loadLookups();
-     // ✅ restore previous selection if any
-  const saved = this.audienceState.getSelection();
-  if (saved) {
-    this.allEmployees = saved.allEmployees;
-    this.byDepartment = saved.departmentIds?.length > 0;
-    this.byLocation   = saved.cities?.length > 0;
-    this.byPosition   = saved.positionIds?.length > 0;
-
-    this.selectedDepartments = saved.departmentIds || [];
-    this.selectedPositions   = saved.positionIds   || [];
-    this.selectedLocations   = saved.cities        || [];
+    this.restorePreviousSelection();
   }
+
+  onToggleAll(checked: boolean) {
+    this.allEmployees = checked;
+    if (checked) {
+      this.byDepartment = this.byLocation = this.byPosition = false;
+      this.selectedDepartments = [];
+      this.selectedLocations = [];
+      this.selectedPositions = [];
+    }
+    this.persistSelection();
+  }
+
+  onToggleSegment(kind: 'dept' | 'loc' | 'pos', checked: boolean) {
+    if (kind === 'dept') { this.byDepartment = checked; if (!checked) this.selectedDepartments = []; }
+    if (kind === 'loc')  { this.byLocation  = checked; if (!checked) this.selectedLocations  = []; }
+    if (kind === 'pos')  { this.byPosition  = checked; if (!checked) this.selectedPositions  = []; }
+    if (checked) this.allEmployees = false;
+    this.persistSelection();
+  }
+
+  onNext() {
+    const deptIds = (this.selectedDepartments || []).map((d: any) => d.id ?? d.value);
+    const posIds  = (this.selectedPositions  || []).map((p: any) => p.id ?? p.value);
+    const cities  = (this.selectedLocations  || []).map((l: any) => l.name ?? l.value ?? l);
+
+    this.audienceState.setSelection({
+      allEmployees: this.allEmployees,
+      departmentIds: deptIds,
+      positionIds: posIds,
+      cities
+    });
+    this.persistSelection();
+    this.router?.navigate(['/lanch-survey/step2']);
+
+    console.log('Step1 selection saved:', this.audienceState.getSelection());
+  }
+
+  onCancel() {
+    console.log('Survey creation cancelled');
+  }
+
+  persistSelection() {
+    this.audienceState.setSelection({
+      allEmployees: this.allEmployees,
+      departmentIds: this.byDepartment ? this.selectedDepartments : [],
+      positionIds:   this.byPosition   ? this.selectedPositions   : [],
+      cities:        this.byLocation   ? this.selectedLocations   : []
+    });
+  }
+
+  private restorePreviousSelection(): void {
+    const saved = this.audienceState.getSelection();
+    if (saved) {
+      this.allEmployees = saved.allEmployees;
+      this.byDepartment = saved.departmentIds?.length > 0;
+      this.byLocation = saved.cities?.length > 0;
+      this.byPosition = saved.positionIds?.length > 0;
+
+      this.selectedDepartments = saved.departmentIds || [];
+      this.selectedPositions = saved.positionIds || [];
+      this.selectedLocations = saved.cities || [];
+    }
   }
 
   private loadLookups() {
@@ -119,7 +126,6 @@ this.router?.navigate(['/lanch-survey/step2']);
       this.lookups.getLocations(true).toPromise(),
       this.lookups.getPositions(true).toPromise()
     ]).then(([depts, locs, pos]) => {
-      // map → {name, value} pour MultiSelect
       this.departmentOptions = (depts ?? []).map((d: DepartmentListItem) => ({
         name: d.name, value: d.departmentId
       }));
@@ -137,15 +143,15 @@ this.router?.navigate(['/lanch-survey/step2']);
     });
   }
 
-  // ----- computed helpers -----
+ 
   get segmentingDisabled(): boolean {
     return this.allEmployees;
   }
+
   get allDisabled(): boolean {
     return this.byDepartment || this.byLocation || this.byPosition;
   }
 
-  // Résumé
   getSelectionSummary(): string {
     if (this.allEmployees) {
       return 'This survey will be sent to all employees in your organization.';
@@ -162,10 +168,5 @@ this.router?.navigate(['/lanch-survey/step2']);
     }
     return parts.length ? `This survey will be sent to employees in: ${parts.join(', ')}.` : '';
   }
-
-  onCancel() {
-    console.log('Survey creation cancelled');
-  }
-
 
 }
