@@ -52,6 +52,7 @@ export class TargetAudiencePanelComponent implements OnInit {
   ngOnInit(): void {
     this.loadLookups();
     this.restorePreviousSelection();
+    this.audienceState.reset();
   }
 
   onToggleAll(checked: boolean) {

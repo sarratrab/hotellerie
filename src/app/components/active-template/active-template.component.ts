@@ -82,6 +82,7 @@ export class ActiveTemplateComponent implements OnInit, OnDestroy {
     private dialogService: DialogService,
     private templateActionsSvc: TemplateActionsService,
     private launchState: AudienceStateService,
+    private audienceState: AudienceStateService,
   ) {}
 
   ngOnInit(): void {
@@ -239,7 +240,7 @@ export class ActiveTemplateComponent implements OnInit, OnDestroy {
     // fermer le menu et vider la sélection
     this.activeCardMenu.set(null);
     this.selectedCard.set(null);
-
+    this.audienceState.reset();
     this.router.navigate(['/lanch-survey/step1']);
   }
 

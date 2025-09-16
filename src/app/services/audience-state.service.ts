@@ -23,7 +23,31 @@ export class AudienceStateService {
     isAnonymous: false
   };
 
-  // --- exposer proprement pour step3 ---
+private readonly initialState: SurveyWizardState = {
+    allEmployees: false,
+    departmentIds: [],
+    positionIds: [],
+    cities: [],
+    selectedEmployeeIds: [],
+    isAnonymous: false
+  };
+
+  reset(): void {
+    this.state = { ...this.initialState };
+  }
+
+  loadSurveyConfiguration(config: Partial<SurveyWizardState>): void {
+    this.state = { ...this.initialState, ...config };
+  }
+
+  hasConfiguration(): boolean {
+    return this.state.allEmployees || 
+           this.state.departmentIds.length > 0 || 
+           this.state.positionIds.length > 0 || 
+           this.state.cities.length > 0 ||
+           this.state.selectedEmployeeIds.length > 0;
+  }
+
   get deadline(): string | undefined { return this.state.deadline; }
   get allowAnonymous(): boolean { return this.state.isAnonymous; }
 
