@@ -32,8 +32,31 @@ private readonly initialState: SurveyWizardState = {
     isAnonymous: false
   };
 
-  reset(): void {
-    this.state = { ...this.initialState };
+ private getDefaultState(): SurveyWizardState {
+    return {
+      allEmployees: false,
+      departmentIds: [],
+      positionIds: [],
+      cities: [],
+      selectedEmployeeIds: [],
+      isAnonymous: false
+    };
+  }
+
+  // --- Reset only audience/targeting ---
+  resetAudience(): void {
+    const { templateId, name, description } = this.state;
+    this.state = {
+      ...this.getDefaultState(),
+      templateId,
+      name,
+      description
+    };
+  }
+
+  // --- Reset everything (including template info) ---
+  resetAll(): void {
+    this.state = this.getDefaultState();
   }
 
   loadSurveyConfiguration(config: Partial<SurveyWizardState>): void {
@@ -93,7 +116,13 @@ private readonly initialState: SurveyWizardState = {
       deadline: this.state.deadline, // ISO
       isAnonymous: this.state.isAnonymous,
       surveyStatus: 0,
-      employeeIds: [...this.state.selectedEmployeeIds]
+      employeeIds: [...this.state.selectedEmployeeIds],
+      // NEW: Add targeting configuration
+      DepartmentIds: [...this.state.departmentIds],
+      PositionIds: [...this.state.positionIds],
+      SelectedCities: [...this.state.cities]
+   
+
     };
   }
 }

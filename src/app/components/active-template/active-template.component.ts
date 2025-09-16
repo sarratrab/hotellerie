@@ -240,7 +240,7 @@ export class ActiveTemplateComponent implements OnInit, OnDestroy {
     // fermer le menu et vider la sélection
     this.activeCardMenu.set(null);
     this.selectedCard.set(null);
-    this.audienceState.reset();
+    this.audienceState.resetAudience();
     this.router.navigate(['/lanch-survey/step1']);
   }
 

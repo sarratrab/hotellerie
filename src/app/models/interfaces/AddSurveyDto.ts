@@ -6,4 +6,8 @@ export interface AddSurveyDto {
   isAnonymous: boolean;
   surveyStatus: number;    // 0 si tu veux "Draft" ou ce que ton enum attend
   employeeIds: number[];
+  allEmployees: boolean;           // Add this field
+  DepartmentIds: number[];
+  PositionIds: number[];
+  SelectedCities: string[];
 }
