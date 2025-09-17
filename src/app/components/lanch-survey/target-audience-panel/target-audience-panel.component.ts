@@ -93,6 +93,7 @@ export class TargetAudiencePanelComponent implements OnInit {
 
   onCancel() {
     console.log('Survey creation cancelled');
+     this.router.navigate(['/active-templates']);
   }
 
   persistSelection() {
