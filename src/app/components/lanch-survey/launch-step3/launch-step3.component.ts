@@ -60,21 +60,38 @@ export class LaunchStep3Component implements OnInit {
     this.wizard.setSettings(this.deadline, this.isAnonymous);
     this.router.navigate(['/lanch-survey/step2']);
   }
-
+  private isEditMode = false;
+  private surveyId?: string;
   onNext() {
-    this.error = this.success = undefined;
-    this.loading = true;
+  this.error = this.success = undefined;
+  this.loading = true;
 
-    try {
-      // 1) stocker et convertir en ISO dans le service
-      // (deadline ici est 'YYYY-MM-DD', le service fera toISOString)
-      this.wizard.setSettings(this.deadline, this.isAnonymous);
+  try {
+    // 1) stocker et convertir en ISO dans le service
+    this.wizard.setSettings(this.deadline, this.isAnonymous);
 
-      // 2) Construire le DTO (NOM/desc/TemplateId déjà placés via Assign)
-      const dto = this.wizard.buildAddSurveyDto();
-      console.log('[Step3] POST dto =', dto);
+    // 2) Construire le DTO (NOM/desc/TemplateId déjà placés via Assign)
+    const dto = this.wizard.buildAddSurveyDto();
+    console.log('[Step3] DTO =', dto);
 
-      // 3) API
+    if (this.isEditMode && this.surveyId) {
+      // --- EDIT MODE ---
+      this.surveyApi.updateSurvey(this.surveyId, dto).subscribe({
+        next: () => {
+          this.loading = false;
+          this.success = 'Survey updated successfully';
+          this.router.navigate(['/surveys']);
+        },
+        error: (err: { error: { message: any; }; statusText: any; }) => {
+          this.loading = false;
+          const detail = err?.error?.message || err?.error || err?.statusText || 'Bad Request';
+          this.error = `Failed to update survey: ${detail}`;
+          console.error('Update survey error:', err);
+        }
+      });
+
+    } else {
+      // --- ADD MODE ---
       this.surveyApi.addSurvey(dto).subscribe({
         next: () => {
           this.loading = false;
@@ -83,16 +100,18 @@ export class LaunchStep3Component implements OnInit {
         },
         error: (err) => {
           this.loading = false;
-          // essayer d’extraire l’erreur côté .NET (ModelState) si dispo
           const detail = err?.error?.message || err?.error || err?.statusText || 'Bad Request';
           this.error = `Failed to create survey: ${detail}`;
           console.error('Create survey error:', err);
         }
       });
-    } catch (e: any) {
-      this.loading = false;
-      this.error = e?.message || 'Invalid data';
-      console.warn('Client-side validation failed:', e);
     }
+
+  } catch (e: any) {
+    this.loading = false;
+    this.error = e?.message || 'Invalid data';
+    console.warn('Client-side validation failed:', e);
   }
+}
+
 }

@@ -32,8 +32,18 @@ export class SurveyComponent implements OnInit{
 CompleteSurvey() {
 throw new Error('Method not implemented.');
 }
+selectedCard(): { id: string } | null {
+   const surveysArray = this.surveys(); // <-- unwrap the signal
+  return surveysArray.find(s => s.isSelected) || null;
+}
+
 EditSurvey() {
- this.router.navigate(['/edit-survey/step1']);
+  const id = this.activeCardMenu() ?? this.selectedCard()?.id;
+  if (!id) return;
+
+  this.activeCardMenu.set(null);
+
+  this.router.navigate([`/lanch-survey/${id}/step1`]);
 }
 
   @ViewChild('menu') menu!: TieredMenu;

@@ -20,6 +20,7 @@ export interface SurveyOutDto {
   providedIn: 'root'
 })
 export class SurveyService {
+ 
   private apiUrl = 'http://localhost:5096/'; // adjust port
 
   constructor(private http: HttpClient) {}
@@ -33,4 +34,11 @@ export class SurveyService {
     return this.http.get<any>(`${baseUrl}api/Survey/GetAllSurveys`)
       .pipe(map(res => res.data));
   }
+
+   // in SurveyService
+updateSurvey(surveyId: string, dto: AddSurveyDto): Observable<void> {
+  // Backend expects PUT with surveyId in URL and DTO in body
+  return this.http.put<void>(`${baseUrl}api/Survey/UpdateSurvey/${surveyId}`, dto);
+}
+
 }

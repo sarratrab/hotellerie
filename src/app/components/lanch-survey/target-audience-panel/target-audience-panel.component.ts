@@ -11,7 +11,7 @@ import { DepartmentListItem } from '../../../models/interfaces/DepartementListIt
 import { PositionListItem } from '../../../models/interfaces/PositionListItem';
 import { LocationListItem } from '../../../models/interfaces/LocationListItem';
 import { AudienceStateService } from '../../../services/audience-state.service';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 
 interface SelectOption {
   name: string;
@@ -43,16 +43,55 @@ export class TargetAudiencePanelComponent implements OnInit {
   loading = false;
   error?: string;
 
+  private isEditMode = false;
+  private surveyId?: string;
+
   constructor(
     private router: Router,
     private lookups: SurveyServiceService,
-    private audienceState: AudienceStateService
+    private audienceState: AudienceStateService,
+    private route: ActivatedRoute,
   ) {}
 
   ngOnInit(): void {
-    this.loadLookups();
-    this.restorePreviousSelection();
-    this.audienceState.resetAudience();
+    this.route.paramMap.subscribe(params => {
+     this.surveyId = this.route.parent?.snapshot.paramMap.get('id') ?? undefined;
+    console.log('surveyId:', this.surveyId);
+      this.isEditMode = !!this.surveyId;
+
+      this.loadLookups();
+
+   if (this.isEditMode && this.surveyId) {
+  this.audienceState.loadSurveyConfig(this.surveyId).subscribe({
+    next: config => {
+      console.log('Loaded survey config', config);
+
+      // Map loaded config to UI variables
+      this.allEmployees = config.allEmployees;
+      this.byDepartment = config.departmentIds?.length > 0;
+      this.byLocation = config.cities?.length > 0;
+      this.byPosition = config.positionIds?.length > 0;
+
+      this.selectedDepartments = config.departmentIds || [];
+      this.selectedPositions = config.positionIds || [];
+      this.selectedLocations = config.cities || [];
+
+      // Update state service as well
+      this.audienceState.setSelection({
+        allEmployees: this.allEmployees,
+        departmentIds: this.selectedDepartments,
+        positionIds: this.selectedPositions,
+        cities: this.selectedLocations
+      });
+    },
+    error: err => console.error(err)
+  });
+}
+ else {
+        this.restorePreviousSelection();
+        this.audienceState.resetAudience();
+      }
+    });
   }
 
   onToggleAll(checked: boolean) {
