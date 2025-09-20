@@ -8,7 +8,7 @@ import { DropdownModule } from "primeng/dropdown";
 import { EmployeeRow } from '../../../models/interfaces/EmployeeRow';
 import { EmployeeApiService } from '../../../services/employee-api.service';
 import { AudienceStateService } from '../../../services/audience-state.service';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 
 @Component({
   selector: 'app-employee-selector',
@@ -26,14 +26,18 @@ export class EmployeeSelectorComponent implements OnInit {
   selectedCount = 0;
   searchTerm = '';
   selectedFilter = '';
+  surveyId: string | undefined;
 
   constructor(
     private employeeApi: EmployeeApiService,
     private audienceState: AudienceStateService,
-    private router: Router
+    private router: Router,
+    private route: ActivatedRoute   // add this
   ) {}
 
   ngOnInit() {
+     // get surveyId from parent route
+  this.surveyId = this.route.parent?.snapshot.paramMap.get('id') ?? undefined;
     const filters = this.audienceState.getSelection();
     this.employeeApi.getForSelection(filters).subscribe({
       next: (rows) => {
@@ -88,7 +92,7 @@ export class EmployeeSelectorComponent implements OnInit {
   onNext() {
     const ids = this.selectedEmployees.map(e => e.id);
     this.audienceState.setSelectedEmployees(ids);
-    this.router.navigate(['/lanch-survey/step3']);
+     this.router.navigate([`/lanch-survey/${this.surveyId}/step3`]);
   }
 
   onCancel() {

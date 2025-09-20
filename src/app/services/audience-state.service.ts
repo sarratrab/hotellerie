@@ -125,6 +125,15 @@ private readonly initialState: SurveyWizardState = {
     if (description !== undefined) this.state.description = description;
   }
 
+  // Build AddSurveyDto from current state + optional overrides// in AudienceStateService
+public getTemplateId(): string | undefined {
+  return this.state.templateId;
+}
+
+public getTemplateName(): string | undefined {
+  return this.state.name;
+}
+
   buildAddSurveyDto(input?: { name?: string; description?: string; templateId?: string }): AddSurveyDto {
     const name        = input?.name        ?? this.state.name        ?? 'Employee Satisfaction Survey';
     const description = input?.description ?? this.state.description ?? '';

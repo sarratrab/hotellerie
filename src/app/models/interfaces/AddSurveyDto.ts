@@ -1,7 +1,7 @@
 export interface AddSurveyDto {
   name: string;
   description?: string;
-  templateId: string;
+  templateId?: string;
   deadline: string;        
   isAnonymous: boolean;
   surveyStatus: number;   

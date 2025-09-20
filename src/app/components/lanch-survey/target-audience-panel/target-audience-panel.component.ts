@@ -54,7 +54,7 @@ export class TargetAudiencePanelComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.route.paramMap.subscribe(params => {
+     this.route.paramMap.subscribe(params => {
      this.surveyId = this.route.parent?.snapshot.paramMap.get('id') ?? undefined;
     console.log('surveyId:', this.surveyId);
       this.isEditMode = !!this.surveyId;
@@ -125,7 +125,8 @@ export class TargetAudiencePanelComponent implements OnInit {
       cities
     });
     this.persistSelection();
-    this.router?.navigate(['/lanch-survey/step2']);
+    this.router.navigate([`/lanch-survey/${this.surveyId}/step2`]);
+
 
     console.log('Step1 selection saved:', this.audienceState.getSelection());
   }

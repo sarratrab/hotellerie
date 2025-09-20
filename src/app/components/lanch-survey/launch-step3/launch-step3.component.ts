@@ -21,50 +21,48 @@ export class LaunchStep3Component implements OnInit {
   loading = false;
   error?: string;
   success?: string;
+  surveyId: string | undefined;
 
   constructor(
     private wizard: AudienceStateService,
     private surveyApi: SurveyService,
     private router: Router,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private audienceState: AudienceStateService
   ) {}
 
-  ngOnInit(): void {
-     this.route.queryParams.subscribe((p) => {
-    const templateId = p['templateId'] || p['id'];
-    const templateName = p['name'];
-    if (templateId) this.wizard.setTemplateInfo(templateId, templateName);
+ngOnInit(): void {
+  // --- read surveyId from parent route ---
+  this.route.parent?.paramMap.subscribe(params => {
+   const rawId = this.route.parent?.snapshot.paramMap.get('id');
+    this.surveyId = rawId && rawId !== 'undefined' && rawId !== 'null' && rawId !== '' 
+      ? rawId 
+      : undefined;
+    console.log('surveyId:', this.surveyId);
+
   });
 
-  // Restore previously saved values if they exist
+const templateId = this.wizard.getTemplateId();
+const templateName = this.wizard.getTemplateName();
+
+  // --- restore wizard state ---
   if (this.wizard.deadline) {
     this.deadline = this.wizard.deadline.substring(0, 10);
   }
   this.isAnonymous = this.wizard.allowAnonymous ?? false;
-    // 1) Si tu arrives ici depuis "Assign", récupère le templateId (et éventuellement le name) en query params
-    this.route.queryParams.subscribe((p) => {
-      const templateId = p['templateId'] || p['id'];
-      const templateName = p['name'];
-      if (templateId) this.wizard.setTemplateInfo(templateId, templateName);
-    });
+}
 
-    // 2) Pré-remplir depuis l’état si tu reviens en arrière
-    if (this.wizard.deadline) {
-      this.deadline = this.wizard.deadline.substring(0, 10);
-    }
-    this.isAnonymous = this.wizard.allowAnonymous ?? false;
-  }
 
   public onCancel() {
     console.log('[Step3] onCancel called');
     this.wizard.setSettings(this.deadline, this.isAnonymous);
     this.router.navigate(['/lanch-survey/step2']);
   }
-  private isEditMode = false;
-  private surveyId?: string;
+
   onNext() {
   this.error = this.success = undefined;
   this.loading = true;
+
 
   try {
     // 1) stocker et convertir en ISO dans le service
@@ -74,7 +72,7 @@ export class LaunchStep3Component implements OnInit {
     const dto = this.wizard.buildAddSurveyDto();
     console.log('[Step3] DTO =', dto);
 
-    if (this.isEditMode && this.surveyId) {
+    if (this.surveyId) {
       // --- EDIT MODE ---
       this.surveyApi.updateSurvey(this.surveyId, dto).subscribe({
         next: () => {
