@@ -33,4 +33,14 @@ export class SurveyService {
     return this.http.get<any>(`${baseUrl}api/Survey/GetAllSurveys`)
       .pipe(map(res => res.data));
   }
+  getCompleted(): Observable<SurveyOutDto[]> {
+    return this.http.get<any>(`${baseUrl}api/Survey/GetCompleted`).pipe(map(res => res.data));
+  }
+  complete(id: string): Observable<any> {
+    return this.http.post(`${baseUrl}api/Survey/Complete/${id}`, {});
+  }
+  // optionnel
+  syncStatuses(): Observable<any> {
+    return this.http.post(`${baseUrl}api/Survey/SyncStatuses`, {});
+  }
 }

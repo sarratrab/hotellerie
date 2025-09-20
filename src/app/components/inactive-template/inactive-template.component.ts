@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, signal, computed, PLATFORM_ID, Inject, ViewChild } from '@angular/core';
+import { Component, OnInit, OnDestroy, signal, computed, PLATFORM_ID, Inject, ViewChild, HostListener } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
@@ -286,6 +286,29 @@ private tint(hex: string, ratio = 0.85): string {
   const ng = Math.round(g + (255 - g) * ratio);
   const nb = Math.round(b + (255 - b) * ratio);
   return `rgb(${nr}, ${ng}, ${nb})`;
+}
+
+    closeMenu(): void {
+  this.activeCardMenu.set(null);
+}
+
+  /** Ferme au clic n'importe où dans le document */
+@HostListener('document:click')
+onDocClick(): void {
+  this.closeMenu();
+}
+
+/** Ferme avec la touche Échap */
+@HostListener('document:keydown.escape', ['$event'])
+onEsc(_: KeyboardEvent): void {
+  this.closeMenu();
+}
+
+/** Ferme si on scrolle ou on redimensionne (optionnel mais UX ++) */
+@HostListener('window:scroll')
+@HostListener('window:resize')
+onWindowMove(): void {
+  if (this.activeCardMenu()) this.closeMenu();
 }
 
 }

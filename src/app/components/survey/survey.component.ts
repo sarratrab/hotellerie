@@ -1,4 +1,4 @@
-import { Component, computed, Inject, OnDestroy, OnInit, PLATFORM_ID, signal, ViewChild } from '@angular/core';
+import { Component, computed, HostListener, Inject, OnDestroy, OnInit, PLATFORM_ID, signal, ViewChild } from '@angular/core';
 import { SurveyNavbarComponent } from "../survey-navbar/survey-navbar.component";
 import { TemplateNavbarComponent } from "../template-navbar/template-navbar.component";
 import { TieredMenu, TieredMenuModule } from 'primeng/tieredmenu';
@@ -13,6 +13,9 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
 import { SurveyOutDto, SurveyService } from '../../services/SurveyService';
+import { TemplateService } from '../../services/template-services.service';
+import { map, switchMap } from 'rxjs/operators';
+import { forkJoin, of } from 'rxjs';
 
 @Component({
   selector: 'app-survey',
@@ -29,9 +32,7 @@ import { SurveyOutDto, SurveyService } from '../../services/SurveyService';
   styleUrl: './survey.component.css'
 })
 export class SurveyComponent implements OnInit{
-CompleteSurvey() {
-throw new Error('Method not implemented.');
-}
+
 EditSurvey() {
  this.router.navigate(['/edit-survey/step1']);
 }
@@ -43,7 +44,7 @@ EditSurvey() {
   ref: DynamicDialogRef | undefined;
   coalesce(v: any, fb: any) { return v === null || v === undefined ? fb : v; }
 
-
+selectedCard = signal<any | null>(null);
   searchTerm = signal<string>('');
   selectedYear = signal<string>('2025');
   selectedType = signal<string>('');
@@ -65,26 +66,39 @@ isDueSoon(s: any, days = 7): boolean {
 
 
   totalSurveys = computed(() => this.filteredSurveys().length);
-     private loadSurveys(): void {
-    this.surveyService.getAll().subscribe({
-      next: (surveys: SurveyOutDto[]) => {
-        this.surveys.set(surveys.map(s => ({
-          id: s.surveyId,
-          name: s.name,
-          description: s.description,
-          createdOn: new Date(s.createdOn),
-          deadline: new Date(s.deadline),
-          isAnonymous: s.isAnonymous,
-          typeLabel: 'Survey',
-          sentTo: s.employeeIds.length,
-          stats: { completed: 0, notTouched: s.employeeIds.length, inProgress: 0 }
-        })));
-      },
-      error: err => {
-        console.error('Error fetching surveys:', err);
-      }
-    });
-  }
+   private loadSurveys(): void {
+  this.surveyService.getAll().pipe(
+    map((res: any) => Array.isArray(res) ? res : (res?.data ?? [])),
+    switchMap((surveys: SurveyOutDto[]) => forkJoin({
+      surveys: of(surveys),
+      types : this.templateTypeService.list(),
+      templates : this.templateService.getAll()
+    })),
+    switchMap(({ surveys, templates ,types}) => {
+      const templateById = new Map(templates.map(t => [t.templateId, t]));
+      const typeById = new Map(types.map(t=> [t.id, t]))
+      return forkJoin(
+        surveys.map(s =>
+          this.templateService.getById(s.templateId).pipe(
+            map(tpl => ({
+              id: s.surveyId,
+              name: s.name,
+              description: s.description,
+              createdOn: new Date(s.createdOn),
+              deadline: new Date(s.deadline),
+              isAnonymous: s.isAnonymous,
+              typeLabel: templateById.get(s.templateId)?.typeName?? 'Unknown',
+              typecolor : typeById.get(templateById.get(s.templateId)!.typeId)?.color,
+              sentTo: s.employeeIds.length,
+              stats: { completed: 0, notTouched: s.employeeIds.length, inProgress: 0 }
+            }))
+          )
+        )
+      );
+    })
+  ).subscribe(cards => this.surveys.set(cards));
+}
+
 
 
   private documentClickListener?: (event: Event) => void;
@@ -96,6 +110,7 @@ isDueSoon(s: any, days = 7): boolean {
     private messageService: MessageService,
     private dialogService: DialogService,
      private surveyService: SurveyService,
+     private templateService:TemplateService
   ) {}
 
   ngOnInit(): void {
@@ -106,18 +121,18 @@ isDueSoon(s: any, days = 7): boolean {
       { label: 'Export to PDF', command: () => console.log('') }
     ];
 
-    this.templateTypeService.list().subscribe({
-      next: types => {
-        console.log('Types:', types);
-        this.typeOptions = types.map(t => ({
-          value: t.id,
-          label: t.name
-        }));
-      },
-      error: err => {
-        console.error('Error fetching types:', err);
-      }
+
+    
+  }
+
+  onComplete() {
+    const survey= this.selectedCard();
+    this.surveyService.complete(survey!.id).subscribe({
+      next: _ => this.loadSurveys(), // refresh la liste -> il disparaît des actifs
+      error: err => console.error(err)
     });
+    this.activeCardMenu.set(null);
+    this.selectedCard.set(null);
   }
 
 
@@ -161,18 +176,84 @@ isDueSoon(s: any, days = 7): boolean {
     console.log('Type filter changed to:', this.selectedType());
   }
 
-  toggleCardMenu(event: Event, surveyId: string): void {
+  toggleCardMenu(event: Event, survey: any): void {
     event.stopPropagation();
 
-    if (this.activeCardMenu() === surveyId) {
+
+    if (this.activeCardMenu() === survey.id) {
+      // fermer si déjà ouvert
       this.activeCardMenu.set(null);
-    } else {
-      const rect = (event.target as HTMLElement).getBoundingClientRect();
-      this.menuPosition.set({
-        x: rect.left - 100,
-        y: rect.bottom + 5
-      });
-      this.activeCardMenu.set(surveyId);
+      this.selectedCard.set(null);
+      return;
     }
+
+    const rect = (event.target as HTMLElement).getBoundingClientRect();
+    this.menuPosition.set({
+      x: rect.left - 100,
+      y: rect.bottom + 5
+    });
+
+    this.activeCardMenu.set(survey.id);
+    this.selectedCard.set(survey);
   }
+    getTypeColor(survey: any): string {
+    return this.normalizeHex(survey?? '#3B82F6');
+  }
+
+  typeChipStyle(survey: any) {
+    const hex = this.getTypeColor(survey);
+    return {
+      'background-color': this.tint(hex, 0.85),
+      color: hex,
+      'border-color': this.tint(hex, 0.7)
+    };
+  }
+
+  private normalizeHex(c: string): string {
+    if (!c) return '#3B82F6';
+    c = ('' + c).trim();
+    if (!c.startsWith('#')) c = '#' + c;
+    if (c.length === 4) {
+      c = '#' + c[1] + c[1] + c[2] + c[2] + c[3] + c[3];
+    }
+    return c.toUpperCase();
+  }
+    private hexToRgb(hex: string) {
+    const h = this.normalizeHex(hex).slice(1);
+    const r = parseInt(h.slice(0, 2), 16);
+    const g = parseInt(h.slice(2, 4), 16);
+    const b = parseInt(h.slice(4, 6), 16);
+    return { r, g, b };
+  }
+
+  private tint(hex: string, ratio = 0.85): string {
+    const { r, g, b } = this.hexToRgb(hex);
+    const nr = Math.round(r + (255 - r) * ratio);
+    const ng = Math.round(g + (255 - g) * ratio);
+    const nb = Math.round(b + (255 - b) * ratio);
+    return `rgb(${nr}, ${ng}, ${nb})`;
+  }
+    closeMenu(): void {
+  this.activeCardMenu.set(null);
+}
+
+  /** Ferme au clic n'importe où dans le document */
+@HostListener('document:click')
+onDocClick(): void {
+  this.closeMenu();
+}
+
+/** Ferme avec la touche Échap */
+@HostListener('document:keydown.escape', ['$event'])
+onEsc(_: KeyboardEvent): void {
+  this.closeMenu();
+}
+
+/** Ferme si on scrolle ou on redimensionne (optionnel mais UX ++) */
+@HostListener('window:scroll')
+@HostListener('window:resize')
+onWindowMove(): void {
+  if (this.activeCardMenu()) this.closeMenu();
+}
+
 }

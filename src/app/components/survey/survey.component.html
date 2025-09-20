@@ -90,7 +90,7 @@
 <div class="survey-card survey-card--row" *ngFor="let survey of filteredSurveys()">
      <div class="card-header"><div class="survey-card__title">{{ survey.name }}</div>
   <!-- right side -->
-    <button class="menu-btn" (click)="toggleCardMenu($event, survey.id)">
+    <button class="menu-btn" (click)="toggleCardMenu($event, survey)">
       <span class="menu-dots">⋯</span>
     </button>
     
@@ -125,9 +125,13 @@
   <!-- main -->
  
           
-  <div class="pill pill-type">{{ survey.typeLabel || survey.type || 'HR SURVEY' }}</div>
+                  <span class="type-badge"
+                     [ngStyle]="typeChipStyle(survey.typecolor)">
+                     <span class="dot" [style.background-color]="getTypeColor(survey.typecolor)"></span>
+                         {{ survey.typeLabel}}
+                      </span>
   <div class="pill pill-anon" *ngIf="survey.isAnonymous !== false">ANONYMOUS</div>
-    
+     <div class="pill pill-anon" *ngIf="survey.isAnonymous !== true">Not ANONYMOUS</div>
       <div class="meta">
         <span class="meta-label">Due Date : </span>
         <span class="meta-value">{{survey.deadline | date:'MMM d, yyyy' }}</span>
@@ -136,6 +140,8 @@
 
   </div>
   </div>
+
+
 </div>
 
         </div>
@@ -144,7 +150,7 @@
   </div>
 </div>
 
-<!-- Card Menu Dropdown -->
+  <!-- Card Menu Dropdown -->
 <div
   class="card-menu-dropdown"
   *ngIf="activeCardMenu()"
@@ -152,8 +158,6 @@
   [style.top.px]="menuPosition().y"
 >
   <div class="menu-item" (click)="EditSurvey()" >Edit</div>
-  <div class="menu-item" >Preview</div>
   <div class="menu-item" >View responses </div>
-  <div class="menu-item" (click)="CompleteSurvey()" >complete</div>
+  <div class="menu-item" (click)="onComplete()" >complete</div>
 </div>
-

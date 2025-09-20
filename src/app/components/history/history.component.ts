@@ -1,4 +1,4 @@
-import { Component, computed, Inject, OnDestroy, OnInit, PLATFORM_ID, signal, ViewChild } from '@angular/core';
+import { Component, computed, HostListener, Inject, OnDestroy, OnInit, PLATFORM_ID, signal, ViewChild } from '@angular/core';
 import { SurveyNavbarComponent } from "../survey-navbar/survey-navbar.component";
 import { TemplateNavbarComponent } from "../template-navbar/template-navbar.component";
 import { TieredMenu, TieredMenuModule } from 'primeng/tieredmenu';
@@ -12,6 +12,11 @@ import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
+import { SurveyOutDto } from '../../models/interfaces/SurveyOutDto';
+import { SurveyService } from '../../services/SurveyService';
+import { map, switchMap } from 'rxjs/operators';
+import { forkJoin, of } from 'rxjs';
+import { TemplateService } from '../../services/template-services.service';
 
 @Component({
   selector: 'app-history',
@@ -28,6 +33,19 @@ import { ButtonModule } from 'primeng/button';
   styleUrl: './history.component.css'
 })
 export class HistoryComponent implements OnInit{
+    constructor(
+    @Inject(PLATFORM_ID) private platformId: Object,
+    private router: Router,
+    private templateTypeService: TypeServiceService,
+    private messageService: MessageService,
+    private dialogService: DialogService,
+     private surveyService: SurveyService,
+     private templateService : TemplateService
+  ) {}
+
+EditSurvey() {
+ this.router.navigate(['/edit-survey/step1']);
+}
 
   @ViewChild('menu') menu!: TieredMenu;
 
@@ -58,61 +76,60 @@ isDueSoon(s: any, days = 7): boolean {
 
 
   totalSurveys = computed(() => this.filteredSurveys().length);
-    private loadSurveys(): void {
-    // Mock data - replace with actual API call
-    const mockSurveys: any[] = [
-     {
-    id: '1',
-    name: 'Employee Engagement Q1',
-    description: 'Comprehensive quarterly assessment measuring employee engagement, workplace satisfaction, and overall job fulfillment across all departments.',
-    type: 'HR Survey',
-    createdOn: new Date('2025-01-15'),
-    createdBy: 'Jane Doe',
-    usage_status: 1,
-    active_status: 1,
-    deadline: new Date(2025, 0, 30),
-    sentTo: 235,
-    estimatedMins: 7,
-    // extra purely front:
-    ...( {
-      typeLabel: 'HR Survey',
-      isAnonymous: true,
-      stats: { completed: 120, notTouched: 80, inProgress: 35 }
-    } as any )
-  },
-    ];
+     private loadSurveys(): void {
+    this.surveyService.getCompleted().pipe(
+        map((res: any) => Array.isArray(res) ? res : (res?.data ?? [])),
+        switchMap((surveys: SurveyOutDto[]) => forkJoin({
+          surveys: of(surveys),
+          types : this.templateTypeService.list(),
+          templates : this.templateService.getAll()
+        })),
+        switchMap(({ surveys, templates ,types}) => {
+          const templateById = new Map(templates.map(t => [t.templateId, t]));
+          const typeById = new Map(types.map(t=> [t.id, t]))
+          return forkJoin(
+            surveys.map(s =>
+              this.templateService.getById(s.templateId).pipe(
+                map(tpl => ({
+                  id: s.surveyId,
+                  name: s.name,
+                  description: s.description,
+                  createdOn: new Date(s.createdOn),
+                  deadline: new Date(s.deadline),
+                  isAnonymous: s.isAnonymous,
+                  typeLabel: templateById.get(s.templateId)?.typeName?? 'Unknown',
+                  typecolor : typeById.get(templateById.get(s.templateId)!.typeId)?.color,
+                  sentTo: s.employeeIds.length,
+                  stats: { completed: 0, notTouched: s.employeeIds.length, inProgress: 0 }
+                }))
+              )
+            )
+          );
+        })
+      ).subscribe(cards => this.surveys.set(cards));
+    }
 
-    this.surveys.set(mockSurveys);
-  }
 
   private documentClickListener?: (event: Event) => void;
 
-  constructor(
-    @Inject(PLATFORM_ID) private platformId: Object,
-    private router: Router,
-    private templateTypeService: TypeServiceService,
-    private messageService: MessageService,
-    private dialogService: DialogService,
-  ) {}
+
 
   ngOnInit(): void {
     this.loadSurveys();
     this.items = [
+      { label: 'Create a template', command: () => this.router.navigate(['/addtemp']) },
       { label: 'Export to Excel', command: () => console.log('') },
       { label: 'Export to PDF', command: () => console.log('') }
     ];
 
-    this.templateTypeService.list().subscribe({
-      next: types => {
-        console.log('Types:', types);
-        this.typeOptions = types.map(t => ({
-          value: t.id,
-          label: t.name
-        }));
-      },
-      error: err => {
-        console.error('Error fetching types:', err);
-      }
+
+  }
+
+  onComplete(s: SurveyOutDto) {
+    
+    this.surveyService.complete(s.surveyId).subscribe({
+      next: _ => this.loadSurveys(), // refresh la liste -> il disparaît des actifs
+      error: err => console.error(err)
     });
   }
 
@@ -171,5 +188,64 @@ isDueSoon(s: any, days = 7): boolean {
       this.activeCardMenu.set(surveyId);
     }
   }
+
+      getTypeColor(survey: any): string {
+    return this.normalizeHex(survey?? '#3B82F6');
+  }
+
+  typeChipStyle(survey: any) {
+    const hex = this.getTypeColor(survey);
+    return {
+      'background-color': this.tint(hex, 0.85),
+      color: hex,
+      'border-color': this.tint(hex, 0.7)
+    };
+  }
+
+  private normalizeHex(c: string): string {
+    if (!c) return '#3B82F6';
+    c = ('' + c).trim();
+    if (!c.startsWith('#')) c = '#' + c;
+    if (c.length === 4) {
+      c = '#' + c[1] + c[1] + c[2] + c[2] + c[3] + c[3];
+    }
+    return c.toUpperCase();
+  }
+    private hexToRgb(hex: string) {
+    const h = this.normalizeHex(hex).slice(1);
+    const r = parseInt(h.slice(0, 2), 16);
+    const g = parseInt(h.slice(2, 4), 16);
+    const b = parseInt(h.slice(4, 6), 16);
+    return { r, g, b };
+  }
+
+  private tint(hex: string, ratio = 0.85): string {
+    const { r, g, b } = this.hexToRgb(hex);
+    const nr = Math.round(r + (255 - r) * ratio);
+    const ng = Math.round(g + (255 - g) * ratio);
+    const nb = Math.round(b + (255 - b) * ratio);
+    return `rgb(${nr}, ${ng}, ${nb})`;
+  }
+  closeMenu(): void {
+  this.activeCardMenu.set(null);
 }
 
+/** Ferme au clic n'importe où dans le document */
+@HostListener('document:click')
+onDocClick(): void {
+  this.closeMenu();
+}
+
+/** Ferme avec la touche Échap */
+@HostListener('document:keydown.escape', ['$event'])
+onEsc(_: KeyboardEvent): void {
+  this.closeMenu();
+}
+
+/** Ferme si on scrolle ou on redimensionne (optionnel mais UX ++) */
+@HostListener('window:scroll')
+@HostListener('window:resize')
+onWindowMove(): void {
+  if (this.activeCardMenu()) this.closeMenu();
+}
+}

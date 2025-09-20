@@ -333,7 +333,7 @@
   margin: 0 auto;
   padding: 0 50px;
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(580px, 1fr));
   gap: 24px;
 }
 
@@ -883,4 +883,22 @@
 }
 
 
+.type-badge{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  padding:4px 10px;
+  border:1px solid transparent;
+  border-radius:9999px;
+  font-size:11px;
+  font-weight:700;
+  letter-spacing:.3px;
+  text-transform:uppercase;
+  white-space:nowrap;
+}
 
+.type-badge .dot{
+  width:8px;
+  height:8px;
+  border-radius:50%;
+}
