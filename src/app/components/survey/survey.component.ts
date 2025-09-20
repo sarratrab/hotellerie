@@ -34,7 +34,12 @@ import { forkJoin, of } from 'rxjs';
 export class SurveyComponent implements OnInit{
 
 EditSurvey() {
- this.router.navigate(['/edit-survey/step1']);
+  const id = this.activeCardMenu() ?? this.selectedCard()?.id;
+  if (!id) return;
+
+  this.activeCardMenu.set(null);
+
+  this.router.navigate([`/lanch-survey/${id}/step1`]);
 }
 
   @ViewChild('menu') menu!: TieredMenu;

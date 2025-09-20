@@ -16,10 +16,12 @@ export interface SurveyOutDto {
   employeeIds: number[];
 }
 
+
 @Injectable({
   providedIn: 'root'
 })
 export class SurveyService {
+ 
   private apiUrl = 'http://localhost:5096/'; // adjust port
 
   constructor(private http: HttpClient) {}
@@ -43,4 +45,11 @@ export class SurveyService {
   syncStatuses(): Observable<any> {
     return this.http.post(`${baseUrl}api/Survey/SyncStatuses`, {});
   }
+
+   // in SurveyService
+updateSurvey(surveyId: string, dto: AddSurveyDto): Observable<void> {
+  // Backend expects PUT with surveyId in URL and DTO in body
+  return this.http.put<void>(`${baseUrl}api/Survey/UpdateSurvey/${surveyId}`, dto);
+}
+
 }

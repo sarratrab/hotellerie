@@ -2,7 +2,10 @@
 import { Injectable } from '@angular/core';
 import { AudienceSelection } from '../models/interfaces/AudienceSelection';
 import { AddSurveyDto } from '../models/interfaces/AddSurveyDto';
-
+import { map, Observable, tap } from 'rxjs';
+import { SurveyService } from './SurveyService';
+import { baseUrl } from '../../baseURL';
+import { HttpClient } from '@angular/common/http';
 export interface SurveyWizardState extends AudienceSelection {
   selectedEmployeeIds: number[];
   deadline?: string;         // ISO
@@ -11,6 +14,19 @@ export interface SurveyWizardState extends AudienceSelection {
   name?: string;
   description?: string;
 }
+export interface SurveyConfigDto {
+  allEmployees: boolean;
+  departmentIds: number[];
+  positionIds: number[];
+  cities: string[];
+  selectedEmployeeIds: number[];
+  deadline?: string;  // use ISO string for DateTime
+  isAnonymous: boolean;
+  templateId: string;
+  name?: string;
+  description?: string;
+}
+
 
 @Injectable({ providedIn: 'root' })
 export class AudienceStateService {
@@ -43,6 +59,12 @@ private readonly initialState: SurveyWizardState = {
     };
   }
 
+  constructor(
+    private surveyService: SurveyService,
+    private http: HttpClient
+  ) {}
+
+
   // --- Reset only audience/targeting ---
   resetAudience(): void {
     const { templateId, name, description } = this.state;
@@ -59,10 +81,15 @@ private readonly initialState: SurveyWizardState = {
     this.state = this.getDefaultState();
   }
 
-  loadSurveyConfiguration(config: Partial<SurveyWizardState>): void {
-    this.state = { ...this.initialState, ...config };
+  loadSurveyConfig(surveyId: string): Observable<SurveyConfigDto> {
+    return this.http.get<SurveyConfigDto>(`${baseUrl}api/Survey/GetSurveyConfig/${surveyId}`)
+      .pipe(
+        tap(config => {
+          this.state = { ...this.state, ...config };
+        })
+      );
   }
-
+  
   hasConfiguration(): boolean {
     return this.state.allEmployees || 
            this.state.departmentIds.length > 0 || 
@@ -97,6 +124,15 @@ private readonly initialState: SurveyWizardState = {
     if (name !== undefined) this.state.name = name;
     if (description !== undefined) this.state.description = description;
   }
+
+  // Build AddSurveyDto from current state + optional overrides// in AudienceStateService
+public getTemplateId(): string | undefined {
+  return this.state.templateId;
+}
+
+public getTemplateName(): string | undefined {
+  return this.state.name;
+}
 
   buildAddSurveyDto(input?: { name?: string; description?: string; templateId?: string }): AddSurveyDto {
     const name        = input?.name        ?? this.state.name        ?? 'Employee Satisfaction Survey';

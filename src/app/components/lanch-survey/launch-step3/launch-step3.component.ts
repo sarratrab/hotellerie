@@ -21,39 +21,37 @@ export class LaunchStep3Component implements OnInit {
   loading = false;
   error?: string;
   success?: string;
+  surveyId: string | undefined;
 
   constructor(
     private wizard: AudienceStateService,
     private surveyApi: SurveyService,
     private router: Router,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private audienceState: AudienceStateService
   ) {}
 
-  ngOnInit(): void {
-     this.route.queryParams.subscribe((p) => {
-    const templateId = p['templateId'] || p['id'];
-    const templateName = p['name'];
-    if (templateId) this.wizard.setTemplateInfo(templateId, templateName);
+ngOnInit(): void {
+  // --- read surveyId from parent route ---
+  this.route.parent?.paramMap.subscribe(params => {
+   const rawId = this.route.parent?.snapshot.paramMap.get('id');
+    this.surveyId = rawId && rawId !== 'undefined' && rawId !== 'null' && rawId !== '' 
+      ? rawId 
+      : undefined;
+    console.log('surveyId:', this.surveyId);
+
   });
 
-  // Restore previously saved values if they exist
+const templateId = this.wizard.getTemplateId();
+const templateName = this.wizard.getTemplateName();
+
+  // --- restore wizard state ---
   if (this.wizard.deadline) {
     this.deadline = this.wizard.deadline.substring(0, 10);
   }
   this.isAnonymous = this.wizard.allowAnonymous ?? false;
-    // 1) Si tu arrives ici depuis "Assign", récupère le templateId (et éventuellement le name) en query params
-    this.route.queryParams.subscribe((p) => {
-      const templateId = p['templateId'] || p['id'];
-      const templateName = p['name'];
-      if (templateId) this.wizard.setTemplateInfo(templateId, templateName);
-    });
+}
 
-    // 2) Pré-remplir depuis l’état si tu reviens en arrière
-    if (this.wizard.deadline) {
-      this.deadline = this.wizard.deadline.substring(0, 10);
-    }
-    this.isAnonymous = this.wizard.allowAnonymous ?? false;
-  }
 
   public onCancel() {
     console.log('[Step3] onCancel called');
@@ -62,19 +60,36 @@ export class LaunchStep3Component implements OnInit {
   }
 
   onNext() {
-    this.error = this.success = undefined;
-    this.loading = true;
+  this.error = this.success = undefined;
+  this.loading = true;
 
-    try {
-      // 1) stocker et convertir en ISO dans le service
-      // (deadline ici est 'YYYY-MM-DD', le service fera toISOString)
-      this.wizard.setSettings(this.deadline, this.isAnonymous);
 
-      // 2) Construire le DTO (NOM/desc/TemplateId déjà placés via Assign)
-      const dto = this.wizard.buildAddSurveyDto();
-      console.log('[Step3] POST dto =', dto);
+  try {
+    // 1) stocker et convertir en ISO dans le service
+    this.wizard.setSettings(this.deadline, this.isAnonymous);
 
-      // 3) API
+    // 2) Construire le DTO (NOM/desc/TemplateId déjà placés via Assign)
+    const dto = this.wizard.buildAddSurveyDto();
+    console.log('[Step3] DTO =', dto);
+
+    if (this.surveyId) {
+      // --- EDIT MODE ---
+      this.surveyApi.updateSurvey(this.surveyId, dto).subscribe({
+        next: () => {
+          this.loading = false;
+          this.success = 'Survey updated successfully';
+          this.router.navigate(['/surveys']);
+        },
+        error: (err: { error: { message: any; }; statusText: any; }) => {
+          this.loading = false;
+          const detail = err?.error?.message || err?.error || err?.statusText || 'Bad Request';
+          this.error = `Failed to update survey: ${detail}`;
+          console.error('Update survey error:', err);
+        }
+      });
+
+    } else {
+      // --- ADD MODE ---
       this.surveyApi.addSurvey(dto).subscribe({
         next: () => {
           this.loading = false;
@@ -83,16 +98,18 @@ export class LaunchStep3Component implements OnInit {
         },
         error: (err) => {
           this.loading = false;
-          // essayer d’extraire l’erreur côté .NET (ModelState) si dispo
           const detail = err?.error?.message || err?.error || err?.statusText || 'Bad Request';
           this.error = `Failed to create survey: ${detail}`;
           console.error('Create survey error:', err);
         }
       });
-    } catch (e: any) {
-      this.loading = false;
-      this.error = e?.message || 'Invalid data';
-      console.warn('Client-side validation failed:', e);
     }
+
+  } catch (e: any) {
+    this.loading = false;
+    this.error = e?.message || 'Invalid data';
+    console.warn('Client-side validation failed:', e);
   }
+}
+
 }
