@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { LaunchStep3Component } from './launch-step3.component';
+import { LaunchStep3Component } from './step1-survey-info.component';
 
 describe('LaunchStep3Component', () => {
   let component: LaunchStep3Component;

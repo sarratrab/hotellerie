@@ -236,7 +236,7 @@ export class ActiveTemplateComponent implements OnInit, OnDestroy {
       return;
     }
 
-    this.launchState.setTemplateInfo(templateId, name, description);
+    this.launchState.setTemplateInfo(templateId, description);
 
     // fermer le menu et vider la sélection
     this.activeCardMenu.set(null);

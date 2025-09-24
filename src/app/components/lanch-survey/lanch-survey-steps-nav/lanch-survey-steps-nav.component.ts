@@ -22,15 +22,15 @@ export class LanchSurveyStepsNavComponent implements OnInit {
     ngOnInit() {
         this.items = [
             {
-                label: 'Target Audience',
+                label: 'Survey information',
                 routerLink: 'step1'
             },
             {
-                label: 'Select Employees',
+                label: 'Target audience',
                 routerLink: 'step2'
             },
             {
-                label: 'Settings',
+                label: 'Review employee selection ',
                 routerLink: 'step3'
             },
            

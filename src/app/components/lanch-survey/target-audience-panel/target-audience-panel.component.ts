@@ -51,9 +51,11 @@ export class TargetAudiencePanelComponent implements OnInit {
     private lookups: SurveyServiceService,
     private audienceState: AudienceStateService,
     private route: ActivatedRoute,
+    private wizard: AudienceStateService,
   ) {}
 
   ngOnInit(): void {
+    
      this.route.paramMap.subscribe(params => {
      this.surveyId = this.route.parent?.snapshot.paramMap.get('id') ?? undefined;
     console.log('surveyId:', this.surveyId);
@@ -90,6 +92,9 @@ export class TargetAudiencePanelComponent implements OnInit {
  else {
         this.restorePreviousSelection();
         this.audienceState.resetAudience();
+        console.log('[Step1] saving deadline:', this.audienceState.deadline);
+console.log('[Step3] state before build DTO:', this.audienceState.getTemplateId);
+
       }
     });
   }
@@ -125,7 +130,7 @@ export class TargetAudiencePanelComponent implements OnInit {
       cities
     });
     this.persistSelection();
-    this.router.navigate([`/lanch-survey/${this.surveyId}/step2`]);
+    //this.router.navigate([`/lanch-survey/${this.surveyId}/step3`]);
 
 
     console.log('Step1 selection saved:', this.audienceState.getSelection());
@@ -133,7 +138,7 @@ export class TargetAudiencePanelComponent implements OnInit {
 
   onCancel() {
     console.log('Survey creation cancelled');
-     this.router.navigate(['/active-templates']);
+     //this.router.navigate(['/lanch-survey/step1']);
   }
 
   persistSelection() {

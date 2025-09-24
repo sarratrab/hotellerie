@@ -6,4 +6,6 @@ export interface EmployeeRow {
   manager?: string;
   city?: string;
   isSelected: boolean;
+  location?: string;
+  position?: string;
 }

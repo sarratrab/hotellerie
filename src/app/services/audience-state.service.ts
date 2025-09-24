@@ -11,7 +11,7 @@ export interface SurveyWizardState extends AudienceSelection {
   deadline?: string;         // ISO
   isAnonymous: boolean;
   templateId?: string;
-  name?: string;
+  name: string;
   description?: string;
 }
 export interface SurveyConfigDto {
@@ -36,7 +36,8 @@ export class AudienceStateService {
     positionIds: [],
     cities: [],
     selectedEmployeeIds: [],
-    isAnonymous: false
+    isAnonymous: false,
+    name :'',
   };
 
 private readonly initialState: SurveyWizardState = {
@@ -45,7 +46,8 @@ private readonly initialState: SurveyWizardState = {
     positionIds: [],
     cities: [],
     selectedEmployeeIds: [],
-    isAnonymous: false
+    isAnonymous: false,
+    name : '',
   };
 
  private getDefaultState(): SurveyWizardState {
@@ -55,7 +57,8 @@ private readonly initialState: SurveyWizardState = {
       positionIds: [],
       cities: [],
       selectedEmployeeIds: [],
-      isAnonymous: false
+      isAnonymous: false,
+      name : '',
     };
   }
 
@@ -66,15 +69,17 @@ private readonly initialState: SurveyWizardState = {
 
 
   // --- Reset only audience/targeting ---
-  resetAudience(): void {
-    const { templateId, name, description } = this.state;
-    this.state = {
-      ...this.getDefaultState(),
-      templateId,
-      name,
-      description
-    };
-  }
+ resetAudience(): void {
+  const { templateId, name, description, deadline } = this.state;
+  this.state = {
+    ...this.getDefaultState(),
+    templateId,
+    name,
+    description,
+    deadline,   // <-- preserve deadline!
+  };
+}
+
 
   // --- Reset everything (including template info) ---
   resetAll(): void {
@@ -113,15 +118,16 @@ private readonly initialState: SurveyWizardState = {
   getSelectedEmployeeIds(): number[] { return this.state.selectedEmployeeIds ?? []; }
 
   // Step 3
-  setSettings(deadline: Date | string | null, isAnon: boolean) {
+  setSettings(deadline: Date | string | null, isAnon: boolean , name : string) {
     this.state.isAnonymous = isAnon;
     this.state.deadline = deadline ? new Date(deadline).toISOString() : undefined;
+    this.state.name = name;
   }
 
   // depuis “Assign”
-  setTemplateInfo(templateId: string, name?: string, description?: string) {
+  setTemplateInfo(templateId: string,  description?: string) {
     this.state.templateId = templateId;
-    if (name !== undefined) this.state.name = name;
+    //if (name !== undefined) this.state.name = name;
     if (description !== undefined) this.state.description = description;
   }
 
@@ -146,7 +152,7 @@ public getTemplateName(): string | undefined {
     }
 
     return {
-      name,
+      name: this.state.name,
       description,
       templateId, // <= bien “templateId”
       deadline: this.state.deadline, // ISO

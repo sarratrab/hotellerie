@@ -5,16 +5,18 @@ import { ActivatedRoute, Router } from '@angular/router';
 
 import { AudienceStateService } from '../../../services/audience-state.service';
 import { SurveyService } from '../../../services/SurveyService'; // vérifie le nom exact du fichier
+import { InputTextModule } from 'primeng/inputtext';
 
 @Component({
   selector: 'app-launch-step3',
   standalone: true,
   imports: [CommonModule, FormsModule],
-  templateUrl: './launch-step3.component.html',
-  styleUrls: ['./launch-step3.component.css']
+  templateUrl: './step1-survey-info.component.html',
+  styleUrls: ['./step1-survey-info.component.css']
 })
-export class LaunchStep3Component implements OnInit {
+export class SurveyInfo implements OnInit {
   isAnonymous = false;
+   value: string | undefined;
   // champ “date” du HTML → ‘YYYY-MM-DD’
   deadline: string = new Date().toISOString().substring(0, 10);
 
@@ -22,13 +24,15 @@ export class LaunchStep3Component implements OnInit {
   error?: string;
   success?: string;
   surveyId: string | undefined;
+form: any;
+surveyName: string = '';
 
   constructor(
     private wizard: AudienceStateService,
     private surveyApi: SurveyService,
     private router: Router,
     private route: ActivatedRoute,
-    private audienceState: AudienceStateService
+    private audienceState: AudienceStateService,
   ) {}
 
 ngOnInit(): void {
@@ -42,33 +46,47 @@ ngOnInit(): void {
 
   });
 
-const templateId = this.wizard.getTemplateId();
-const templateName = this.wizard.getTemplateName();
-
-  // --- restore wizard state ---
-  if (this.wizard.deadline) {
-    this.deadline = this.wizard.deadline.substring(0, 10);
-  }
+  // Restore saved values from wizard service
+  this.deadline = this.wizard.deadline?.substring(0, 10) ?? new Date().toISOString().substring(0, 10);
   this.isAnonymous = this.wizard.allowAnonymous ?? false;
-}
+  this.surveyName = this.wizard.getTemplateName() ?? this.wizard['state']?.name ?? '';
 
+}
+onNext() {
+ try {
+    const template = this.wizard.getTemplateId();
+    if (!template) {
+      this.error = 'No template selected';
+      return;
+    }
+
+    // Save current step state
+    this.wizard.setSettings(this.deadline, this.isAnonymous, this.surveyName);
+
+  } catch (e: any) {
+    this.error = e?.message || 'Invalid data';
+    console.warn('Client-side validation failed:', e);
+  }
+
+ // this.router.navigate([`/lanch-survey/${this.surveyId}/step2`]);
+}
 
   public onCancel() {
     console.log('[Step3] onCancel called');
-    this.wizard.setSettings(this.deadline, this.isAnonymous);
-    this.router.navigate(['/lanch-survey/step2']);
+    this.wizard.setSettings(this.deadline, this.isAnonymous , this.surveyName);
+    this.router.navigate(['/active-templates']);
   }
-
+/*
   onNext() {
   this.error = this.success = undefined;
   this.loading = true;
 
 
   try {
-    // 1) stocker et convertir en ISO dans le service
+    
     this.wizard.setSettings(this.deadline, this.isAnonymous);
 
-    // 2) Construire le DTO (NOM/desc/TemplateId déjà placés via Assign)
+  
     const dto = this.wizard.buildAddSurveyDto();
     console.log('[Step3] DTO =', dto);
 
@@ -110,6 +128,7 @@ const templateName = this.wizard.getTemplateName();
     this.error = e?.message || 'Invalid data';
     console.warn('Client-side validation failed:', e);
   }
-}
+}*/
+
 
 }

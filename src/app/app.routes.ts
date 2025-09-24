@@ -20,7 +20,7 @@ import { HistoryComponent } from './components/history/history.component';
 import { EmployeeSelectorComponent } from './components/lanch-survey/employee-selector/employee-selector.component';
 import { TargetAudiencePanelComponent } from './components/lanch-survey/target-audience-panel/target-audience-panel.component';
 import { LanchSurveyFooterComponent } from './components/lanch-survey/lanch-survey-footer/lanch-survey-footer.component';
-import { LaunchStep3Component } from './components/lanch-survey/launch-step3/launch-step3.component';
+import { SurveyInfo } from './components/lanch-survey/step1-survey-info/step1-survey-info.component';
 
 
 
@@ -45,19 +45,33 @@ export const routes: Routes = [
   path: 'lanch-survey',
   component: LanchSurveyComponent,
   children: [
-    { path: '', redirectTo: 'step1', pathMatch: 'full' }, // ✅ default child
-    { path: 'step1', component: TargetAudiencePanelComponent },
-    { path: 'step2', component: EmployeeSelectorComponent },
-    { path: 'step3', component: LaunchStep3Component },
+    { path: '', redirectTo: 'step1', pathMatch: 'full' },
+
+    {
+      path: 'step1',
+      component: SurveyInfo,
+      data: { cancelLabel: 'Cancel', nextLabel: 'Next' }
+    },
+    {
+      path: 'step2',
+      component: TargetAudiencePanelComponent,
+      data: { cancelLabel: 'Previous', nextLabel: 'Next' }
+    },
+    {
+      path: 'step3',
+      component: EmployeeSelectorComponent,
+      data: { cancelLabel: 'Previous', nextLabel: 'Finish' }
+    }
   ]
 }
+
 ,{
     path: 'lanch-survey/:id',
     component: LanchSurveyComponent,
     children: [
-      { path: 'step1', component: TargetAudiencePanelComponent },
-      { path: 'step2', component: EmployeeSelectorComponent },
-      { path: 'step3', component: LaunchStep3Component },
+      { path: 'step1', component: SurveyInfo   },
+      { path: 'step2', component: TargetAudiencePanelComponent },
+      { path: 'step3', component: EmployeeSelectorComponent },
       { path: '', redirectTo: 'step1', pathMatch: 'full' }
     ]
   }

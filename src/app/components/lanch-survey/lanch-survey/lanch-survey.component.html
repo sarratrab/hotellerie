@@ -7,6 +7,8 @@
     <div class="sub-nav-items">
 <router-outlet #stepOutlet="outlet"></router-outlet>
     <app-lanch-survey-footer
+  [cancelLabel]="cancelLabel"
+  [nextLabel]="nextLabel"
   (cancel)="cancel()"
   (next)="next()"
 ></app-lanch-survey-footer>
