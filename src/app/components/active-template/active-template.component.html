@@ -3,7 +3,7 @@
    <app-survey-navbar></app-survey-navbar>
    <app-template-navbar></app-template-navbar>
 
-  <!-- Filters and Search -->
+  <!-- Filters and Search + Survey Cards Grid Combined -->
   <div class="sub-navbar">
     <div class="sub-nav-card">
       <div class="sub-nav-items">
@@ -63,12 +63,8 @@
           <p-tieredMenu #menu [model]="items" popup="true"></p-tieredMenu>
         </div>
       </div>
-    </div>
-  </div>
 
-  <!-- Survey Cards Grid -->
-  <div class="sub-navbar">
-    <div class="sub-nav-card">
+      <!-- Survey Cards Grid moved inside same container -->
       <div class="surveys-grid">
         <div class="grid-container">
           <div *ngIf="filteredSurveys().length === 0" class="empty-message">
@@ -127,8 +123,10 @@
           </div>
         </div>
       </div>
+      <!-- End of moved survey cards grid -->
     </div>
   </div>
+  <!-- Removed second .sub-navbar container -->
 </div>
 
 <!-- Card Menu Dropdown -->
