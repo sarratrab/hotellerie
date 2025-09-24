@@ -6,11 +6,13 @@
     Choose your target audience to send this survey to the right employees
   </p>
 
-  <div class="sub-nav-card">
-    <div class="">
-      <div class="space-y-10">
-        <!-- All Employees -->
-        <div class="p-12 transition-colors"
+  <!-- REMOVED: sub-nav-card wrapper div -->
+  <!-- REMOVED: inner empty div wrapper -->
+  
+  <!-- CHANGED: Grid layout changed to 2x2 instead of 1x4 -->
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <!-- ADDED: All Employees card - CHANGED: reduced height and padding -->
+        <div class="border rounded-lg border-blue-500 p-4 hover:bg-blue-50 transition-colors min-h-[200px] relative overflow-visible"
              [class.opacity-50]="allDisabled"
              [class.pointer-events-none]="allDisabled">
           <div class="flex items-start">
@@ -33,12 +35,9 @@
             </div>
           </div>
         </div>
-      </div>
 
-      <!-- Right Column -->
-      <div class="grid grid-cols-1 md:grid-cols-2 md:grid-cols-3 gap-12">
-        <!-- By Location -->
-        <div class="border rounded-lg border-blue-500 p-10 hover:bg-blue-50 transition-colors"
+        <!-- By Location - CHANGED: reduced height and padding -->
+        <div class="border rounded-lg border-blue-500 p-4 hover:bg-blue-50 transition-colors min-h-[200px] relative overflow-visible z-10"
              [class.opacity-50]="segmentingDisabled"
              [class.pointer-events-none]="segmentingDisabled">
           <div class="flex items-start">
@@ -66,9 +65,9 @@
               <p class="text-sm text-gray-600 mt-1 mb-3">
                 Send surveys to employees in specific office locations and regional branches
               </p>
-              <div *ngIf="byLocation" class="animate-fadeIn">
+              <div *ngIf="byLocation" class="animate-fadeIn relative z-20">
 <p-multiSelect
-  class="w-full"
+  class="w-full dropdown-container"
   [options]="locationOptions"
   optionLabel="name"
   optionValue="value"
@@ -79,6 +78,7 @@
   [disabled]="segmentingDisabled"
   (onChange)="persistSelection()"
   [filter]="false"
+  [appendTo]="'body'"
 ></p-multiSelect>
                 <p class="text-xs text-blue-600 mt-1">
                   Great for location-specific feedback and regional insights
@@ -88,8 +88,8 @@
           </div>
         </div>
 
-        <!-- By Department -->
-        <div class="border rounded-lg border-blue-500 p-10 hover:bg-blue-50 transition-colors"
+        <!-- By Department - CHANGED: reduced height and padding -->
+        <div class="border rounded-lg border-blue-500 p-4 hover:bg-blue-50 transition-colors min-h-[200px] relative overflow-visible z-10"
              [class.opacity-50]="segmentingDisabled"
              [class.pointer-events-none]="segmentingDisabled">
           <div class="sub-nav-items">
@@ -117,9 +117,9 @@
               <p class="text-sm text-gray-600 mt-1 mb-3">
                 Target specific departments like HR, Engineering, Sales, and Marketing teams
               </p>
-              <div *ngIf="byDepartment" class="animate-fadeIn">
+              <div *ngIf="byDepartment" class="animate-fadeIn relative z-20">
 <p-multiSelect
-  class="w-full"
+  class="w-full dropdown-container"
   [options]="departmentOptions"
   optionLabel="name"
   optionValue="value"
@@ -130,6 +130,7 @@
   [disabled]="segmentingDisabled"
   (onChange)="persistSelection()"
   [filter]="false"
+  [appendTo]="'body'"
 ></p-multiSelect>
                 <p class="text-xs text-blue-600 mt-1">
                   Perfect for department-specific performance analysis
@@ -138,8 +139,8 @@
             </div>
           </div>
         </div>
-        <!-- By Position -->
-        <div class="border rounded-lg border-blue-500 p-10 hover:bg-blue-50 transition-colors"
+        <!-- By Position - CHANGED: reduced height and padding -->
+        <div class="border rounded-lg border-blue-500 p-4 hover:bg-blue-50 transition-colors min-h-[200px] relative overflow-visible z-10"
              [class.opacity-50]="segmentingDisabled"
              [class.pointer-events-none]="segmentingDisabled">
           <div class="flex items-start">
@@ -167,9 +168,9 @@
               <p class="text-sm text-gray-600 mt-1 mb-3">
                 Send surveys to employees based on their job roles and seniority levels
               </p>
-              <div *ngIf="byPosition" class="animate-fadeIn">
+              <div *ngIf="byPosition" class="animate-fadeIn relative z-20">
 <p-multiSelect
-  class="w-full"
+  class="w-full dropdown-container"
   [options]="positionOptions"
   optionLabel="name"
   optionValue="value"
@@ -180,6 +181,7 @@
   [disabled]="segmentingDisabled"
   (onChange)="persistSelection()"
   [filter]="false"
+  [appendTo]="'body'"
 ></p-multiSelect>
                 <p class="text-xs text-blue-600 mt-1">
                   Ideal for role-specific feedback and career development insights
@@ -190,8 +192,7 @@
         </div>
 
       </div>
-    </div>
-  </div>
+      <!-- REMOVED: Closing divs for sub-nav-card wrapper -->
 
   <!-- Selection Summary -->
   <div *ngIf="getSelectionSummary()" class="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
