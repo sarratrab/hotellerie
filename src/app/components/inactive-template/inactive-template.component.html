@@ -3,10 +3,11 @@
   <app-survey-navbar></app-survey-navbar>
   <app-template-navbar></app-template-navbar>
 
-  <!-- Filters and Search -->
+  <!-- Combined Filters + Search + Survey Cards Grid -->
   <div class="sub-navbar">
     <div class="sub-nav-card">
       <div class="sub-nav-items">
+        <!-- Filters and Search -->
         <div class="surveys-count">
           Surveys ({{ totalSurveys() }})
         </div>
@@ -54,21 +55,15 @@
             </select>
           </div>
 
-          <div class="filter-dropdowns">
-            <div class="dropdown-wrapper">
-              <button class="actions-btn" (click)="toggleMenu($event)">Actions</button>
-            </div>
+          <div class="dropdown-wrapper">
+            <button class="actions-btn" (click)="toggleMenu($event)">Actions</button>
           </div>
 
           <p-tieredMenu #menu [model]="items" popup="true"></p-tieredMenu>
         </div>
       </div>
-    </div>
-  </div>
 
-  <!-- Survey Cards Grid -->
-  <div class="sub-navbar">
-    <div class="sub-nav-card">
+      <!-- Survey Cards Grid -->
       <div class="surveys-grid">
         <div class="grid-container">
           <div *ngIf="filteredSurveys().length === 0" class="empty-message">
@@ -83,7 +78,7 @@
             <div class="card-header">
               <div class="card-title-section">
                 <div class="card-title">{{ survey.name }}</div>
-                <br>
+                <br />
                 <div class="card-body">
                   <div class="card-description">{{ survey.description }}</div>
                 </div>
@@ -107,11 +102,13 @@
               </div>
 
               <div class="card-badges">
-                                 <span class="type-badge"
-                     [ngStyle]="typeChipStyle(survey)">
-                     <span class="dot" [style.background-color]="getTypeColor(survey)"></span>
-                         {{ survey.type }}
-                      </span>
+                <span
+                  class="type-badge"
+                  [ngStyle]="typeChipStyle(survey)"
+                >
+                  <span class="dot" [style.background-color]="getTypeColor(survey)"></span>
+                  {{ survey.type }}
+                </span>
               </div>
             </div>
           </div>
@@ -119,19 +116,19 @@
       </div>
     </div>
   </div>
-</div>
 
-<!-- Card Menu Dropdown -->
-<div
-  class="card-menu-dropdown"
-  *ngIf="activeCardMenu()"
-  [style.left.px]="menuPosition().x"
-  [style.top.px]="menuPosition().y"
->
-  <div class="menu-item" (click)="preview()">Preview</div>
-  <div class="menu-item" (click)="setActive(true)">activate</div>
-  <div class="menu-item" (click)="deleteTemplate()">Delete</div>
-</div>
+  <!-- Card Menu Dropdown -->
+  <div
+    class="card-menu-dropdown"
+    *ngIf="activeCardMenu()"
+    [style.left.px]="menuPosition().x"
+    [style.top.px]="menuPosition().y"
+  >
+    <div class="menu-item" (click)="preview()">Preview</div>
+    <div class="menu-item" (click)="setActive(true)">Activate</div>
+    <div class="menu-item" (click)="deleteTemplate()">Delete</div>
+  </div>
 
-<p-confirmDialog></p-confirmDialog>
-<p-toast></p-toast>
+  <p-confirmDialog></p-confirmDialog>
+  <p-toast></p-toast>
+</div>
