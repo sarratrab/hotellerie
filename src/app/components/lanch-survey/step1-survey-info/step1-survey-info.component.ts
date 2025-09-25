@@ -37,6 +37,7 @@ surveyName: string = '';
 
 ngOnInit(): void {
   // --- read surveyId from parent route ---
+  
   this.route.parent?.paramMap.subscribe(params => {
    const rawId = this.route.parent?.snapshot.paramMap.get('id');
     this.surveyId = rawId && rawId !== 'undefined' && rawId !== 'null' && rawId !== '' 
@@ -73,7 +74,7 @@ onNext() {
 
   public onCancel() {
     console.log('[Step3] onCancel called');
-    this.wizard.setSettings(this.deadline, this.isAnonymous , this.surveyName);
+    this.wizard.setSettings(this.deadline, this.isAnonymous, this.surveyName);
     this.router.navigate(['/active-templates']);
   }
 /*

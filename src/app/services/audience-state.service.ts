@@ -70,13 +70,23 @@ private readonly initialState: SurveyWizardState = {
 
   // --- Reset only audience/targeting ---
  resetAudience(): void {
-  const { templateId, name, description, deadline } = this.state;
+  const { templateId, name, description, deadline , isAnonymous } = this.state;
   this.state = {
     ...this.getDefaultState(),
     templateId,
     name,
     description,
-    deadline,   // <-- preserve deadline!
+    deadline, 
+    isAnonymous  // <-- preserve deadline!
+  };
+}
+ resetAudienceexid(): void {
+  const { templateId, name, description, deadline } = this.state;
+  this.state = {
+    ...this.getDefaultState(),
+    templateId,
+    description,
+    
   };
 }
 
