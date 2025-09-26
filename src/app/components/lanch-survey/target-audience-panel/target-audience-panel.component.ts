@@ -62,6 +62,7 @@ export class TargetAudiencePanelComponent implements OnInit {
       this.isEditMode = !!this.surveyId;
 
       this.loadLookups();
+      this.reloadDepartments(); 
 
    if (this.isEditMode && this.surveyId) {
   this.audienceState.loadSurveyConfig(this.surveyId).subscribe({
@@ -189,7 +190,61 @@ console.log('[Step3] state before build DTO:', this.audienceState.getTemplateId)
       this.error = 'Failed to load options. Please try again.';
       this.loading = false;
     });
+    this.reloadDepartments(); 
   }
+
+
+  // target-audience-panel.component.ts  (AJOUTS MINIMAUX)
+
+// --- AJOUT : recharge Departments en fonction des locations sélectionnées ---
+private reloadDepartments(): void {
+  this.lookups.getDepartmentsByCities(this.selectedLocations, true).subscribe({
+    next: (depts) => {
+      const allowedIds = new Set((depts ?? []).map(d => d.departmentId));
+      // options
+      this.departmentOptions = (depts ?? []).map(d => ({ name: d.name, value: d.departmentId }));
+      // pruning des sélections devenues invalides
+      this.selectedDepartments = (this.selectedDepartments ?? []).filter(id => allowedIds.has(id));
+      // après màj des départements, on régénère les positions
+      this.reloadPositions();
+      this.persistSelection();
+    },
+    error: () => { /* silencieux pour ne rien casser */ }
+  });
+}
+
+// --- AJOUT : recharge Positions en fonction de locations + departments sélectionnés ---
+private reloadPositions(): void {
+  this.lookups.getPositionsByFilters(this.selectedLocations, this.selectedDepartments, true).subscribe({
+    next: (pos) => {
+      const allowed = new Set((pos ?? []).map(p => p.positionId));
+      this.positionOptions = (pos ?? []).map(p => ({ name: p.name, value: p.positionId }));
+      this.selectedPositions = (this.selectedPositions ?? []).filter(id => allowed.has(id));
+      this.persistSelection();
+    },
+    error: () => { /* noop */ }
+  });
+}
+
+// --- AJOUTS : handlers appelés par le template ---
+onLocationsChange(values: string[]) {
+  this.selectedLocations = values ?? [];
+  this.byLocation = (this.selectedLocations.length > 0);
+  this.reloadDepartments();          // -> mettra aussi à jour positions
+}
+
+onDepartmentsChange(values: number[]) {
+  this.selectedDepartments = values ?? [];
+  this.byDepartment = (this.selectedDepartments.length > 0);
+  this.reloadPositions();
+}
+
+onPositionsChange(values: number[]) {
+  this.selectedPositions = values ?? [];
+  this.byPosition = (this.selectedPositions.length > 0);
+  this.persistSelection();
+}
+
 
  
   get segmentingDisabled(): boolean {

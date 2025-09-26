@@ -33,5 +33,21 @@ export class SurveyServiceService {
       `${baseUrl}api/Location/GetAll`, { params }
     ).pipe(map(r => r.data ?? []));
   }
+  getDepartmentsByCities(cities: string[], onlyActive = true): Observable<DepartmentListItem[]> {
+  let params = new HttpParams().set('onlyActive', String(onlyActive));
+  if (cities?.length) params = params.set('locationCities', cities.join(','));
+  return this.http
+    .get<ApiResponse<DepartmentListItem[]>>(`${baseUrl}api/Departement/GetLookupByCities`, { params })
+    .pipe(map(r => r.data ?? []));
+}
+
+getPositionsByFilters(cities: string[], departmentIds: number[], onlyActive = true): Observable<PositionListItem[]> {
+  let params = new HttpParams().set('onlyActive', String(onlyActive));
+  if (cities?.length) params = params.set('locationCities', cities.join(','));
+  if (departmentIds?.length) params = params.set('departmentIds', departmentIds.join(','));
+  return this.http
+    .get<ApiResponse<PositionListItem[]>>(`${baseUrl}api/Position/GetLookupByFilters`, { params })
+    .pipe(map(r => r.data ?? []));
+}
 }
 

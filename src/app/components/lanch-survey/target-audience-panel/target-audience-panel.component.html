@@ -76,7 +76,7 @@
   display="chip"
   [showToggleAll]="true"
   [disabled]="segmentingDisabled"
-  (onChange)="persistSelection()"
+  (onChange)="onLocationsChange($event.value)"
   [filter]="false"
   [appendTo]="'body'"
 ></p-multiSelect>
@@ -127,8 +127,8 @@
   placeholder="Select departments"
   display="chip"
   [showToggleAll]="true"
-  [disabled]="segmentingDisabled"
-  (onChange)="persistSelection()"
+  (onChange)="onDepartmentsChange($event.value)"
+  [disabled]="!byLocation && departmentOptions.length === 0"
   [filter]="false"
   [appendTo]="'body'"
 ></p-multiSelect>
@@ -178,8 +178,8 @@
   placeholder="Select positions"
   display="chip"
   [showToggleAll]="true"
-  [disabled]="segmentingDisabled"
-  (onChange)="persistSelection()"
+  (onChange)="onPositionsChange($event.value)"
+  [disabled]="positionOptions.length === 0"
   [filter]="false"
   [appendTo]="'body'"
 ></p-multiSelect>
