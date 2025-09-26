@@ -58,7 +58,7 @@ export class TargetAudiencePanelComponent implements OnInit {
     
      this.route.paramMap.subscribe(params => {
      this.surveyId = this.route.parent?.snapshot.paramMap.get('id') ?? undefined;
-    console.log('surveyId:', this.surveyId);
+  console.log('surveyId:', this.surveyId);
       this.isEditMode = !!this.surveyId;
 
       this.loadLookups();
@@ -138,6 +138,7 @@ console.log('[Step3] state before build DTO:', this.audienceState.getTemplateId)
 
   onCancel() {
     console.log('Survey creation cancelled');
+    this.persistSelection(); 
      //this.router.navigate(['/lanch-survey/step1']);
   }
 

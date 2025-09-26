@@ -242,6 +242,7 @@ export class ActiveTemplateComponent implements OnInit, OnDestroy {
     this.activeCardMenu.set(null);
     this.selectedCard.set(null);
     this.audienceState.resetAudience();
+    this.audienceState.resetAudienceexid();
     this.router.navigate(['/lanch-survey/step1']);
   }
 
