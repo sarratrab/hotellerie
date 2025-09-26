@@ -6,12 +6,15 @@
   <div class="sub-nav-card">
     <div class="sub-nav-items">
 <router-outlet #stepOutlet="outlet"></router-outlet>
-    <app-lanch-survey-footer
+<app-lanch-survey-footer
   [cancelLabel]="cancelLabel"
   [nextLabel]="nextLabel"
+  [showExtraCancel]="showExtraCancel"
   (cancel)="cancel()"
+  (extraCancel)="extraCancel()"
   (next)="next()"
 ></app-lanch-survey-footer>
+
   </div>
 
   </div>
