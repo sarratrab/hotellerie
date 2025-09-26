@@ -569,6 +569,13 @@
     grid-template-columns: 1fr;
   }
 }
+ .sub-navbar1 {
+            padding-left: 24px;
+            padding-right: 24px;
+            padding-bottom: 24px;
+            background-color: #f0f2f5;
+        }
+
  .sub-navbar {
             padding: 24px;
             background-color: #f0f2f5;
@@ -581,6 +588,7 @@
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
             padding: 20px 24px;
         }
+
 
         .sub-nav-items {
             display: flex;
@@ -705,7 +713,7 @@
 /* carte horizontale */
 .survey-card--row {
   display: flex;
-  gap: 20px;
+  gap: 25px;
   align-items: stretch;
   padding: 16px 20px;
   height: auto;             /* override l’ancienne hauteur */
@@ -715,6 +723,16 @@
   display: flex;
   flex-direction: column;
   align-items: flex-end;
+  
+
+}
+.survey-card__aside1 {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  margin-left: 0px;
+  
+
 }
 
 .survey-card__aside .pill-group {  /* wrap both pills or target the container you use */

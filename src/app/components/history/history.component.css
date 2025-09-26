@@ -569,6 +569,12 @@
     grid-template-columns: 1fr;
   }
 }
+ .sub-navbar1 {
+            padding-left: 24px;
+            padding-right: 24px;
+            padding-bottom: 24px;
+            background-color: #f0f2f5;
+        }
  .sub-navbar {
             padding: 24px;
             background-color: #f0f2f5;
@@ -716,7 +722,14 @@
   flex-direction: column;
   align-items: flex-end;
 }
+.survey-card__aside1 {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  margin-left: 260px;
+  
 
+}
 .survey-card__aside .pill-group {  /* wrap both pills or target the container you use */
   display: flex;
   gap: 8px;

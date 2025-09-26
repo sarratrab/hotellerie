@@ -22,19 +22,19 @@
   justify-content: space-between;
   align-items: center;
   height: 100%;
-  max-width: 1400px;
-  margin: 0 auto;
-  padding: 0 50px;
+  max-width: 1474px;
 }
 
 .navbar-left {
   display: flex;
   align-items: center;
-  gap: 60px;
+  gap: 435px;
+  margin-left: 20px;
 }
 .logo {
   display: flex;
   align-items: center;
+  
 }
 
 .logo-img {
@@ -96,7 +96,7 @@
 .navbar-right {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 20px;
 }
 
 .nav-icon {

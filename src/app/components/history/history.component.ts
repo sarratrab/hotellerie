@@ -9,7 +9,7 @@ import { Router } from '@angular/router';
 import { TypeServiceService } from '../../services/type-service.service';
 import { ToastModule } from 'primeng/toast';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
-import { CommonModule } from '@angular/common';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
 import { SurveyOutDto } from '../../models/interfaces/SurveyOutDto';
@@ -32,7 +32,7 @@ import { TemplateService } from '../../services/template-services.service';
   templateUrl: './history.component.html',
   styleUrl: './history.component.css'
 })
-export class HistoryComponent implements OnInit{
+export class HistoryComponent implements OnInit,OnDestroy{
     constructor(
     @Inject(PLATFORM_ID) private platformId: Object,
     private router: Router,
@@ -54,13 +54,17 @@ EditSurvey() {
   ref: DynamicDialogRef | undefined;
   coalesce(v: any, fb: any) { return v === null || v === undefined ? fb : v; }
 
-
+  private typeColorById = new Map<string, string>();
+  private typeLabelById = new Map<string, string>();
   searchTerm = signal<string>('');
   selectedYear = signal<string>('2025');
   selectedType = signal<string>('');
+
   surveys = signal<any[]>([]);
   activeCardMenu = signal<string | null>(null);
+
   menuPosition = signal<{ x: number; y: number }>({ x: 0, y: 0 });
+  
   isOverdue(s: any): boolean {
   if (!s?.deadline) return false;
   const due = new Date(s.deadline).getTime();
@@ -111,17 +115,40 @@ isDueSoon(s: any, days = 7): boolean {
 
 
   private documentClickListener?: (event: Event) => void;
+    ngOnDestroy(): void {
+    this.removeDocumentClickListener();
+  }
 
+  private removeDocumentClickListener(): void {
+    if (isPlatformBrowser(this.platformId) && this.documentClickListener) {
+      document.removeEventListener('click', this.documentClickListener);
+    }
+  }
 
 
   ngOnInit(): void {
-    this.loadSurveys();
+    
     this.items = [
       { label: 'Create a template', command: () => this.router.navigate(['/addtemp']) },
       { label: 'Export to Excel', command: () => console.log('') },
       { label: 'Export to PDF', command: () => console.log('') }
     ];
+        this.templateTypeService.list().subscribe({
+      next: (types: any[]) => {
+        this.typeOptions = types.map(t => ({
+          value: t.id,
+          label: t.name,
+          color: t.color
+        }));
 
+        this.typeColorById = new Map(types.map(t => [t.id, this.normalizeHex(t.color)]));
+        this.typeLabelById = new Map(types.map(t => [t.id, t.name]));
+      },
+      error: err => {
+        console.error('Error fetching types:', err);
+      }
+    });
+   this.loadSurveys();
 
   }
 
@@ -146,13 +173,14 @@ isDueSoon(s: any, days = 7): boolean {
         !search ||
         survey.name.toLowerCase().includes(search) ||
         survey.createdBy.toLowerCase().includes(search) ||
-        survey.type.toLowerCase().includes(search) ||
+        survey.label.toLowerCase().includes(search) ||
         (survey.usage_status && survey.usage_status);
 
       const matchesYear =
         !year || survey.createdOn.getFullYear().toString() === year;
+
       const matchesType =
-        !type || survey.type.toLowerCase() === type.toLowerCase();
+        !type || survey.typeLabel.toLowerCase() === type.toLowerCase();
 
       return matchesSearch && matchesYear && matchesType;
     });
@@ -162,17 +190,9 @@ isDueSoon(s: any, days = 7): boolean {
     this.menu.toggle(event);
   }
 
-  onSearch(): void {
-    console.log('Searching for:', this.searchTerm());
-  }
-
-  onYearChange(): void {
-    console.log('Year filter changed to:', this.selectedYear());
-  }
-
-  onTypeChange(): void {
-    console.log('Type filter changed to:', this.selectedType());
-  }
+  onSearch(): void {}
+  onYearChange(): void {}
+  onTypeChange(): void {}
 
   toggleCardMenu(event: Event, surveyId: string): void {
     event.stopPropagation();

@@ -578,6 +578,28 @@
     grid-template-columns: 1fr;
   }
 }
+.survey-card__aside {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+.survey-card__metrics {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 4px;
+}
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+ .sub-navbar1 {
+            padding-left: 24px;
+            padding-right: 24px;
+            padding-bottom: 24px;
+            background-color: #f0f2f5;
+        }
  .sub-navbar {
             padding: 24px;
             background-color: #f0f2f5;

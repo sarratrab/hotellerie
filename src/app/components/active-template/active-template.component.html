@@ -4,7 +4,7 @@
    <app-template-navbar></app-template-navbar>
 
   <!-- Filters and Search + Survey Cards Grid Combined -->
-  <div class="sub-navbar">
+  <div class="sub-navbar1">
     <div class="sub-nav-card">
       <div class="sub-nav-items">
         <div class="surveys-count">
@@ -102,14 +102,15 @@
                   <span class="meta-value">{{ survey.createdBy }}</span>
                 </div>
               </div>
-
-              <div class="card-badges">
-                <!-- type + couleur -->
+              
+                    <div class="survey-card__metrics">
+      <div class="chips">
                  <span class="type-badge"
                      [ngStyle]="typeChipStyle(survey)">
                      <span class="dot" [style.background-color]="getTypeColor(survey)"></span>
                          {{ survey.type }}
                       </span>
+                   
 
                 <div
                   class="status-badge"
@@ -117,7 +118,11 @@
                 >
                   {{ (survey.usage_status==1)? 'In Use' : 'Idle' }}
                 </div>
-              </div>
+                </div>
+                </div>
+             
+          
+              
             </div>
 
           </div>

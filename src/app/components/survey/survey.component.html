@@ -57,7 +57,7 @@
   </div>
 
   <!-- Survey Cards Grid -->
-  <div class="sub-navbar">
+  <div class="sub-navbar1">
     <div class="sub-nav-card">
       <div class="surveys-grid">
         <div class="grid-container">
@@ -111,9 +111,14 @@
                       </span>
   <div class="pill pill-anon" *ngIf="survey.isAnonymous !== false">ANONYMOUS</div>
      <div class="pill pill-anon" *ngIf="survey.isAnonymous !== true">Not ANONYMOUS</div>
+    
+     <div class="survey-card__aside1">
+
       <div class="meta">
         <span class="meta-label">Due Date : </span>
         <span class="meta-value">{{survey.deadline | date:'MMM d, yyyy' }}</span>
+      </div>
+
       </div>
 
 

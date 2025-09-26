@@ -126,7 +126,20 @@ isDueSoon(s: any, days = 7): boolean {
       { label: 'Export to PDF', command: () => console.log('') }
     ];
 
+        this.templateTypeService.list().subscribe({
+      next: (types: any[]) => {
+        this.typeOptions = types.map(t => ({
+          value: t.id,
+          label: t.name,
+          color: t.color
+        }));
 
+
+      },
+      error: err => {
+        console.error('Error fetching types:', err);
+      }
+    });
     
   }
 
@@ -159,7 +172,7 @@ isDueSoon(s: any, days = 7): boolean {
       const matchesYear =
         !year || survey.createdOn.getFullYear().toString() === year;
       const matchesType =
-        !type || survey.type.toLowerCase() === type.toLowerCase();
+        !type || survey.typeLabel.toLowerCase() === type.toLowerCase();
 
       return matchesSearch && matchesYear && matchesType;
     });
