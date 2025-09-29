@@ -24,6 +24,7 @@ export class LanchSurveyComponent implements AfterViewInit {
 
   cancelLabel = 'Cancel';
   nextLabel = 'Next';
+  showExtraCancel = false;
 
   constructor(private router: Router, private route: ActivatedRoute , private cdr: ChangeDetectorRef) {
    
@@ -79,6 +80,8 @@ export class LanchSurveyComponent implements AfterViewInit {
     const child = this.route.firstChild?.snapshot;
     this.cancelLabel = child?.data?.['cancelLabel'] ?? 'Cancel';
     this.nextLabel = child?.data?.['nextLabel'] ?? 'Next';
+    this.showExtraCancel = child?.data?.['showExtraCancel'] ?? false;
+     console.log('showExtraCancel now:', this.showExtraCancel);
   }
 async next() {
   const child = this.outlet?.component as any;
@@ -110,6 +113,9 @@ private navigateNext() {
     this.router.navigate(['/active-templates']);
   }
 }
-
+extraCancel() {
+  // Always exit survey
+  this.router.navigate(['/active-templates']);
+}
 
 }

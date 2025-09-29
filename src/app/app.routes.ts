@@ -50,17 +50,17 @@ export const routes: Routes = [
     {
       path: 'step1',
       component: SurveyInfo,
-      data: { cancelLabel: 'Cancel', nextLabel: 'Next' }
+      data: { cancelLabel: 'Cancel', nextLabel: 'Next' , showExtraCancel: false } // NEW
     },
     {
       path: 'step2',
       component: TargetAudiencePanelComponent,
-      data: { cancelLabel: 'Previous', nextLabel: 'Next' }
+      data: { cancelLabel: 'Previous', nextLabel: 'Next', showExtraCancel: true } // NEW
     },
     {
       path: 'step3',
       component: EmployeeSelectorComponent,
-      data: { cancelLabel: 'Previous', nextLabel: 'Finish' }
+      data: { cancelLabel: 'Previous', nextLabel: 'Finish', showExtraCancel: true } // NEW
     }
   ]
 }
