@@ -51,5 +51,20 @@ updateSurvey(surveyId: string, dto: AddSurveyDto): Observable<void> {
   // Backend expects PUT with surveyId in URL and DTO in body
   return this.http.put<void>(`${baseUrl}api/Survey/UpdateSurvey/${surveyId}`, dto);
 }
+// survey.service.ts
+getById(surveyId: string): Observable<SurveyOutDto> {
+  return this.http
+    .get<{ data: SurveyOutDto }>(`${baseUrl}api/Survey/GetSurveyById/${surveyId}`)
+    .pipe(map(resp => resp.data)); // unwrap 'data'
+}
+
+addSurveyAnswer(surveyId: string, employeeId: string, answers: string, isFinal: boolean) {
+  return this.http.post(`${baseUrl}api/SurveyResponse/Answer`, {
+    surveyId,
+    employeeId,
+    answers,
+    isFinal
+  });
+}
 
 }

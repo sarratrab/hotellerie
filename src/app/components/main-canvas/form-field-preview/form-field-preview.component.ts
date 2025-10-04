@@ -1,4 +1,4 @@
-import { Component, input, inject } from '@angular/core';
+import { Component, input, inject, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { FormField } from '../../../models/field.model';
@@ -19,5 +19,11 @@ export class FormFieldPreviewComponent {
   getFieldComponent(type: string) {
     const fieldDef = this.fieldRegistry.getFieldType(type);
     return fieldDef?.component || null;
+  }
+
+  @Output() valueChange = new EventEmitter<{ fieldId: string, value: any }>();
+  onValueChange(value: any) {
+    this.field().answer = value; // ✅ save locally
+    this.valueChange.emit({ fieldId: this.field().id, value }); // ✅ notify parent
   }
 }

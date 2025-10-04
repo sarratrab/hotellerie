@@ -21,6 +21,7 @@ import { EmployeeSelectorComponent } from './components/lanch-survey/employee-se
 import { TargetAudiencePanelComponent } from './components/lanch-survey/target-audience-panel/target-audience-panel.component';
 import { LanchSurveyFooterComponent } from './components/lanch-survey/lanch-survey-footer/lanch-survey-footer.component';
 import { SurveyInfo } from './components/lanch-survey/step1-survey-info/step1-survey-info.component';
+import { SurveyAnswerComponent } from './components/response-manag/survey-answer/survey-answer.component';
 
 
 
@@ -39,6 +40,7 @@ export const routes: Routes = [
      { path: 'surveys', component: SurveyComponent },
      {path : 'history' , component : HistoryComponent},
      
+ { path: 'surveys/:surveyId', component: SurveyAnswerComponent },
      {path : 'lanch-footer' , component : LanchSurveyFooterComponent},
      
 {

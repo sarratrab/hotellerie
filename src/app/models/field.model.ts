@@ -14,6 +14,7 @@ export interface FormField {
   showCancelButton?: boolean;
   alignment?: 'left' | 'right';
   orientation?: 'horizontal' | 'vertical';
+  answer?: string | string[];   // <-- add this
 }
 
 export interface FieldTypeDefinition {
