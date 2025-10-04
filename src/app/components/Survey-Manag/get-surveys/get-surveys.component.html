@@ -5,9 +5,9 @@
   <div class="sub-navbar">
     <div class="sub-nav-card">
       <div class="sub-nav-items">
-        <div class="surveys-count">
-          Active Surveys ({{ totalSurveys() }})
-        </div>
+       <div class="surveys-count">
+  {{ isOpenPage ? 'Active Surveys' : 'Completed Surveys' }} ({{ totalSurveys() }})
+</div>
 
         <div class="search-container">
           <div class="search-wrapper">
@@ -143,5 +143,6 @@
 >
   <div class="menu-item" (click)="EditSurvey()" >Edit</div>
   <div class="menu-item" >View responses </div>
-  <div class="menu-item" (click)="onComplete()" >complete</div>
+<div class="menu-item" (click)="onComplete()" *ngIf="isOpenPage">Complete</div>
+
 </div>

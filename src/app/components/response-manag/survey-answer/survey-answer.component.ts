@@ -28,7 +28,7 @@ import { FormFieldPreviewComponent } from '../../Survey-Builder-tool/main-canvas
     CommonModule,
     RouterModule,
     FormFieldPreviewComponent,
-    FormsModule, HomeComponent, NavbarComponent],
+    FormsModule, NavbarComponent],
   templateUrl: './survey-answer.component.html',
   styleUrl: './survey-answer.component.css'
 })

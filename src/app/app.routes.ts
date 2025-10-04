@@ -1,8 +1,6 @@
 import { Routes } from '@angular/router';
-
 import { NavbarComponent } from './components/navbar/navbar.component';
 import { HomeComponent } from './components/home/home.component';
-
 import { SurveyAnswerComponent } from './components/response-manag/survey-answer/survey-answer.component';
 import { AddTemplateComponent } from './components/Template-Mang/add-template/add-template.component';
 import { PreferencesComponent } from './components/preference/preferences/preferences.component';
@@ -10,14 +8,13 @@ import { TemplateDetailComponent } from './components/Template-Mang/template-det
 import { EditTemplateComponent } from './components/Template-Mang/edit-template/edit-template.component';
 import { AddTypeComponent } from './components/preference/add-type/add-type.component';
 import { EditTypeComponent } from './components/preference/edit-type/edit-type.component';
-import { SurveyComponent } from './components/Survey-Manag/survey/survey.component';
-import { HistoryComponent } from './components/Survey-Manag/history/history.component';
 import { LanchSurveyFooterComponent } from './components/Survey-Manag/lanch-survey/lanch-survey-footer/lanch-survey-footer.component';
 import { LanchSurveyComponent } from './components/Survey-Manag/lanch-survey/lanch-survey/lanch-survey.component';
 import { SurveyInfo } from './components/Survey-Manag/lanch-survey/step1-survey-info/step1-survey-info.component';
 import { TargetAudiencePanelComponent } from './components/Survey-Manag/lanch-survey/target-audience-panel/target-audience-panel.component';
 import { EmployeeSelectorComponent } from './components/Survey-Manag/lanch-survey/employee-selector/employee-selector.component';
 import { GetTemplatesComponent } from './components/Template-Mang/get-templates/get-templates.component';
+import { GetSurveysComponent } from './components/Survey-Manag/get-surveys/get-surveys.component';
 
 
 
@@ -37,6 +34,16 @@ export const routes: Routes = [
     component: GetTemplatesComponent,
     data: { isActivePage: false }
   },
+  { 
+    path: 'surveys', 
+    component: GetSurveysComponent, 
+    data: { status: 'open' } // ✅ open surveys
+  },
+  { 
+    path: 'history', 
+    component: GetSurveysComponent, 
+    data: { status: 'completed' } // ✅ completed surveys
+  },
      {path : 'addtemp' , component : AddTemplateComponent},
     
      {path : 'home' , component : HomeComponent},
@@ -47,8 +54,7 @@ export const routes: Routes = [
      {path : 'edit-template/:id' , component : EditTemplateComponent},
      {path : 'addtype' , component : AddTypeComponent},
      { path: 'edittype/:id', component: EditTypeComponent },
-     { path: 'surveys', component: SurveyComponent },
-     {path : 'history' , component : HistoryComponent},
+     
      
  { path: 'surveys/:surveyId', component: SurveyAnswerComponent },
      {path : 'lanch-footer' , component : LanchSurveyFooterComponent},
