@@ -3,7 +3,8 @@
   width: 100%;
   min-height: 100vh;
   background-color: #f8f9fa;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 
+             'Ubuntu', 'Cantarell', 'Oxygen', 'Helvetica Neue', Arial, sans-serif;
 }
 
 /* Header Navigation */
@@ -330,8 +331,9 @@
 .grid-container {
   max-width: 1400px;
   display: grid;
-  margin-left: 6px;
-  grid-template-columns: repeat(auto-fit, minmax(688px, 688px));
+  margin: 0 auto;
+  padding-inline: clamp(16px, 3vw, 24px); /* Modern approach */
+  grid-template-columns: repeat(auto-fit, minmax(clamp(300px, 45%, 600px), 1fr));
   gap: 24px;
 }
 
@@ -723,7 +725,7 @@
   display: flex;
   flex-direction: column;
   align-items: flex-end;
-  margin-left: 270px;
+  margin-left: auto;
   
 
 }
