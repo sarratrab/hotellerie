@@ -2,16 +2,20 @@ import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-
+import { ToastModule } from 'primeng/toast'; // ✅ for <p-toast>
+import { MessageService } from 'primeng/api'; // ✅ to use MessageService
 
 import { InputTextModule } from 'primeng/inputtext';
 import { AudienceStateService } from '../../../../services/audience-state.service';
 import { SurveyService } from '../../../../services/SurveyService';
+import { Toast } from "primeng/toast";
+
 
 @Component({
   selector: 'app-launch-step3',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, ToastModule],
+   providers: [MessageService], // ✅ provide MessageService
   templateUrl: './step1-survey-info.component.html',
   styleUrls: ['./step1-survey-info.component.css']
 })
@@ -34,6 +38,7 @@ surveyName: string = '';
     private router: Router,
     private route: ActivatedRoute,
     private audienceState: AudienceStateService,
+    private messageService: MessageService
   ) {}
 
 ngOnInit(): void {
@@ -54,83 +59,64 @@ ngOnInit(): void {
   this.surveyName = this.wizard.getTemplateName() ?? this.wizard['state']?.name ?? '';
 
 }
-onNext() {
- try {
+onNext(): boolean {  // Return boolean
+  console.log('onNext called');
+  
+  try {
     const template = this.wizard.getTemplateId();
     if (!template) {
-      this.error = 'No template selected';
-      return;
+      this.messageService.add({
+        key: 'tc',
+        severity: 'error',
+        summary: 'Validation Error',
+        detail: 'No template selected',
+        life: 3000
+      });
+      return false; // ❌ Stop navigation
     }
-
+    
+    if (!this.surveyName || this.surveyName.trim() === '') {
+      this.messageService.add({
+        key: 'tc',
+        severity: 'error',
+        summary: 'Validation Error',
+        detail: 'Survey name is required',
+        life: 3000
+      });
+      return false; // ❌ Stop navigation
+    }
+    
     // Save current step state
     this.wizard.setSettings(this.deadline, this.isAnonymous, this.surveyName);
-
+    return true; // ✅ Allow navigation
+    
   } catch (e: any) {
-    this.error = e?.message || 'Invalid data';
+    this.messageService.add({
+      key: 'tc',
+      severity: 'error',
+      summary: 'Error',
+      detail: e?.message || 'Invalid data',
+      life: 3000
+    });
     console.warn('Client-side validation failed:', e);
+    return false; // ❌ Stop navigation
   }
-
- // this.router.navigate([`/lanch-survey/${this.surveyId}/step2`]);
 }
 
+testToast() {
+  console.log('Testing toast...');
+  this.messageService.add({
+    key: 'tc',
+    severity: 'success',
+    summary: 'Test',
+    detail: 'Toast is working!',
+    life: 3000
+  });
+}
   public onCancel() {
     console.log('[Step3] onCancel called');
     this.wizard.setSettings(this.deadline, this.isAnonymous, this.surveyName);
     this.router.navigate(['/active-templates']);
   }
-/*
-  onNext() {
-  this.error = this.success = undefined;
-  this.loading = true;
-
-
-  try {
-    
-    this.wizard.setSettings(this.deadline, this.isAnonymous);
-
-  
-    const dto = this.wizard.buildAddSurveyDto();
-    console.log('[Step3] DTO =', dto);
-
-    if (this.surveyId) {
-      // --- EDIT MODE ---
-      this.surveyApi.updateSurvey(this.surveyId, dto).subscribe({
-        next: () => {
-          this.loading = false;
-          this.success = 'Survey updated successfully';
-          this.router.navigate(['/surveys']);
-        },
-        error: (err: { error: { message: any; }; statusText: any; }) => {
-          this.loading = false;
-          const detail = err?.error?.message || err?.error || err?.statusText || 'Bad Request';
-          this.error = `Failed to update survey: ${detail}`;
-          console.error('Update survey error:', err);
-        }
-      });
-
-    } else {
-      // --- ADD MODE ---
-      this.surveyApi.addSurvey(dto).subscribe({
-        next: () => {
-          this.loading = false;
-          this.success = 'Survey created successfully';
-          this.router.navigate(['/surveys']);
-        },
-        error: (err) => {
-          this.loading = false;
-          const detail = err?.error?.message || err?.error || err?.statusText || 'Bad Request';
-          this.error = `Failed to create survey: ${detail}`;
-          console.error('Create survey error:', err);
-        }
-      });
-    }
-
-  } catch (e: any) {
-    this.loading = false;
-    this.error = e?.message || 'Invalid data';
-    console.warn('Client-side validation failed:', e);
-  }
-}*/
-
 
 }

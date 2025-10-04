@@ -1,254 +1,80 @@
+<p-toast key="tc" ></p-toast>
 <!-- LaunchStep3Component Template -->
 <div class="launch-step3-container">
-   <h2 class="text-xl font-semibold mb-2 text-gray-800">
-    Survey informatoin
+  <h2 class="text-xl font-semibold mb-2 text-gray-800">
+    Survey Information <!-- Fixed typo -->
   </h2>
   <div class="settings-section">
-    <div class="grid grid-cols-1 grid-cols-1">
+    <div class="grid grid-cols-1"> <!-- removed duplicate grid-cols-1 -->
       <div class="space-y-6">
    
-    <div>
+        <!-- Survey Name -->
+        <div>
           <label for="name" class="input-label">Survey Name</label>
           <input 
             type="text"
             id="name" 
-            name="name" 
+            name="name"
             [(ngModel)]="surveyName"  
+            #surveyNameCtrl="ngModel"
             placeholder="Enter survey name"
             required
             class="custom-input"
           />
-          <div class="error-message" style="display: none;">
+          <div class="error-message" *ngIf="surveyNameCtrl.invalid && surveyNameCtrl.touched">
             Survey name is required
           </div>
-      </div>
+        </div>
 
+        <!-- Anonymous Response Setting -->
+        <div class="setting-item">
+          <div class="checkbox-container">
+            <input 
+              type="checkbox" 
+              id="allowAnonymous"
+              [(ngModel)]="isAnonymous"
+              name="allowAnonymous"
+              class="custom-checkbox"
+            />
+            <label for="allowAnonymous" class="checkbox-label">
+              Allow anonymous Response
+            </label>
+          </div>
+        </div>
 
-
-
- <!-- Anonymous Response Setting -->
-    <div class="setting-item">
-      <div class="checkbox-container">
-        <input 
-          type="checkbox" 
-          id="allowAnonymous"
-          [(ngModel)]="isAnonymous"
-          class="custom-checkbox"
-        />
-        <label for="allowAnonymous" class="checkbox-label">
-          Allow anonymous Response
-        </label>
-      </div>
-    </div>
         <!-- Send Notification Mail Setting -->
-    <div class="setting-item">
-      <div class="checkbox-container">
-        <input 
-          type="checkbox" 
-          id="sendNotification"
-          class="custom-checkbox"
-        />
-        <label for="sendNotification" class="checkbox-label">
-          Send Notification mail
-        </label>
+        <div class="setting-item">
+          <div class="checkbox-container">
+            <input 
+              type="checkbox" 
+              id="sendNotification"
+              name="sendNotification"
+              class="custom-checkbox"
+            />
+            <label for="sendNotification" class="checkbox-label">
+              Send Notification mail
+            </label>
+          </div>
+        </div>
+       
+        <!-- Expiration Date Setting -->
+        <div class="setting-item expiration-setting">
+          <label for="expirationDate" class="field-label">
+            Expiration Date
+          </label>
+          <div class="date-input-container">
+            <input 
+              type="date"
+              id="expirationDate"
+              [(ngModel)]="deadline"
+              name="deadline"
+              class="date-input"
+            />
+          </div>
+        </div>
+<button (click)="testToast()">Test Toast</button>
       </div>
     </div>
-   
-
-    <!-- Expiration Date Setting -->
-    <div class="setting-item expiration-setting">
-      <label for="expirationDate" class="field-label">
-        Expiration Date
-      </label>
-      <div class="date-input-container">
-        <input 
-          type="date"
-          id="expirationDate"
-          [(ngModel)]="deadline"
-          class="date-input"
-          placeholder="mm/dd/yyyy"
-        />
-      </div>
-    </div>
-
- </div>
-  </div>
   </div>
 </div>
-<br>
 
-<style>
-.launch-step3-container {
-  padding: 24px;
-  background-color: white;
-  border-radius: 8px;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-}
-
-.settings-section {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  max-width: 1500px;
-}
-
-.setting-item {
-  display: flex;
-  flex-direction: column;
-  gap: 1px;
-}
-
-.checkbox-container {
-  
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.custom-checkbox {
-  width: 20px;
-  height: 20px;
-  border: 2px solid #dee2e6;
-  border-radius: 4px;
-  background: white;
-  cursor: pointer;
-  appearance: none;
-  position: relative;
-  transition: all 0.2s ease;
-  flex-shrink: 0;
-}
-
-.custom-checkbox:checked {
-  background-color: #007bff;
-  border-color: #007bff;
-}
-
-.custom-checkbox:checked::after {
-  content: '✓';
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  color: white;
-  font-size: 14px;
-  font-weight: bold;
-}
-
-.custom-checkbox:hover {
-  border-color: #007bff;
-}
-
-.custom-checkbox:focus {
-  outline: 2px solid #007bff33;
-  outline-offset: 2px;
-}
-
-.checkbox-label {
-  font-size: 14px;
-  color: #333;
-  cursor: pointer;
-  user-select: none;
-  line-height: 1.4;
-}
-
-.expiration-setting {
-  margin-top: 8px;
-}
-
-.field-label {
-  font-size: 14px;
-  color: #333;
-  font-weight: 500;
-  margin-bottom: 8px;
-  display: block;
-}
-
-.date-input-container {
-  position: relative;
-  max-width: 500px;
-}
-
-.date-input {
-  width: 100%;
-  padding: 10px 12px;
-  border: 2px solid #dee2e6;
-  border-radius: 4px;
-  font-size: 17px;
-  color: #495057;
-  background: white;
-  transition: border-color 0.2s ease;
-  font-family: inherit;
-}
-
-.date-input:focus {
-  outline: none;
-  border-color: #007bff;
-  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
-}
-
-.date-input:hover {
-  border-color: #007bff;
-}
-
-.date-input::placeholder {
-  color: #007bff;
-  font-style: italic;
-}
-
-/* Calendar icon styling for date input */
-.date-input::-webkit-calendar-picker-indicator {
-  cursor: pointer;
-  padding: 4px;
-  border-radius: 4px;
-  transition: background-color 0.2s ease;
-  color: #007bff;
-}
-
-.date-input::-webkit-calendar-picker-indicator:hover {
-  background-color: rgba(0, 123, 255, 0.1);
-}
-
-/* Responsive design */
-@media (max-width: 768px) {
-  .launch-step3-container {
-    padding: 16px;
-  }
-  
-  .date-input-container {
-    max-width: none;
-  }
-  
-  .settings-section {
-    max-width: none;
-  }
-}
-
-/* Focus visible for accessibility */
-.custom-checkbox:focus-visible {
-  outline: 2px solid #007bff;
-  outline-offset: 2px;
-}
-
-.checkbox-label:focus-visible {
-  outline: 2px solid #007bff;
-  outline-offset: 2px;
-  border-radius: 2px;
-}
-
-/* Disabled state */
-.custom-checkbox:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
-
-.custom-checkbox:disabled + .checkbox-label {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
-
-.date-input:disabled {
-  background-color: #f8f9fa;
-  opacity: 0.6;
-  cursor: not-allowed;
-}
-</style>

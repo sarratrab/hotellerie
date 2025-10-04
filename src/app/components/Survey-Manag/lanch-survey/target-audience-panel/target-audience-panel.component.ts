@@ -136,6 +136,7 @@ console.log('[Step3] state before build DTO:', this.audienceState.getTemplateId)
 
 
     console.log('Step1 selection saved:', this.audienceState.getSelection());
+    return true; // OK to proceed
   }
 
   onCancel() {

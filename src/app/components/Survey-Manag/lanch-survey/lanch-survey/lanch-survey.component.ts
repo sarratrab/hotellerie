@@ -4,6 +4,7 @@ import { SurveyNavbarComponent } from "../../survey-navbar/survey-navbar.compone
 import { LanchSurveyStepsNavComponent } from "../lanch-survey-steps-nav/lanch-survey-steps-nav.component";
 import { LanchSurveyFooterComponent } from "../lanch-survey-footer/lanch-survey-footer.component";
 import { filter } from 'rxjs';
+import { Toast, ToastModule } from "primeng/toast";
 
 @Component({
   selector: 'app-lanch-survey',
@@ -85,8 +86,13 @@ export class LanchSurveyComponent implements AfterViewInit {
   }
 async next() {
   const child = this.outlet?.component as any;
-  if (child?.onNext) await child.onNext();
-  this.navigateNext();
+  if (child?.onNext) {
+    const canProceed = await child.onNext();
+    if (!canProceed) {
+      return; // ❌ Don't navigate if validation failed
+    }
+  }
+  this.navigateNext(); // ✅ Only navigate if validation passed
 }
 
 
