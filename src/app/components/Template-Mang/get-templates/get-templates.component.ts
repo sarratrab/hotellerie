@@ -14,29 +14,25 @@ import { FormsModule } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
 
 import { TemplateNavbarComponent } from '../template-navbar/template-navbar.component';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { TieredMenu, TieredMenuModule } from 'primeng/tieredmenu';
 import { MenuItem, MessageService } from 'primeng/api';
-
 import { ToastModule } from 'primeng/toast';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { DialogService, DynamicDialogRef } from 'primeng/dynamicdialog';
 import { DuplicateTemplateDialogComponent } from '../duplicate-template-dialog/duplicate-template-dialog.component';
-
-import { MultiSelectModule } from 'primeng/multiselect';
 import { SurveyNavbarComponent } from '../../Survey-Manag/survey-navbar/survey-navbar.component';
 import { TemplateBase } from '../../../models/interfaces/templateBase';
+import { TemplateCard } from '../../../models/interfaces/template-read';
 import { TemplateService } from '../../../services/template-services.service';
 import { TypeServiceService } from '../../../services/type-service.service';
 import { TemplateActionsService } from '../../../services/TemplateActionsService';
 import { AudienceStateService } from '../../../services/audience-state.service';
 import { ActiveStatus } from '../../../models/interfaces/enums/ActiveStatus';
 import { UsageStatus } from '../../../models/interfaces/enums/UsageStatus';
-import { TemplateCard } from '../../../models/interfaces/template-read';
-
 
 @Component({
-  selector: 'app-active-template',
+  selector: 'app-get-templates',
   imports: [
     CommonModule,
     FormsModule,
@@ -45,58 +41,64 @@ import { TemplateCard } from '../../../models/interfaces/template-read';
     TemplateNavbarComponent,
     TieredMenuModule,
     ToastModule,
-    ConfirmDialogModule,
-    MultiSelectModule,
+    ConfirmDialogModule
   ],
-  templateUrl: './active-template.component.html',
-  styleUrl: './active-template.component.css'
+  templateUrl: './get-templates.component.html',
+  styleUrl: './get-templates.component.css',
+  providers: [MessageService]
 })
-export class ActiveTemplateComponent implements OnInit, OnDestroy {
+export class GetTemplatesComponent implements OnInit, OnDestroy {
 
   @ViewChild('menu') menu!: TieredMenu;
 
   items: MenuItem[] = [];
-  typeOptions: { value: string; label: string }[] = [];
+  typeOptions: { value: string; label: string; color?: string }[] = [];
   ref: DynamicDialogRef | undefined;
 
   private typeColorById = new Map<string, string>();
   private typeLabelById = new Map<string, string>();
 
-  // ---------- state ----------
   searchTerm = signal<string>('');
   selectedYear = signal<string>('2025');
   selectedType = signal<string>('');
-
   surveys = signal<TemplateBase[]>([]);
   activeCardMenu = signal<string | null>(null);
   menuPosition = signal<{ x: number; y: number }>({ x: 0, y: 0 });
-
-  // NEW: carte actuellement “ouverte” par le menu
   selectedCard = signal<TemplateBase | null>(null);
 
   totalSurveys = computed(() => this.filteredSurveys().length);
+
+  isActivePage = true; // default to active; can be set externally if needed
 
   private documentClickListener?: (event: Event) => void;
 
   constructor(
     @Inject(PLATFORM_ID) private platformId: Object,
     private router: Router,
+     private route: ActivatedRoute,
     private templateSvc: TemplateService,
     private templateTypeService: TypeServiceService,
-    private messageService: MessageService,
+      private msg: MessageService,
     private dialogService: DialogService,
     private templateActionsSvc: TemplateActionsService,
     private launchState: AudienceStateService,
     private audienceState: AudienceStateService,
   ) {}
 
-  ngOnInit(): void {
-    this.items = [
-      { label: 'Create a template', command: () => this.router.navigate(['/addtemp']) },
-      { label: 'Export to Excel', command: () => console.log('') },
-      { label: 'Export to PDF', command: () => console.log('') }
-    ];
+ngOnInit(): void {
+  this.items = [
+    { label: 'Create a template', command: () => this.router.navigate(['/addtemp']) },
+    { label: 'Export to Excel', command: () => console.log('') },
+    { label: 'Export to PDF', command: () => console.log('') }
+  ];
 
+  // Get isActivePage from route data
+  this.route.data.subscribe(data => {
+    if (data['isActivePage'] !== undefined) {
+      this.isActivePage = data['isActivePage'];
+    }
+
+    // Load types first
     this.templateTypeService.list().subscribe({
       next: (types: any[]) => {
         this.typeOptions = types.map(t => ({
@@ -107,17 +109,20 @@ export class ActiveTemplateComponent implements OnInit, OnDestroy {
 
         this.typeColorById = new Map(types.map(t => [t.id, this.normalizeHex(t.color)]));
         this.typeLabelById = new Map(types.map(t => [t.id, t.name]));
-      },
-      error: err => {
-        console.error('Error fetching types:', err);
-      }
-    });
 
-    this.loadSurveysFromAPI();
-  }
+        // Load surveys with correct status (active/inactive)
+        this.loadSurveysFromAPI();
+      },
+      error: err => console.error('Error fetching types:', err)
+    });
+  });
+}
+
 
   ngOnDestroy(): void {
-    this.removeDocumentClickListener();
+    if (isPlatformBrowser(this.platformId) && this.documentClickListener) {
+      document.removeEventListener('click', this.documentClickListener);
+    }
   }
 
   // ---------- filters ----------
@@ -153,12 +158,10 @@ export class ActiveTemplateComponent implements OnInit, OnDestroy {
   onTypeChange(): void {}
 
   // ---------- card menu ----------
-  // On passe ici l’objet survey complet (depuis *ngFor)
   toggleCardMenu(event: Event, survey: TemplateBase): void {
     event.stopPropagation();
 
     if (this.activeCardMenu() === survey.id) {
-      // fermer si déjà ouvert
       this.activeCardMenu.set(null);
       this.selectedCard.set(null);
       return;
@@ -183,10 +186,7 @@ export class ActiveTemplateComponent implements OnInit, OnDestroy {
   duplicateTemplate(): void {
     const survey = this.selectedCard();
     const templateId = survey?.id;
-    if (!templateId) {
-      console.error('No template selected for duplication');
-      return;
-    }
+    if (!templateId) return;
 
     const defaultName = survey ? `${survey.name} (Copy)` : '';
 
@@ -223,26 +223,17 @@ export class ActiveTemplateComponent implements OnInit, OnDestroy {
     if (id) this.router.navigate(['/templates', id]);
   }
 
-  // ✅ Paramètre optionnel pour supporter (click)="onAssign()" dans le menu
   onAssign(t?: any) {
     const src = t ?? this.selectedCard();
-    if (!src) {
-      console.error('No template context for Assign');
-      return;
-    }
+    if (!src) return;
 
     const templateId = src?.templateId ?? src?.id ?? src?.template_id;
-    const name       = src?.name ?? src?.title ?? '';
     const description = src?.description ?? src?.summary ?? '';
 
-    if (!templateId) {
-      console.error('TemplateId manquant');
-      return;
-    }
+    if (!templateId) return;
 
     this.launchState.setTemplateInfo(templateId, description);
 
-    // fermer le menu et vider la sélection
     this.activeCardMenu.set(null);
     this.selectedCard.set(null);
     this.audienceState.resetAudience();
@@ -254,37 +245,24 @@ export class ActiveTemplateComponent implements OnInit, OnDestroy {
     return template.id;
   }
 
-  private removeDocumentClickListener(): void {
-    if (isPlatformBrowser(this.platformId) && this.documentClickListener) {
-      document.removeEventListener('click', this.documentClickListener);
-    }
-  }
-
   // ---------- data ----------
-  async loadSurveysFromAPI(): Promise<void> {
-    try {
-      this.templateSvc.getAll({ status: 1 /* Active */ }).subscribe({
-        next: list => {
-          const mapped = list.map(this.mapDtoToTemplateBase.bind(this));
-          this.surveys.set(mapped);
-        },
-        error: err => console.error('Error loading templates:', err)
-      });
-    } catch (error) {
-      console.error('Error loading surveys:', error);
-    }
+ async loadSurveysFromAPI(): Promise<void> {
+  const status = this.isActivePage ? 1 : 0; // 1 = active, 0 = inactive
+  try {
+    this.templateSvc.getAll({ status }).subscribe({
+      next: list => {
+        this.surveys.set(list.map(this.mapDtoToTemplateBase.bind(this)));
+      },
+      error: err => console.error('Error loading templates:', err)
+    });
+  } catch (error) {
+    console.error('Error loading surveys:', error);
   }
+}
 
   private performDuplication(templateId: string, newName: string): void {
     const originalTemplate = this.surveys().find(s => s.id === templateId);
-    if (!originalTemplate) {
-      this.messageService.add({
-        severity: 'error',
-        summary: 'Error',
-        detail: 'Original template not found'
-      });
-      return;
-    }
+    if (!originalTemplate) return;
 
     this.templateSvc.getById(templateId).subscribe({
       next: templateDetails => {
@@ -299,31 +277,38 @@ export class ActiveTemplateComponent implements OnInit, OnDestroy {
         };
 
         this.templateSvc.add(newTemplate).subscribe({
-          next: () => {
-            this.messageService.add({
-              severity: 'success',
-              summary: 'Success',
-              detail: 'Template duplicated successfully'
-            });
-            this.loadSurveysFromAPI();
-          },
-          error: err => {
-            this.messageService.add({
-              severity: 'error',
-              summary: 'Error',
-              detail: 'An error occurred while duplicating the template'
-            });
-            console.error('Error duplicating template:', err);
-          }
+          next: () => this.loadSurveysFromAPI(),
+          error: err => console.error('Error duplicating template:', err)
         });
       },
-      error: err => {
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Error',
-          detail: 'Could not retrieve template details for duplication'
-        });
-        console.error('Error getting template details:', err);
+      error: err => console.error('Error getting template details:', err)
+    });
+  }
+  setActive(active: boolean) {
+    const id = this.activeCardMenu();
+    this.activeCardMenu.set(null);
+    if (!id) return;
+
+    this.templateSvc.editTemplate({
+      templateId: id,
+      activeStatus: active ? ActiveStatus.Active : ActiveStatus.Inactive
+    }).subscribe({
+      next: () => {
+        if ((this as any).templates?.update) {
+          (this as any).templates.update((list: any[]) =>
+            list.map(x =>
+              (x.templateId ?? x.id) === id
+                ? { ...x, activeStatusId: active ? ActiveStatus.Active : ActiveStatus.Inactive, usageStatusId: active ? (x.usageStatusId ?? 1) : null }
+                : x
+            )
+          );
+        }
+
+        this.msg.add({ severity: 'success', summary: active ? 'Activé' : 'Désactivé', detail: 'Statut du template mis à jour.', life: 2200 });
+        setTimeout(() => this.router.navigate(['/active-templates']), 2200);
+      },
+      error: (err) => {
+        this.msg.add({ severity: 'error', summary: 'Échec', detail: err?.error?.message || 'Impossible de mettre à jour le statut.' });
       }
     });
   }
@@ -349,9 +334,7 @@ export class ActiveTemplateComponent implements OnInit, OnDestroy {
   private mapActiveStatus(v: number | string | null | undefined) {
     if (typeof v === 'string') {
       const s = v.toLowerCase();
-      return s.includes('active') && !s.includes('not')
-        ? ActiveStatus.Active
-        : ActiveStatus.Inactive;
+      return s.includes('active') && !s.includes('not') ? ActiveStatus.Active : ActiveStatus.Inactive;
     }
     return v === 1 ? ActiveStatus.Active : ActiveStatus.Inactive;
   }
@@ -383,9 +366,7 @@ export class ActiveTemplateComponent implements OnInit, OnDestroy {
     if (!c) return '#3B82F6';
     c = ('' + c).trim();
     if (!c.startsWith('#')) c = '#' + c;
-    if (c.length === 4) {
-      c = '#' + c[1] + c[1] + c[2] + c[2] + c[3] + c[3];
-    }
+    if (c.length === 4) c = '#' + c[1] + c[1] + c[2] + c[2] + c[3] + c[3];
     return c.toUpperCase();
   }
 
@@ -404,26 +385,18 @@ export class ActiveTemplateComponent implements OnInit, OnDestroy {
     const nb = Math.round(b + (255 - b) * ratio);
     return `rgb(${nr}, ${ng}, ${nb})`;
   }
-      closeMenu(): void {
-  this.activeCardMenu.set(null);
-}
 
-  /** Ferme au clic n'importe où dans le document */
-@HostListener('document:click')
-onDocClick(): void {
-  this.closeMenu();
-}
+  closeMenu(): void {
+    this.activeCardMenu.set(null);
+  }
 
-/** Ferme avec la touche Échap */
-@HostListener('document:keydown.escape', ['$event'])
-onEsc(_: KeyboardEvent): void {
-  this.closeMenu();
-}
+  @HostListener('document:click')
+  onDocClick(): void { this.closeMenu(); }
 
-/** Ferme si on scrolle ou on redimensionne (optionnel mais UX ++) */
-@HostListener('window:scroll')
-@HostListener('window:resize')
-onWindowMove(): void {
-  if (this.activeCardMenu()) this.closeMenu();
-}
+  @HostListener('document:keydown.escape', ['$event'])
+  onEsc(_: KeyboardEvent): void { this.closeMenu(); }
+
+  @HostListener('window:scroll')
+  @HostListener('window:resize')
+  onWindowMove(): void { if (this.activeCardMenu()) this.closeMenu(); }
 }

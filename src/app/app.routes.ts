@@ -5,8 +5,6 @@ import { HomeComponent } from './components/home/home.component';
 
 import { SurveyAnswerComponent } from './components/response-manag/survey-answer/survey-answer.component';
 import { AddTemplateComponent } from './components/Template-Mang/add-template/add-template.component';
-import { ActiveTemplateComponent } from './components/Template-Mang/active-template/active-template.component';
-import { InactiveTemplateComponent } from './components/Template-Mang/inactive-template/inactive-template.component';
 import { PreferencesComponent } from './components/preference/preferences/preferences.component';
 import { TemplateDetailComponent } from './components/Template-Mang/template-detail/template-detail.component';
 import { EditTemplateComponent } from './components/Template-Mang/edit-template/edit-template.component';
@@ -19,16 +17,31 @@ import { LanchSurveyComponent } from './components/Survey-Manag/lanch-survey/lan
 import { SurveyInfo } from './components/Survey-Manag/lanch-survey/step1-survey-info/step1-survey-info.component';
 import { TargetAudiencePanelComponent } from './components/Survey-Manag/lanch-survey/target-audience-panel/target-audience-panel.component';
 import { EmployeeSelectorComponent } from './components/Survey-Manag/lanch-survey/employee-selector/employee-selector.component';
+import { GetTemplatesComponent } from './components/Template-Mang/get-templates/get-templates.component';
 
 
 
 export const routes: Routes = [  
      { path: '', component: HomeComponent },
+      {
+    path: 'templates',
+    component: GetTemplatesComponent
+  },
+      {
+    path: 'active-templates',
+    component: GetTemplatesComponent,
+    data: { isActivePage: true }
+  },
+  {
+    path: 'inactive-templates',
+    component: GetTemplatesComponent,
+    data: { isActivePage: false }
+  },
      {path : 'addtemp' , component : AddTemplateComponent},
-     {path : 'active-templates' , component : ActiveTemplateComponent},
+    
      {path : 'home' , component : HomeComponent},
      {path : 'navbar' , component : NavbarComponent},
-     {path : 'inactive-templates' , component : InactiveTemplateComponent},
+  
      {path : 'preferences' , component : PreferencesComponent},
      {path : 'templates/:id' , component : TemplateDetailComponent},
      {path : 'edit-template/:id' , component : EditTemplateComponent},
