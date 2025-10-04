@@ -5,9 +5,7 @@ import { ActivatedRoute } from '@angular/router';
 import { of } from 'rxjs';
 import { RouterModule, Router } from '@angular/router';
 import { Location } from '@angular/common';
-import { TemplateNavbarComponent } from '../../template-navbar/template-navbar.component';
-import { FormFieldPreviewComponent } from '../../main-canvas/form-field-preview/form-field-preview.component';
-import { SurveyNavbarComponent } from '../../survey-navbar/survey-navbar.component';
+
 import { TemplateService } from '../../../services/template-services.service';
 import { TemplateDetail } from '../../../models/interfaces/template-read';
 import { FormRow } from '../../../models/form.model';
@@ -16,6 +14,9 @@ import { Input, Output, EventEmitter } from '@angular/core';
 import { HomeComponent } from "../../home/home.component";
 import { NavbarComponent } from "../../navbar/navbar.component";
 import { SurveyService } from '../../../services/SurveyService';
+import { SurveyNavbarComponent } from '../../Survey-Manag/survey-navbar/survey-navbar.component';
+import { TemplateNavbarComponent } from '../../Template-Mang/template-navbar/template-navbar.component';
+import { FormFieldPreviewComponent } from '../../Survey-Builder-tool/main-canvas/form-field-preview/form-field-preview.component';
 
 
 

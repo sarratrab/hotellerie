@@ -1,27 +1,24 @@
 import { Routes } from '@angular/router';
 
-import { EditTypeComponent } from './components/edit-type/edit-type.component';
-
-import { ActiveTemplateComponent } from './components/active-template/active-template.component';
 import { NavbarComponent } from './components/navbar/navbar.component';
-
-
-import { AddTemplateComponent } from './components/add-template/add-template.component';
-
-import { EditTemplateComponent } from './components/edit-template/edit-template.component';
-import { InactiveTemplateComponent } from './components/inactive-template/inactive-template.component';
 import { HomeComponent } from './components/home/home.component';
-import { PreferencesComponent } from './components/preferences/preferences.component';
-import { TemplateDetailComponent } from './components/template-detail/template-detail.component';
-import { AddTypeComponent } from './components/add-type/add-type.component';
-import { SurveyComponent } from './components/survey/survey.component';
-import { LanchSurveyComponent } from './components/lanch-survey/lanch-survey/lanch-survey.component';
-import { HistoryComponent } from './components/history/history.component';
-import { EmployeeSelectorComponent } from './components/lanch-survey/employee-selector/employee-selector.component';
-import { TargetAudiencePanelComponent } from './components/lanch-survey/target-audience-panel/target-audience-panel.component';
-import { LanchSurveyFooterComponent } from './components/lanch-survey/lanch-survey-footer/lanch-survey-footer.component';
-import { SurveyInfo } from './components/lanch-survey/step1-survey-info/step1-survey-info.component';
+
 import { SurveyAnswerComponent } from './components/response-manag/survey-answer/survey-answer.component';
+import { AddTemplateComponent } from './components/Template-Mang/add-template/add-template.component';
+import { ActiveTemplateComponent } from './components/Template-Mang/active-template/active-template.component';
+import { InactiveTemplateComponent } from './components/Template-Mang/inactive-template/inactive-template.component';
+import { PreferencesComponent } from './components/preference/preferences/preferences.component';
+import { TemplateDetailComponent } from './components/Template-Mang/template-detail/template-detail.component';
+import { EditTemplateComponent } from './components/Template-Mang/edit-template/edit-template.component';
+import { AddTypeComponent } from './components/preference/add-type/add-type.component';
+import { EditTypeComponent } from './components/preference/edit-type/edit-type.component';
+import { SurveyComponent } from './components/Survey-Manag/survey/survey.component';
+import { HistoryComponent } from './components/Survey-Manag/history/history.component';
+import { LanchSurveyFooterComponent } from './components/Survey-Manag/lanch-survey/lanch-survey-footer/lanch-survey-footer.component';
+import { LanchSurveyComponent } from './components/Survey-Manag/lanch-survey/lanch-survey/lanch-survey.component';
+import { SurveyInfo } from './components/Survey-Manag/lanch-survey/step1-survey-info/step1-survey-info.component';
+import { TargetAudiencePanelComponent } from './components/Survey-Manag/lanch-survey/target-audience-panel/target-audience-panel.component';
+import { EmployeeSelectorComponent } from './components/Survey-Manag/lanch-survey/employee-selector/employee-selector.component';
 
 
 

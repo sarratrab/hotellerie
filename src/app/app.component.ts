@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-import { FormDesignerComponent } from './components/form-designer/form-designer.component';
+
 import { HttpClientModule } from '@angular/common/http';
 import { ToastModule } from "primeng/toast";
 import { ConfirmDialog } from "primeng/confirmdialog";
