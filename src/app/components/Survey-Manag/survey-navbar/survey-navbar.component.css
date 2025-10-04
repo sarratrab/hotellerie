@@ -22,7 +22,7 @@
   justify-content: space-between;
   align-items: center;
   height: 100%;
-  max-width: 1474px;
+  max-width: 1483px;
 }
 
 .navbar-left {
@@ -96,7 +96,7 @@
 .navbar-right {
     display: flex;
     align-items: center;
-    gap: 20px;
+    gap: 15px;
 }
 
 .nav-icon {
