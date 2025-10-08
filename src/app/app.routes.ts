@@ -15,6 +15,7 @@ import { TargetAudiencePanelComponent } from './components/Survey-Manag/lanch-su
 import { EmployeeSelectorComponent } from './components/Survey-Manag/lanch-survey/employee-selector/employee-selector.component';
 import { GetTemplatesComponent } from './components/Template-Mang/get-templates/get-templates.component';
 import { GetSurveysComponent } from './components/Survey-Manag/get-surveys/get-surveys.component';
+import { SurveyEmployeeComponent } from './components/response-manag/survey-employee/survey-employee.component';
 
 
 
@@ -23,6 +24,9 @@ export const routes: Routes = [
       {
     path: 'templates',
     component: GetTemplatesComponent
+  },      {
+    path: 'Surveys-employee',
+    component:SurveyEmployeeComponent
   },
       {
     path: 'active-templates',
@@ -55,8 +59,10 @@ export const routes: Routes = [
      {path : 'addtype' , component : AddTypeComponent},
      { path: 'edittype/:id', component: EditTypeComponent },
      
-     
- { path: 'surveys/:surveyId', component: SurveyAnswerComponent },
+  {
+    path: 'surveys/:surveyId/answer',
+    component: SurveyAnswerComponent,
+  },
      {path : 'lanch-footer' , component : LanchSurveyFooterComponent},
      
 {

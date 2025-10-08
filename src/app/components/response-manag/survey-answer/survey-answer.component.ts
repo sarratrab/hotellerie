@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { switchMap } from 'rxjs/operators';
+import { catchError, map, switchMap, tap } from 'rxjs/operators';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
 import { of } from 'rxjs';
@@ -13,134 +13,179 @@ import { FormsModule } from '@angular/forms';
 import { Input, Output, EventEmitter } from '@angular/core';
 import { HomeComponent } from "../../home/home.component";
 import { NavbarComponent } from "../../navbar/navbar.component";
-import { SurveyService } from '../../../services/SurveyService';
+import { SurveyOutDto, SurveyService } from '../../../services/SurveyService';
 import { SurveyNavbarComponent } from '../../Survey-Manag/survey-navbar/survey-navbar.component';
 import { TemplateNavbarComponent } from '../../Template-Mang/template-navbar/template-navbar.component';
 import { FormFieldPreviewComponent } from '../../Survey-Builder-tool/main-canvas/form-field-preview/form-field-preview.component';
+import { FormField } from '../../../models/field.model';
+import { ResponseService, SaveResponseDto } from '../../../services/response.service';
 
 
 
 
 @Component({
   selector: 'app-survey-answer',
-  imports: [SurveyNavbarComponent,
-    TemplateNavbarComponent,
+  imports: [
     CommonModule,
     RouterModule,
-    FormFieldPreviewComponent,
     FormsModule, NavbarComponent],
   templateUrl: './survey-answer.component.html',
   styleUrl: './survey-answer.component.css'
 })
-export class SurveyAnswerComponent implements OnInit {
- rows: FormRow[] = [];
+export class SurveyAnswerComponent {
+  surveyId!: string;
+  templateId!: string;
+  employeeId =4;
+
   tpl?: TemplateDetail;
-  answers: string = '';
+  rows: FormRow[] = [];
   loading = true;
+  submitting = false;
   errorMsg: string | null = null;
+  successMsg: string | null = null;
+  survey: any;
+  
 
   constructor(
     private route: ActivatedRoute,
-    private svc: TemplateService,
-    private location: Location,
     private router: Router,
-    private surveySvc : SurveyService
+    private tplSvc: TemplateService,
+    private respSvc: ResponseService,
+    private srv: SurveyService
   ) {}
 
-   ngOnInit() {
-   this.route.paramMap
-  .pipe(
-    switchMap(params => {
-      const surveyId = params.get('surveyId');
-      if (!surveyId) return of(null);
-      this.loading = true;
-      this.errorMsg = null;
-      return this.surveySvc.getById(surveyId);
-    }),
-    switchMap(survey => {
-      if (!survey) return of(null as unknown as TemplateDetail);
-      return this.svc.getById(survey.templateId); // fetch template by templateId
+ngOnInit(): void {
+  this.loading = true;
+
+  this.route.paramMap.pipe(
+    // 1) lire surveyId depuis l’URL, à CHAQUE navigation
+    map(pm => pm.get('surveyId') ?? ''),
+    tap(id => this.surveyId = id),
+
+    // 2) charger le survey pour récupérer templateId
+    switchMap(id => this.srv.getById(id)),         // Observable<SurveyOutDto>
+    tap(s => this.survey = s),                      // mémoriser pour le submit()
+
+    // 3) charger le template correspondant
+    switchMap(s => this.tplSvc.getById(s.templateId)),
+
+    // 4) gestion d’erreur douce
+    catchError(err => {
+      console.error(err);
+      this.errorMsg = 'Erreur lors du chargement du template.';
+      this.loading = false;
+      return of(null);
     })
   )
-  .subscribe({
-    next: t => {
-      if (!t) {
-        this.errorMsg = 'Survey introuvable.';
-        this.loading = false;
-        return;
-      }
-      this.tpl = t;
-      this.rows = this.extractRows(t.templateDefinition);
-      this.loading = false;
-    },
-    error: err => {
-      console.error('Loading error:', err);
-      this.errorMsg = 'Erreur lors du chargement du survey.';
-      this.loading = false;
-    },
+  .subscribe(tpl => {
+    if (!tpl) return;
+    this.tpl = tpl;
+
+    const parsed = this.extractRows(tpl.templateDefinition);
+    this.rows = parsed.map(row => ({
+      ...row,
+      fields: row.fields.map(f => ({ ...f, answer: this.initAnswer(f) })),
+    }));
+
+    this.errorMsg = null;
+    this.successMsg = null;
+    this.loading = false;
+    window.scrollTo({ top: 0 });
   });
 
-  }
+  // (facultatif) tester un employé sans login ?employeeId=5
+  this.route.queryParamMap.subscribe(q => {
+    const e = q.get('employeeId');
+    if (e) this.employeeId = +e;
+  });
+}
 
   private extractRows(jsonStr: string): FormRow[] {
     try {
       const j = JSON.parse(jsonStr);
-      if (Array.isArray(j)) return j as FormRow[];
-      if (j && Array.isArray(j.rows)) return j.rows as FormRow[];
+      if (Array.isArray(j)) return j as FormRow[];                // [{ id, fields: [...] }]
+      if (j && Array.isArray(j.rows)) return j.rows as FormRow[]; // { rows: [...] }
       return [];
-    } catch {
-      return [];
+    } catch { return []; }
+  }
+
+  private initAnswer(f: FormField) {
+    switch (f.type) {
+      case 'checkbox': return [] as string[];
+      case 'number':   return null as number | null;
+      case 'date':     return null;
+      default:         return '';
     }
   }
 
-  cancel() {
-    //if (window.history.length > 1) {
-      //this.location.back();
-      //return;
-   // }
-    this.router.navigate(['/surveys']);
+// Helpers lisibles pour le template
+isArray(v: any): v is any[] {
+  return Array.isArray(v);
+}
+
+hasOption(f: FormField, val: string): boolean {
+  const arr: string[] = Array.isArray(f.answer) ? f.answer : [];
+  return arr.includes(val);
+}
+
+// Tu as déjà celle-ci, je la remets pour contexte :
+onToggleCheckbox(f: FormField, value: string, checked: boolean) {
+  const cur: string[] = Array.isArray(f.answer) ? f.answer : [];
+  f.answer = checked ? [...cur, value] : cur.filter(v => v !== value);
+}
+
+
+
+
+  private serializeValue(f: FormField): string {
+    if (f.type === 'checkbox') return JSON.stringify(Array.isArray(f.answer) ? f.answer : []);
+    if (typeof f.answer === 'object' && f.answer !== null) return JSON.stringify(f.answer);
+    return (f.answer ?? '').toString();
   }
 
-  save() {
-    console.log('Saving draft answers:', this.answers);
-    // TODO: call API for draft save
+  isInvalid(f: FormField): boolean {
+    if (!f.required) return false;
+    if (f.type === 'checkbox') return !f.answer || (f.answer as any[]).length === 0;
+    return f.answer === '' || f.answer === null || f.answer === undefined;
   }
 
-submit() {
-  const surveyId = this.route.snapshot.paramMap.get('surveyId');
-  const employeeId = "11";
-
-  if (!surveyId) {
-    console.error('No surveyId found in route');
-    return;
+  canSubmit(): boolean {
+    return this.rows.every((r: FormRow) => r.fields.every((c: FormField) => !this.isInvalid(c)));
   }
 
-  const responseData = JSON.stringify(this.rows); // includes answers now
+  saveDraft() { this.submit(false); }
 
-  this.surveySvc.addSurveyAnswer(surveyId, employeeId, responseData, true)
-    .subscribe({
-      next: (res) => {
-        console.log('Survey submitted successfully:', res);
-        alert('Survey submitted!');
-        this.router.navigate(['/surveys']);
+  submit(finalize = true) {
+    if (!this.tpl) return;
+
+    if (finalize && !this.canSubmit()) { this.errorMsg = 'Veuillez compléter les champs obligatoires.'; return; }
+
+    const answers = this.rows.flatMap((r: FormRow) =>
+      r.fields.map((f: FormField) => ({
+        fieldId: f.id,
+        type: f.type,
+        value: this.serializeValue(f)
+      }))
+    );
+
+    const payload: SaveResponseDto = {
+      templateId: this.survey.templateId,
+      surveyId: this.surveyId,
+      employeeId: this.employeeId,
+      answers,
+      finalize
+    };
+
+    this.submitting = true;
+    this.respSvc.saveResponse(payload).subscribe({
+      next: () => {
+        this.submitting = false;
+        this.successMsg = finalize ? 'Réponse soumise avec succès.' : 'Brouillon enregistré.';
       },
-      error: (err) => {
-        console.error('Error submitting survey:', err);
-        alert('Error submitting survey');
+      error: () => {
+        this.submitting = false;
+        this.errorMsg = 'Échec de l’enregistrement.';
       }
     });
-}
-
-
-onFieldChange(rowId: string, fieldId: string, value: any) {
-  const row = this.rows.find(r => r.id === rowId);
-  if (!row) return;
-
-  const field = row.fields.find(f => f.id === fieldId);
-  if (!field) return;
-
-  field.answer = value; // ✅ update the field with the answer
-  console.log('Captured answer:', rowId, fieldId, value);
-}
-
+  }
 }
