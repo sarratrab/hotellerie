@@ -144,7 +144,7 @@
   [style.top.px]="menuPosition().y"
 >
   <div class="menu-item" (click)="EditSurvey()" >Edit</div>
-  <div class="menu-item" >View responses </div>
+  <div class="menu-item"(click)="viewresponse()" >View responses </div>
 <div class="menu-item" (click)="onComplete()" *ngIf="isOpenPage">Complete</div>
 
 </div>

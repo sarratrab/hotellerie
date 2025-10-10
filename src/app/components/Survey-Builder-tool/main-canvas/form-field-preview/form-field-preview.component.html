@@ -3,8 +3,10 @@
       [ngComponentOutletInputs]="{ field: field() }"
     ></ng-container>
 -->
-<ng-container
-  [ngComponentOutlet]="getFieldComponent(field().type)"
-  [ngComponentOutletInputs]="{ field: field(), model: field().answer }"
-  (ngModelChange)="onValueChange($event)"
-></ng-container>
+<ng-container *ngIf="field">
+  <ng-container
+    [ngComponentOutlet]="getFieldComponent(field.type)"
+    [ngComponentOutletInputs]="{ field: field, model: model }"
+    (ngModelChange)="onValueChange($event)">
+  </ng-container>
+</ng-container>

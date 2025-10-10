@@ -149,6 +149,12 @@ ngOnInit(): void {
     this.router.navigate([`/lanch-survey/${id}/step1`]);
   }
 
+  viewresponse (){
+     const id = this.activeCardMenu() ?? this.selectedCard()?.id;
+    if (!id) return;
+this.router.navigate([`surveys/seeanswer/${id}`]);
+
+}
   onComplete(): void {
     if (!this.selectedCard() || !this.isOpenPage) return; // ✅ only complete if open survey
     const survey = this.selectedCard();

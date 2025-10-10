@@ -1,0 +1,28 @@
+<app-survey-navbar></app-survey-navbar>
+<div class="sub-navbar">
+  <div class="sub-nav-card">
+    <div class="left">
+      <h2>{{ title }}</h2>
+    </div>
+    <div class="right">
+      <button class="link">Back to Surveys</button>
+      <button class="outline">View by Employee</button>
+    </div>
+  </div>
+</div>
+
+<!-- Summary -->
+<section class="summary">
+  <app-summary-cards></app-summary-cards>
+</section>
+
+<!-- Selector -->
+<section class="selector-row">
+  <app-employee-filter></app-employee-filter>
+</section>
+
+<!-- Details -->
+<section class="details">
+  <!-- Details go here -->
+<app-viewanswer></app-viewanswer>
+</section>

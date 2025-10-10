@@ -16,6 +16,8 @@ import { EmployeeSelectorComponent } from './components/Survey-Manag/lanch-surve
 import { GetTemplatesComponent } from './components/Template-Mang/get-templates/get-templates.component';
 import { GetSurveysComponent } from './components/Survey-Manag/get-surveys/get-surveys.component';
 import { SurveyEmployeeComponent } from './components/response-manag/survey-employee/survey-employee.component';
+import { ViewResponseComponent } from './components/response-manag/view-response/view-response.component';
+import { SurveyViewAnswerComponent } from './components/response-manag/viewanswer/viewanswer.component';
 
 
 
@@ -42,6 +44,13 @@ export const routes: Routes = [
     path: 'surveys', 
     component: GetSurveysComponent, 
     data: { status: 'open' } // ✅ open surveys
+  },
+  {
+    path: "surveys/seeanswer/:id",
+    component : ViewResponseComponent, 
+  },
+  {path: "surveys/:surveyId/answers",
+    component: SurveyViewAnswerComponent,
   },
   { 
     path: 'history', 

@@ -1,0 +1,142 @@
+.sub-navbar {
+  padding: 14px 20px;
+  background-color: #f0f2f5;
+}
+
+.sub-nav-card {
+  background: #fff;
+  border-radius: 8px;
+  border: 1px solid #e9ecef;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  padding: 16px 18px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* Title section */
+.sub-nav-card .left {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+}
+.sub-nav-card .left h2 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 400;
+  color: #2c2c2c;
+  letter-spacing: 0.1px;
+  font-family: inherit;
+}
+
+/* Actions section */
+.sub-nav-card .right {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+/* "Back to Surveys" link */
+.sub-nav-card .right .link {
+  background: none;
+  border: none;
+  color: #2f6df6;
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+  padding: 6px 12px;
+  border-radius: 6px;
+  transition: background 0.2s, color 0.2s;
+  text-decoration: none;
+  outline: none;
+}
+.sub-nav-card .right .link:hover {
+  text-decoration: underline;
+  background: #e8f1ff;
+}
+
+/* "View by Employee" button */
+.sub-nav-card .right .outline {
+  background: #fff;
+  color: #2f6df6;
+  border: 1.5px solid #2f6df6;
+  padding: 6px 18px 6px 14px;
+  border-radius: 8px;
+  font-weight: 500;
+  font-size: 15px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: background 0.2s, border 0.2s;
+  box-shadow: none;
+  outline: none;
+}
+.sub-nav-card .right .outline:hover {
+  background: #e8f1ff;
+  border-color: #1d4ed8;
+}
+
+/* Filter icon (SVG) */
+.sub-nav-card .right .outline svg {
+  width: 20px;
+  height: 20px;
+  color: #2f6df6;
+  margin-left: 2px;
+  vertical-align: middle;
+  display: inline-block;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+  .sub-nav-card {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+    padding: 10px 8px;
+  }
+  .sub-nav-card .right {
+    justify-content: flex-end;
+    gap: 8px;
+  }
+  .sub-nav-card .left h2 {
+    font-size: 15px;
+  }
+}
+/* ========== NEW: Details Spacing (match summary) ========== */
+
+/* Details section - match summary spacing exactly */
+.details {
+  padding: 0 20px;
+  margin-bottom: 20px;
+}
+
+/* Style the answer card inside details */
+.details app-viewanswer {
+  display: block;
+  width: 100%;
+}
+
+/* ========== Responsive ========== */
+@media (max-width: 600px) {
+  .sub-nav-card {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+    padding: 10px 8px;
+  }
+  .sub-nav-card .right {
+    justify-content: flex-end;
+    gap: 8px;
+  }
+  .sub-nav-card .left h2 {
+    font-size: 15px;
+  }
+  
+  /* Reduce padding on mobile */
+  .details {
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+}

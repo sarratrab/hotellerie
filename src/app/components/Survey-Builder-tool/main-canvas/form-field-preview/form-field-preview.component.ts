@@ -1,4 +1,4 @@
-import { Component, input, inject, Output, EventEmitter } from '@angular/core';
+import { Component, input, inject, Output, EventEmitter, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { FieldTypesService } from '../../../../services/field-types.service';
@@ -14,7 +14,7 @@ import { FormField } from '../../../../models/field.model';
   styleUrl: './form-field-preview.component.css'
 })
 export class FormFieldPreviewComponent {
- field = input.required<FormField>();
+@Input() field!: FormField; @Input() model: any;
   fieldRegistry = inject(FieldTypesService);
 
   getFieldComponent(type: string) {
@@ -22,9 +22,10 @@ export class FormFieldPreviewComponent {
     return fieldDef?.component || null;
   }
 
-  @Output() valueChange = new EventEmitter<{ fieldId: string, value: any }>();
-  onValueChange(value: any) {
-    this.field().answer = value; // ✅ save locally
-    this.valueChange.emit({ fieldId: this.field().id, value }); // ✅ notify parent
+ @Output() valueChange = new EventEmitter<{ fieldId: string, value: any }>();
+ onValueChange(value: any) {
+    this.field.answer = value; // save locally
+    this.valueChange.emit({ fieldId: this.field.id, value }); // notify parent
   }
+
 }
