@@ -15,27 +15,120 @@
 <!-- Survey Answers -->
 @if (!loading && !errorMsg) {
   <div class="bg-white shadow-md rounded-lg border border-gray-200 p-6">
-        @for (row of rows; track row.id) {
-          <div class="flex gap-4 flex-wrap mb-6">
-            @for (field of row.fields; track field.id) {
-              <div class="flex-1 min-w-[300px]">
-                <!-- Read-only wrapper with pointer-events-none -->
-                <div class="pointer-events-none opacity-90">
-                  <app-form-field-preview 
-                    [field]="field"
-                    [model]="field.answer">
-                  </app-form-field-preview>
-                </div>
-                
-                <!-- Display the actual answer value below -->
-                <div class="mt-2 p-3 bg-blue-50 border border-blue-200 rounded">
-                  <span class="text-xs font-semibold text-blue-700">Answer:</span>
-                  <p class="text-sm text-blue-900 font-medium">{{ getDisplayValue(field) }}</p>
-                </div>
+    @for (row of rows; track row.id) {
+      <div class="flex gap-4 flex-wrap mb-6">
+        @for (field of row.fields; track field.id) {
+          <div class="flex-1 min-w-[300px]">
+            
+            <!-- Question Label -->
+            <label class="block text-sm font-medium text-gray-700 mb-2">
+              {{ field.label }}
+              @if (field.required) {
+                <span class="text-red-500">*</span>
+              }
+            </label>
+
+            <!-- Text Input -->
+            @if (field.type === 'text' || field.type === 'email') {
+              <input 
+                type="text" 
+                [value]="field.answer || ''"
+                [placeholder]="field.placeholder || ''"
+                class="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50 text-gray-700 cursor-not-allowed"
+                disabled
+              />
+            }
+
+            <!-- Textarea -->
+            @if (field.type === 'textarea') {
+              <textarea 
+                [value]="field.answer || ''"
+                [placeholder]="field.placeholder || ''"
+                rows="4"
+                class="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50 text-gray-700 cursor-not-allowed resize-none"
+                disabled
+              ></textarea>
+            }
+
+            <!-- Radio Buttons -->
+            @if (field.type === 'radio') {
+              <div class="space-y-2">
+                @for (option of field.options; track option.value) {
+                  <label [class]="field.answer === option.value 
+          ? 'flex items-center space-x-2 cursor-not-allowed px-3 py-2 border-2 border-blue-500 bg-blue-50 rounded-md' 
+          : 'flex items-center space-x-2 cursor-not-allowed px-3 py-2 border border-gray-200 bg-white rounded-md'">
+                    <input 
+                      type="radio" 
+                      [checked]="field.answer === option.value"
+                      class="w-4 h-4 text-blue-600 cursor-not-allowed"
+                      disabled
+                    />
+                    <span class="text-sm text-gray-700">{{ option.label }}</span>
+                  </label>
+                }
               </div>
             }
+
+            <!-- Checkboxes -->
+            @if (field.type === 'checkbox') {
+              <div class="space-y-2">
+                @for (option of field.options; track option.value) {
+                  <label class="flex items-center space-x-2 cursor-not-allowed">
+                    <input 
+                      type="checkbox" 
+                      [checked]="(field.answer || []).includes(option.value)"
+                      class="w-4 h-4 text-blue-600 rounded cursor-not-allowed"
+                      disabled
+                    />
+                    <span class="text-sm text-gray-700">{{ option.label }}</span>
+                  </label>
+                }
+              </div>
+            }
+
+            <!-- Select Dropdown -->
+            @if (field.type === 'select') {
+              <select 
+                class="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50 text-gray-700 cursor-not-allowed"
+                disabled
+              >
+                <option value="">{{ field.placeholder || 'Select an option' }}</option>
+                @for (option of field.options; track option.value) {
+                  <option 
+                    [value]="option.value"
+                    [selected]="field.answer === option.value"
+                  >
+                    {{ option.label }}
+                  </option>
+                }
+              </select>
+            }
+
+            <!-- Date Input -->
+            @if (field.type === 'date') {
+              <input 
+                type="date" 
+                [value]="field.answer || ''"
+                class="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50 text-gray-700 cursor-not-allowed"
+                disabled
+              />
+            }
+
+            <!-- Number Input -->
+            @if (field.type === 'number') {
+              <input 
+                type="number" 
+                [value]="field.answer || ''"
+                [placeholder]="field.placeholder || ''"
+                class="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50 text-gray-700 cursor-not-allowed"
+                disabled
+              />
+            }
+
           </div>
         }
+      </div>
+    }
 
     <!-- Footer Info -->
     <div class="bg-gray-50 px-4 py-3 border-t border-gray-200 -mx-6 -mb-6 mt-6">

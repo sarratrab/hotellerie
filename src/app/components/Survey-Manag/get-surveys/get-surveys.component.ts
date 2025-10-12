@@ -152,7 +152,7 @@ ngOnInit(): void {
   viewresponse (){
      const id = this.activeCardMenu() ?? this.selectedCard()?.id;
     if (!id) return;
-this.router.navigate([`surveys/seeanswer/${id}`]);
+    this.router.navigate([`surveys/seeanswer/${id}`]);
 
 }
   onComplete(): void {

@@ -4,7 +4,7 @@ import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { ResponseService, SaveResponseDto } from '../../../services/response.service';
 import { FormRow } from '../../../models/form.model';
 import { FormFieldPreviewComponent } from '../../Survey-Builder-tool/main-canvas/form-field-preview/form-field-preview.component';
-import { catchError, map, of, switchMap, tap } from 'rxjs';
+import { catchError, forkJoin, map, of, switchMap, tap } from 'rxjs';
 import { TemplateService } from '../../../services/template-services.service';
 import { SurveyService } from '../../../services/SurveyService';
 import { TemplateDetail } from '../../../models/interfaces/template-read';
@@ -23,16 +23,16 @@ type SurveyResponseItem = {
 
 @Component({
   selector: 'app-viewanswer',
-  imports: [SurveyNavbarComponent, CommonModule,
+  imports: [ CommonModule,
     RouterModule,
     FormsModule, NavbarComponent, FormFieldPreviewComponent],
   templateUrl: './viewanswer.component.html',
   styleUrl: './viewanswer.component.css'
 })
 export class SurveyViewAnswerComponent implements OnInit {
-  surveyId!: string;
+    surveyId!: string;
   templateId!: string;
-  employeeId = 4;
+  employeeId = 9;
 
   rows: FormRow[] = [];
   loading = true;
@@ -44,68 +44,113 @@ export class SurveyViewAnswerComponent implements OnInit {
     private router: Router,
     private tplSvc: TemplateService,
     private respSvc: ResponseService,
-    private srv: SurveyService
+    private surveySvc: SurveyService
   ) {}
 
   ngOnInit(): void {
     this.loading = true;
     this.errorMsg = null;
 
-    // Hardcoded template definition
-    const fakeTemplateDefinition = JSON.stringify({
-      rows: [
-        {
-          id: 'row1',
-          fields: [
-            {
-              id: 'fe066c0e-789d-4965-82f1-8e8a79d2a0f2',
-              label: 'Please enter your name',
-              type: 'text',
-              placeholder: 'Enter name...',
-              required: true,
-            },
-            {
-              id: '4dba9f7b-82dc-4506-8f79-8ff1876584ab',
-              label: 'Choose one option',
-              type: 'radio',
-              options: [
-                { label: 'Option 1', value: 'option1' },
-                { label: 'Option 2', value: 'option2' },
-                { label: 'Option 3', value: 'option3' }
-              ],
-              required: true
-            }
-          ]
-        }
-      ]
-    });
+    // Extract surveyId from URL
+    this.surveyId = this.route.snapshot.paramMap.get('id') || '';
+    console.log('SurveyId from route:', this.surveyId);
 
-    const hardcodedAnswers: SurveyResponseItem[] = [
-      {
-        FieldId: 'fe066c0e-789d-4965-82f1-8e8a79d2a0f2',
-        Type: 'text',
-        Value: 'Hello User'
-      },
-      {
-        FieldId: '4dba9f7b-82dc-4506-8f79-8ff1876584ab',
-        Type: 'radio',
-        Value: 'option2'
+    if (!this.surveyId) {
+      this.errorMsg = 'Survey ID is missing from URL';
+      this.loading = false;
+      return;
+    }
+
+    // Step 1: Get Survey by ID to get templateId
+    this.surveySvc.getById(this.surveyId).pipe(
+      catchError(err => {
+        console.error('Error fetching survey:', err);
+        this.errorMsg = 'Failed to load survey. Please try again.';
+        this.loading = false;
+        return of(null);
+      })
+    ).subscribe(survey => {
+      console.log('Survey loaded:', survey);
+      
+      if (!survey) {
+        this.errorMsg = 'Survey not found';
+        this.loading = false;
+        return;
       }
-    ];
 
-    // Parse template rows and inject answers
-    const parsed = this.extractRows(fakeTemplateDefinition);
-    this.rows = parsed.map(row => ({
-      ...row,
-      fields: row.fields.map(f => ({
-        ...f,
-        answer: hardcodedAnswers.find(a => a.FieldId === f.id)?.Value ?? null
-      }))
-    }));
+      this.survey = survey;
+      this.templateId = survey.templateId;
+      console.log('Template ID:', this.templateId);
 
-    this.surveyId = '1';
-    this.employeeId = 4;
-    this.loading = false;
+      // Step 2: Fetch both template and response data in parallel
+      forkJoin({
+        template: this.tplSvc.getById(this.templateId).pipe(
+          catchError(err => {
+            console.error('Error fetching template:', err);
+            return of(null);
+          })
+        ),
+        response: this.respSvc.getResponseBySurveyAndEmployee(this.surveyId, this.employeeId).pipe(
+          catchError(err => {
+            console.error('Error fetching response:', err);
+            console.error('Error status:', err.status);
+            console.error('Error message:', err.message);
+            return of(null);
+          })
+        )
+      }).subscribe(({ template, response }) => {
+        console.log('Template received:', template);
+        console.log('Response received:', response);
+
+        if (!template) {
+          this.errorMsg = 'Failed to load survey template.';
+          this.loading = false;
+          return;
+        }
+
+        if (!response) {
+          this.errorMsg = `No response found for Survey ID: ${this.surveyId} and Employee ID: ${this.employeeId}`;
+          this.loading = false;
+          return;
+        }
+
+        // Parse template definition
+        const templateDefinition = template.templateDefinition;
+        console.log('Template definition:', templateDefinition);
+        
+        const parsedRows = this.extractRows(templateDefinition);
+        console.log('Parsed rows:', parsedRows);
+
+        // Parse response data (JSON string containing answers)
+        let answers: SurveyResponseItem[] = [];
+        try {
+          console.log('Response data to parse:', response.responseData);
+          answers = JSON.parse(response.responseData);
+          console.log('Parsed answers:', answers);
+        } catch (err) {
+          console.error('Error parsing response data:', err);
+          this.errorMsg = 'Invalid response data format.';
+          this.loading = false;
+          return;
+        }
+
+        // Merge template with answers
+        this.rows = parsedRows.map(row => ({
+          ...row,
+          fields: row.fields.map(f => {
+            const answer = answers.find(a => a.FieldId === f.id)?.Value ?? null;
+            console.log(`Field ${f.id} answer:`, answer);
+            return {
+              ...f,
+              answer: answer
+            };
+          })
+        }));
+
+        console.log('Final rows with answers:', this.rows);
+        this.loading = false;
+      });
+    });
   }
 
   private extractRows(jsonStr: string): FormRow[] {
@@ -114,37 +159,14 @@ export class SurveyViewAnswerComponent implements OnInit {
       if (Array.isArray(j)) return j as FormRow[];
       if (j && Array.isArray(j.rows)) return j.rows as FormRow[];
       return [];
-    } catch {
+    } catch (err) {
+      console.error('Error extracting rows:', err);
       return [];
-    }
-  }
-
-  // Get display value for the answer
-  getDisplayValue(field: FormField): string {
-    if (!field.answer) return 'No answer provided';
-
-    switch (field.type) {
-      case 'checkbox':
-        const checkboxValues = Array.isArray(field.answer) ? field.answer : [];
-        return checkboxValues.length > 0 ? checkboxValues.join(', ') : 'None selected';
-
-      case 'radio':
-      case 'select':
-        const option = field.options?.find(opt => opt.value === field.answer);
-        return option ? option.label : field.answer;
-
-      case 'date':
-        return field.answer instanceof Date 
-          ? field.answer.toLocaleDateString() 
-          : field.answer;
-
-      default:
-        return field.answer.toString();
     }
   }
 
   goBack(): void {
     this.router.navigate(['/surveys']);
   }
-
 }
+
