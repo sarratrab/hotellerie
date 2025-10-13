@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, Input, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { ResponseService, SaveResponseDto } from '../../../services/response.service';
@@ -33,6 +33,7 @@ export class SurveyViewAnswerComponent implements OnInit {
     surveyId!: string;
   templateId!: string;
   employeeId = 9;
+   @Input() emailFilter: string = '';
 
   rows: FormRow[] = [];
   loading = true;

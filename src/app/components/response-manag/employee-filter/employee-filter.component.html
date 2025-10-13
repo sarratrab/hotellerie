@@ -1,0 +1,36 @@
+<div class="filter-container">
+  <div class="filter-navigation">
+    <button class="nav-arrow" (click)="previousEmployee()" [disabled]="!hasPrevious()">
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+        <path d="M12.5 15L7.5 10L12.5 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </button>
+    
+    <div class="select-wrapper">
+      <select 
+        id="emailFilter" 
+        [(ngModel)]="emailFilter"
+        (ngModelChange)="onSelectChange()"
+        class="employee-select"
+      >
+        <option value="">Select an employee</option>
+        @for (email of employeeEmails; track email) {
+          <option [value]="email">{{ email }}</option>
+        }
+      </select>
+      @if (emailFilter) {
+        <button class="clear-button" (click)="clearFilter()">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+            <path d="M12 4L4 12M4 4L12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        </button>
+      }
+    </div>
+    
+    <button class="nav-arrow" (click)="nextEmployee()" [disabled]="!hasNext()">
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+        <path d="M7.5 15L12.5 10L7.5 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </button>
+  </div>
+</div>

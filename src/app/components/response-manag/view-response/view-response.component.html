@@ -16,13 +16,14 @@
   <app-summary-cards></app-summary-cards>
 </section>
 
-<!-- Selector -->
-<section class="selector-row">
-  <app-employee-filter></app-employee-filter>
-</section>
-
 <!-- Details -->
 <section class="details">
-  <!-- Details go here -->
-<app-viewanswer></app-viewanswer>
+  <div class="details-card">
+    <!-- Filter Section inside the card -->
+    <app-employee-filter  >
+    </app-employee-filter>
+    
+    <!-- Survey answers -->
+    <app-viewanswer [emailFilter]="emailFilter"></app-viewanswer>
+  </div>
 </section>
