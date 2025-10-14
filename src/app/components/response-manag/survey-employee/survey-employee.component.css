@@ -4,6 +4,18 @@
   align-items: center;
   
 }
+.type-chip{
+  gap:6px;
+  border:1px solid transparent;
+  font-size:12px;
+  border-radius: 999px;
+  font-weight: 600;
+  line-height: 18px;
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid transparent;
+}
+
 
 .logo-img {
   width: 30px; /* Adjust size to fit your design */
@@ -13,29 +25,141 @@
 }
 /* Survey Cards Grid */
 .surveys-grid {
-  padding: 40px 0;
+  padding: 10px 0;
   
 }
+/* panel */
+.panel { background: #fff; border-radius: 14px; padding: 20px; box-shadow: 0 2px 10px rgba(16,24,40,.06); }
+.panel-header { margin-bottom: 14px; }
+.panel-header h2 { font-size: 18px; font-weight: 600; color: #101828; }
+
+/* grid */
+.cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+}
+
+/* card */
+.card {
+  display: flex;
+  flex-direction: column;
+  min-height: 240px;
+  border: 1px solid #EEF2F7;
+  border-radius: 14px;
+  background: #fff;
+  padding: 14px 14px 12px;
+  transition: box-shadow .2s ease, transform .2s ease;
+}
+.card:hover { box-shadow: 0 6px 18px rgba(16,24,40,.10); transform: translateY(-2px); }
+
+.card-body { display: flex; flex-direction: column; gap: 8px; }
+.card-title { margin: 0; font-size: 16px; font-weight: 700; color: #111827; line-height: 1.2; }
+.card-desc { margin: 0; font-size: 13px; color: #475467; min-height: 36px; }
+
+/* meta bloc */
+.meta { display: grid; grid-template-columns: 1fr auto; gap: 10px; align-items: center; }
+.meta-item { display: flex; gap: 6px; align-items: center; }
+.meta-label { font-size: 12px; color: #667085; }
+.meta-value { font-size: 13px; color: #344054; font-weight: 500; }
+
+.i-clock::before { content: "⏱"; font-size: 14px; color:#667085; }
+
+/* chips */
+.chip {
+  font-size: 12px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-weight: 600;
+  line-height: 18px;
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid transparent;
+}
+.chip.pending { background: #fff7e6; border-color:#ffe7b9; color:#ad6800; }
+.chip.inprogress { background: #e6f4ff; border-color:#bfe3ff; color:#1e6091;}
+.chip.completed { background: #e8f5e9; border-color:#d3ecd6; color:#2d7738; }
+
+/* progress */
+.progress {
+  height: 6px;
+  background: #F2F4F7;
+  border-radius: 6px;
+  overflow: hidden;
+  margin-top: 4px;
+}
+.progress-row {
+  display: flex; align-items: center; gap: 8px; margin-top: 8px;
+}
+.progress-bar {
+  flex: 1; height: 6px; background: #F2F4F7; border-radius: 9999px; overflow: hidden;
+}
+.progress-fill {
+  height: 100%; background: #6366F1; border-radius: 9999px; transition: width .25s ease;
+}
+.progress-text {
+  min-width: 36px; text-align: right; font-size: 12px; color: #6b7280;
+}
+
+
+
+/* footer actions */
+.card-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  margin-top: auto; /* pousse les actions en bas */
+}
+.btn {
+  border: 1px solid #E5E7EB;
+  background: #fff;
+  padding: 8px 12px;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #344054;
+  cursor: pointer;
+  text-decoration: none;
+}
+.btn:hover { background: #F9FAFB; }
+.btn.ghost { border-color: #E5E7EB; }
+.btn.primary {
+  background: #6366F1;
+  color: #fff;
+  border-color: #6366F1;
+}
+.btn.primary:hover { background: #585CE5; border-color: #585CE5; }
+
 
 .grid-container {
-
   max-width: 1400px;
-
-  display: grid;
-
   margin: 0 auto;
-
-  padding-inline: clamp(16px, 3vw, 24px); /* Modern approach */
-
-  grid-template-columns: repeat(auto-fit, minmax(clamp(300px, 45%, 600px), 1fr));
-
+  padding: 0 50px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
   gap: 24px;
-
 }
 .sub-navbar{
   padding:18px 20px;
   background:#eef1f5;
   align-items:center;
+}
+.survey-card {
+  background-color: #ffffff;
+  border: 1px solid #e9ecef;
+  border-radius: 10px;
+  overflow: hidden;
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+  height: 300px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.survey-card:hover {
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  transform: translateY(-2px);
 }
  .sub-navbar1 {
             padding-left: 24px;
@@ -48,7 +172,6 @@
             border-radius: 8px;
             border: 1px solid #e9ecef;
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-            padding: 20px 24px;
         }
 .navbar-content {
   display: flex;
@@ -524,6 +647,8 @@
 .section-head{
   display:flex; align-items:center; gap:10px;
   margin: 6px 2px 14px;
+  margin-left: 15px ;
+  margin-top: 10px;
 }
 .section-head h3{
   font-weight:700; font-size:16px; color:var(--text);

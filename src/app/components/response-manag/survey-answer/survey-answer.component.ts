@@ -44,6 +44,8 @@ export class SurveyAnswerComponent {
   errorMsg: string | null = null;
   successMsg: string | null = null;
   survey: any;
+    readOnly = false;               // 👈 lecture seule si Completed
+responseStatus?: string; 
   
 
   constructor(
@@ -55,6 +57,11 @@ export class SurveyAnswerComponent {
   ) {}
 
 ngOnInit(): void {
+    this.route.queryParamMap.subscribe(q => {
+    const e = q.get('employeeId');
+    if (e) this.employeeId = +e;
+  });
+  
   this.loading = true;
 
   this.route.paramMap.pipe(
@@ -86,6 +93,7 @@ ngOnInit(): void {
       ...row,
       fields: row.fields.map(f => ({ ...f, answer: this.initAnswer(f) })),
     }));
+    
 
     this.errorMsg = null;
     this.successMsg = null;

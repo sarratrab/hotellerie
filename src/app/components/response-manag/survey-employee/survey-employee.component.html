@@ -43,44 +43,76 @@
     </div>
   <div class="sub-navbar1">
     <div class="sub-nav-card">
-            <div class="section-head">
-      <h3>Active Surveys</h3>
-    </div>
+
+
+        <!-- Surveys Count -->
+        <div class="section-head">
+          <h3>Active Surveys </h3>
+        </div>
+  
 
       <div class="surveys-grid">
         <div class="grid-container">
-      <article class="survey-card survey-card--row" *ngFor="let s of activeSurveys">
-        <div class="card-body">
-          <h4 class="card-title">{{ s.title }}</h4>
-          <p class="card-desc">{{ s.description }}</p>
 
-          <div class="meta">
-            <div class="meta-item" *ngIf="s.progress !== undefined">
-              <div class="progress">
-                <div class="bar" [style.width.%]="s.progress"></div>
-              </div>
-              <span class="muted">{{ s.progress }}% completed</span>
-            </div>
+       
+    <div class="survey-card" *ngFor="let s of active">
+      <div class="card-body">
+        <h3 class="card-title" [title]="s.title">{{ s.title }}</h3>
+        <p class="card-desc" [title]="s.description || '—'">
+          {{ s.description || '—' }}
+        </p>
+        <div class="progress-row" aria-label="Progress">
+  <div class="progress-bar" [attr.aria-valuenow]="progress(s)" aria-valuemin="0" aria-valuemax="100" role="progressbar">
+    <div class="progress-fill" [style.width.%]="progress(s)"></div>
+  </div>
+  <span class="progress-text">{{ progress(s) }}%</span>
+</div>
 
-            <div class="meta-item">
-              <i class="i i-calendar"></i>
-              <span class="muted">
-                {{ s.due | date:'MMM d, y' }}
-              </span>
-            </div>
+        <div class="meta">
+          <div class="meta-item">
+            <span class="meta-label">Due date</span>
+            <span class="meta-value">{{ s.dueDate | date:'MMM d, y' }}</span>
+          </div>
+        <div class="meta-item">
+    <span class="i-clock"></span>
+    <span class="meta-value">~{{ s.estimatedMinutes }} min</span>
+  </div>
+  </div>
+  <div class="meta">
 
-            <div class="meta-item">
-              <i class="i i-time"></i>
-              <span class="muted">~{{ s.minutes }} minutes</span>
-            </div>
+          <div class="meta-item">
+            <div class="chip" [ngStyle]="typeChipStyle(s)">
+  {{ s.typeLabel }}
+</div>
+
+            <span class="chip" [ngClass]="chipClass(s)">
+              {{ uiText(s) }}
+            </span>
           </div>
         </div>
 
-        <div class="card-actions">
-          <button class="btn btn-soft">FEEDBACK</button>
-          <span class="chip" [ngClass]="statusClass(s.status)">{{ s.status }}</span>
-        </div>
-      </article>
+
+
+      </div>
+      <!-- sous le titre -->
+
+      <footer class="card-actions">
+        <button type="button" class="btn ghost" >
+         
+        </button>
+
+        <a
+          class="btn primary"
+          [routerLink]="['/surveys', s.surveyId, 'answer']"
+          [queryParams]="{ employeeId: employeeId }">
+          {{ s.uiStatus === 2 ? 'View' : s.uiStatus === 1 ? 'Continue' : 'Start' }}
+        </a>
+      </footer>
+    </div>
+
+  <ng-template #noActive>
+    <div class="empty">No active surveys.</div>
+  </ng-template>
   </div>
       </div>
     </div>
@@ -94,33 +126,64 @@
       <div class="surveys-grid">
         <div class="grid-container">
 
+    <div class="survey-card" *ngFor="let s of completed">
+      <div class="card-body">
+        <h3 class="card-title" [title]="s.title">{{ s.title }}</h3>
+        <p class="card-desc" [title]="s.description || '—'">
+          {{ s.description || '—' }}
+        </p>
+        <div class="progress-row" aria-label="Progress">
+  <div class="progress-bar" [attr.aria-valuenow]="progress(s)" aria-valuemin="0" aria-valuemax="100" role="progressbar">
+    <div class="progress-fill" [style.width.%]="progress(s)"></div>
+  </div>
+  <span class="progress-text">{{ progress(s) }}%</span>
+</div>
 
-      <article class="survey-card survey-card--row" *ngFor="let s of completedSurveys">
-        <div class="card-body">
-          <h4 class="card-title">{{ s.title }}</h4>
-          <p class="card-desc">{{ s.description }}</p>
+        <div class="meta">
+          <div class="meta-item">
+            <span class="meta-label">Due date</span>
+            <span class="meta-value">{{ s.dueDate | date:'MMM d, y' }}</span>
+          </div>
+        <div class="meta-item">
+    <span class="i-clock"></span>
+    <span class="meta-value">~{{ s.estimatedMinutes }} min</span>
+  </div>
+  </div>
+  <div class="meta">
 
-          <div class="meta">
-            <div class="meta-item">
-              <i class="i i-check"></i>
-              <span class="muted">
-                Completed: {{ s.completedOn | date:'MMM d, y' }}
-              </span>
-            </div>
+          <div class="meta-item">
+            <div class="chip" [ngStyle]="typeChipStyle(s)">
+  {{ s.typeLabel }}
+</div>
 
-            <div class="meta-item">
-              <i class="i i-time"></i>
-              <span class="muted">{{ s.minutes }} minutes</span>
-            </div>
+            <span class="chip" [ngClass]="chipClass(s)">
+              {{ uiText(s) }}
+            </span>
           </div>
         </div>
 
-        <div class="card-actions">
-          <button class="btn btn-soft">FEEDBACK</button>
-          <span class="chip chip-green">COMPLETED</span>
-          <span class="chip chip-purple" *ngIf="s.tag === 'TRAINING'">TRAINING</span>
-        </div>
-      </article>
+
+
+      </div>
+      <!-- sous le titre -->
+
+      <footer class="card-actions">
+        <button type="button" class="btn ghost" >
+         
+        </button>
+
+        <a
+          class="btn primary"
+          [routerLink]="['/surveys', s.surveyId, 'answer']"
+          [queryParams]="{ employeeId: employeeId }">
+          {{ s.uiStatus === 2 ? 'View' : s.uiStatus === 1 ? 'Continue' : 'Start' }}
+        </a>
+      </footer>
+    </div>
+
+  <ng-template #noActive>
+    <div class="empty">No active surveys.</div>
+  </ng-template>
   </div>
 </div>
 </div>
