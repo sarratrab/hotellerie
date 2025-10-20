@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { Router, RouterLink } from "@angular/router";
+import { Router } from '@angular/router';
 interface StatCard {
   label: string;
   value: string;
@@ -14,14 +14,13 @@ interface TodoItem {
   tag: string;
   completed: boolean;
 }
-
 @Component({
-  selector: 'app-home',
-  imports: [RouterLink],
-  templateUrl: './home.component.html',
-  styleUrl: './home.component.css'
+  selector: 'app-dashboard-marketing',
+  imports: [],
+  templateUrl: './dashboard-marketing.component.html',
+  styleUrl: './dashboard-marketing.component.css'
 })
-export class HomeComponent  implements OnInit {
+export class DashboardMarketingComponent implements OnInit {
   currentDate: string;
   userName: string = 'John Doe';
   
